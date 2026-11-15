@@ -3,8 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v2.0 — location drives the wheel; every filter change updates the
- *              wheel immediately; Figma L1/L2 page structure
+ * Version:     v2.1 — result pops up as a modal the moment the wheel lands
  * Description: Page state: filters, place, radius → available dishes → wheel →
  *              spin → three paths. Logic lives in lib/spin.ts.
  *              Client-only (RandomizerClient) so initial state can read storage.
@@ -18,6 +17,7 @@ import type { RadiusKm } from "@/lib/places.ts";
 import { DEFAULT_FILTERS, SpinError, seeded, spin, targetRotation, type Filters, type SpinContext } from "@/lib/spin.ts";
 import { FilterPanel, MY_LOCATION, type Place } from "./FilterPanel";
 import { Paths, PersonaTeaser, TrustCard } from "./Paths";
+import { ResultModal } from "./ResultModal";
 import { Wheel } from "./Wheel";
 
 const KEY = "wti:v2";
@@ -58,6 +58,7 @@ export function Randomizer() {
   const [rotation, setRotation] = useState(0);
   const [spinError, setSpinError] = useState<string | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   const [locating, setLocating] = useState(false);
   const [locateError, setLocateError] = useState<string | null>(null);
   const pathsRef = useRef<HTMLDivElement>(null);
@@ -119,16 +120,28 @@ export function Randomizer() {
 
   function onLanded() {
     setSpun((s) => (s ? { ...s, landed: true } : s));
-    window.setTimeout(() => pathsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 450);
+    window.setTimeout(() => setModalOpen(true), 350); // let the eye see the pointer settle first
+  }
+
+  function pickPlace() {
+    setModalOpen(false);
+    if (window.matchMedia("(min-width: 1024px)").matches) heroRef.current?.scrollIntoView({ behavior: "smooth" });
+    else setSheetOpen(true);
   }
 
   function notTodayWinner() {
     if (!spun) return;
     const nt = { ...notToday, [spun.wheel[spun.winner].slug]: Date.now() + DAY_MS };
+    setModalOpen(false);
     setNotToday(nt);
-    setSpun(null);
     heroRef.current?.scrollIntoView({ behavior: "smooth" });
-    window.setTimeout(() => doSpin(false, nt), 500);
+    window.setTimeout(() => doSpin(false, nt), 400);
+  }
+
+  function spinAgain() {
+    setModalOpen(false);
+    heroRef.current?.scrollIntoView({ behavior: "smooth" });
+    window.setTimeout(() => doSpin(false), 300);
   }
 
   function locate() {
@@ -174,10 +187,6 @@ export function Randomizer() {
       <section className="hero" id="wheel" ref={heroRef}>
         <div className="hero__inner container">
           <div className="hero__stage">
-            <svg className="hero__title" viewBox="0 0 560 300" aria-hidden="true">
-              <path id="title-arc" d="M20 300 C 110 110, 340 20, 620 60" fill="none" />
-              <text><textPath href="#title-arc" startOffset="2%"><tspan className="t-sm">რა ვჭამოთ </tspan><tspan className="t-lg">დღეს?</tspan></textPath></text>
-            </svg>
             <h1 className="sr-only">რა ვჭამოთ დღეს?</h1>
             {wheel.length > 0
               ? <Wheel dishes={wheel} rotation={rotation} spinning={spinning} winnerIndex={winner} onSpin={() => doSpin(false)} onLanded={onLanded} />
@@ -195,8 +204,8 @@ export function Randomizer() {
             )}
             {spinError && <p className="hero__error" role="alert">{spinError}</p>}
             {dish && (
-              <button className="hero__winner" onClick={() => pathsRef.current?.scrollIntoView({ behavior: "smooth" })}>
-                ბორბალმა აირჩია: <strong>{dish.name}</strong> ↓
+              <button className="hero__winner" onClick={() => setModalOpen(true)}>
+                ბორბალმა აირჩია: <strong>{dish.name}</strong> · ნახე
               </button>
             )}
             <div className="hero__actions only-mobile">
@@ -217,17 +226,24 @@ export function Randomizer() {
         </div>
       )}
 
+      {modalOpen && dish && (
+        <ResultModal
+          dish={dish} place={place} radius={radius}
+          onClose={() => setModalOpen(false)} onAgain={spinAgain} onNotToday={notTodayWinner} onPickPlace={pickPlace}
+        />
+      )}
+
       <PersonaTeaser />
       <TrustCard />
 
       <div ref={pathsRef} className="paths-anchor">
         <Paths
           dish={dish} place={place} radius={radius}
-          onPickPlace={() => (window.matchMedia("(min-width: 1024px)").matches ? heroRef.current?.scrollIntoView({ behavior: "smooth" }) : setSheetOpen(true))}
+          onPickPlace={pickPlace}
         />
         {dish && (
           <div className="container again">
-            <button className="pill pill--dark" onClick={() => { heroRef.current?.scrollIntoView({ behavior: "smooth" }); window.setTimeout(() => doSpin(false), 500); }}>კიდევ დაატრიალე</button>
+            <button className="pill pill--dark" onClick={spinAgain}>კიდევ დაატრიალე</button>
             <button className="pill pill--outline" onClick={notTodayWinner}>„{dish.name}“ დღეს არა</button>
           </div>
         )}

@@ -18,7 +18,7 @@ import { priceBand, type Dish } from "@/lib/catalog.ts";
 import { deliveryLinks, mapsDirectionsUrl, mapsSearchUrl, type RadiusKm, type VenueMatch } from "@/lib/places.ts";
 import { MY_LOCATION, type Place } from "./FilterPanel";
 
-type VenueState =
+export type VenueState =
   | { kind: "no-place" }
   | { kind: "loading" }
   | { kind: "ready"; venues: VenueMatch[] }
@@ -28,13 +28,11 @@ type Tab = "read" | "go" | "order";
 
 type Props = { dish: Dish | null; place: Place | null; radius: RadiusKm; onPickPlace: () => void };
 
-const km = (d: number) => (d < 1 ? `${Math.round(d * 1000)} მ` : `${d.toFixed(1)} კმ`);
 
-export function Paths({ dish, place, radius, onPickPlace }: Props) {
-  const [tab, setTab] = useState<Tab>("go");
+/** Nearby venues for a dish (≤6). Network subscription: setState only in callbacks. */
+export function useNearbyVenues(dish: Dish | null, place: Place | null, radius: RadiusKm): VenueState {
   const key = dish && place ? `${dish.slug}|${place.center.lat}|${place.center.lng}|${radius}` : null;
   const [fetched, setFetched] = useState<{ key: string; state: VenueState } | null>(null);
-
   useEffect(() => {
     if (!key || !dish || !place) return;
     const ctrl = new AbortController();
@@ -48,8 +46,14 @@ export function Paths({ dish, place, radius, onPickPlace }: Props) {
       .catch((e: Error) => { if (e.name !== "AbortError") setFetched({ key, state: { kind: "error", message: e.message } }); });
     return () => ctrl.abort();
   }, [key, dish, place, radius]);
+  return !place ? { kind: "no-place" } : fetched?.key === key ? fetched.state : { kind: "loading" };
+}
 
-  const venues: VenueState = !place ? { kind: "no-place" } : fetched?.key === key ? fetched.state : { kind: "loading" };
+export const km = (d: number) => (d < 1 ? `${Math.round(d * 1000)} მ` : `${d.toFixed(1)} კმ`);
+
+export function Paths({ dish, place, radius, onPickPlace }: Props) {
+  const [tab, setTab] = useState<Tab>("go");
+  const venues = useNearbyVenues(dish, place, radius);
   const area = place && place.label !== MY_LOCATION ? place.label : "თბილისი";
   const term = dish?.search ?? "";
   const delivery = deliveryLinks(place?.wolt ?? null);

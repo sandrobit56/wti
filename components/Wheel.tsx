@@ -3,8 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v2.0 — matches Figma "v3/Wheel": thick white rim with yellow/pink
- *              studs, pastel slices, white separators, red hub, map-pin pointer
+ * Version:     v2.1 — curved title lives inside the wheel SVG on an arc concentric
+ *              with the rim, so it can never sit on top of the wheel
  * Description: Presentational wheel. It does NOT choose anything: it gets the
  *              dishes and a target rotation and animates there (Figma motion spec:
  *              3.2s, cubic-bezier(0.1, 0.7, 0.15, 1)). onLanded fires when the
@@ -47,6 +47,13 @@ export function Wheel({ dishes, rotation, spinning, winnerIndex, onSpin, onLande
   return (
     <div className="wheel">
       <svg viewBox="-200 -222 400 422" role="img" aria-label={`ბორბალი: ${dishes.map((d) => d.name).join(", ")}`}>
+        {/* Title on an arc outside the rim (r=218 baseline): reads around the wheel, never across it. */}
+        <path id="wheel-title-arc" d="M -168 -139 A 218 218 0 0 1 168 -139" fill="none" />
+        <text className="wheel__title" aria-hidden="true">
+          <textPath href="#wheel-title-arc" startOffset="50%" textAnchor="middle">
+            <tspan className="wheel__title-sm">რა ვჭამოთ </tspan><tspan className="wheel__title-lg">დღეს?</tspan>
+          </textPath>
+        </text>
         <circle r={RIM} fill="#fff" />
         <g
           className={spinning ? "wheel__disc wheel__disc--spinning" : "wheel__disc"}
