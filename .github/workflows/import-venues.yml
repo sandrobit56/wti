@@ -1,0 +1,37 @@
+# File:        .github/workflows/import-venues.yml
+# Application: რა ვჭამოთ? (WTI)
+# Author:      Sandro Germanishvili
+# Date:        2026-11-15
+# Version:     v1.0
+# Description: Monthly (and on demand) refresh of data/venues.json from Overture
+#              Maps Places. Opens a commit on main only when the data changed.
+name: import-venues
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 2 * *" # 03:17 UTC on the 2nd of each month
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "overturemaps>=0.19"
+      - name: Download Tbilisi places
+        run: overturemaps download --bbox=44.65,41.62,45.05,41.85 -f geojsonseq -t place -o raw-places.jsonl
+      - name: Build data/venues.json
+        run: python scripts/import-venues.py raw-places.jsonl
+      - name: Commit if changed
+        run: |
+          git config user.name "wti-bot"
+          git config user.email "wti-bot@users.noreply.github.com"
+          git add data/venues.json
+          git diff --cached --quiet || git commit -m "data: refresh Tbilisi venues from Overture"
+          git push
