@@ -86,3 +86,16 @@ test("venue matching: name hit first, radius respected", () => {
   assert.deepEqual(m.map((x) => x.id), ["b", "a"]);
   assert.ok(distanceKm(origin, venues[2]) > 2);
 });
+
+test("real-data quirks: Georgian restaurant tagged middle_eastern is not a falafel place; 'Xinklis Saxli' is khinkali", () => {
+  const origin = { lat: 41.7095, lng: 44.756 };
+  const base = { lat: 41.71, lng: 44.756, address: null, website: null, source: "meta", license: "CDLA-Permissive-2.0" };
+  const venues: Venue[] = [
+    { ...base, id: "g", name: "Shemomechama", cats: ["food_and_drink", "georgian_restaurant", "middle_eastern_restaurant", "restaurant"] },
+    { ...base, id: "x", name: "Xinklis Saxli Vake", cats: ["food_and_drink", "restaurant"] },
+  ];
+  const by = (slug: string) => DISHES.find((d) => d.slug === slug)!;
+  assert.deepEqual(matchVenues(venues, by("falafel"), origin, 2).map((v) => v.id), []);
+  assert.deepEqual(matchVenues(venues, by("shawarma"), origin, 2).map((v) => v.id), []);
+  assert.deepEqual(matchVenues(venues, by("khinkali"), origin, 2).map((v) => v.id), ["x", "g"]);
+});

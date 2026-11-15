@@ -3,13 +3,17 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v1.0 — phase 1 catalog: 27 dishes
+ * Version:     v1.1 — venue matching tuned on real Overture data (2,458 venues)
  * Description: The dish catalog the wheel spins over. Plain typed data — the
  *              compiler is the validator (a typo in a tag or category won't build).
  *              `venue` says how to find venues for a dish in Overture data:
  *              `cats` = substrings of Overture taxonomy ids (e.g. "georgian" matches
  *              "georgian_restaurant"), `names` = substrings of the venue name.
  *              Target for launch is 40 dishes (cold-start plan §2).
+ *              Data note: Meta tags most Georgian restaurants ALSO as
+ *              "middle_eastern_restaurant" — never use "middle_eastern" as a cat.
+ *              Many khinkali houses are plain "restaurant", so names carry Latin
+ *              transliterations too ("Xinklis Saxli", "Hinkali Factory").
  */
 
 export type Category = "ცომეული" | "ხორცი" | "ზღვის" | "სალათი" | "სტრიტფუდი" | "დესერტი" | "საუზმე" | "კერძი";
@@ -42,19 +46,19 @@ const D = (d: Dish) => d;
 export const DISHES: Dish[] = [
   D({ slug: "khinkali", name: "ხინკალი", category: "ხორცი", cuisine: "ქართული", price: 1, spicy: 0, vegetarian: false, vegan: false,
       meals: ["სადილი", "ვახშამი", "ღამე"], heaviness: "მძიმე", baseWeight: 3, tags: ["dumpling", "supra"], icon: "khinkali",
-      venue: { cats: ["georgian"], names: ["ხინკ", "khinkal"] }, search: "ხინკალი" }),
+      venue: { cats: ["georgian"], names: ["ხინკ", "hinkal", "xinkl"] }, search: "ხინკალი" }),
   D({ slug: "khachapuri", name: "ხაჭაპური", category: "ცომეული", cuisine: "ქართული", price: 1, spicy: 0, vegetarian: true, vegan: false,
       meals: ["საუზმე", "სადილი", "ვახშამი"], heaviness: "მძიმე", baseWeight: 3, tags: ["bakery", "supra"], icon: "khachapuri",
-      venue: { cats: ["georgian", "bakery"], names: ["ხაჭაპ", "khachap"] }, search: "ხაჭაპური" }),
+      venue: { cats: ["georgian", "bakery"], names: ["ხაჭაპ", "achap"] }, search: "ხაჭაპური" }),
   D({ slug: "lobiani", name: "ლობიანი", category: "ცომეული", cuisine: "ქართული", price: 1, spicy: 0, vegetarian: true, vegan: true,
       meals: ["საუზმე", "სადილი"], heaviness: "ნორმალური", baseWeight: 2, tags: ["bakery", "lenten", "fast"], icon: "lobiani",
       venue: { cats: ["bakery"], names: ["საცხობ", "პურ", "bakery", "lobian"] }, search: "ლობიანი" }),
   D({ slug: "mtsvadi", name: "მწვადი", category: "ხორცი", cuisine: "ქართული", price: 2, spicy: 0, vegetarian: false, vegan: false,
       meals: ["სადილი", "ვახშამი"], heaviness: "მძიმე", baseWeight: 3, tags: ["grill", "supra"], icon: "mtsvadi",
-      venue: { cats: ["barbecue", "grill", "steakhouse", "georgian"], names: ["მწვად", "mtsvad", "grill"] }, search: "მწვადი" }),
+      venue: { cats: ["barbecue", "grill", "steakhouse", "meat_restaurant", "georgian"], names: ["მწვად", "mtsvad", "mcvad", "grill"] }, search: "მწვადი" }),
   D({ slug: "shawarma", name: "შაურმა", category: "სტრიტფუდი", cuisine: "ახლოაღმოსავლური", price: 1, spicy: 1, vegetarian: false, vegan: false,
       meals: ["სადილი", "ვახშამი", "ღამე"], heaviness: "მძიმე", baseWeight: 3, tags: ["fast"], icon: "shawarma",
-      venue: { cats: ["kebab", "shawarma", "doner", "middle_eastern"], names: ["შაურმ", "shaurm", "shawarm", "doner"] }, search: "შაურმა" }),
+      venue: { cats: ["kebab", "shawarma", "doner"], names: ["შაურმ", "shaurm", "shawarm", "doner", "döner"] }, search: "შაურმა" }),
   D({ slug: "pizza", name: "პიცა", category: "სტრიტფუდი", cuisine: "იტალიური", price: 2, spicy: 0, vegetarian: true, vegan: false,
       meals: ["სადილი", "ვახშამი", "ღამე"], heaviness: "მძიმე", baseWeight: 2, tags: ["fast"], icon: "pizza",
       venue: { cats: ["pizza"], names: ["pizza", "პიც"] }, search: "პიცა" }),
@@ -120,7 +124,7 @@ export const DISHES: Dish[] = [
       venue: { cats: ["dessert", "pastry", "patisserie", "cake", "ice_cream", "bakery"], names: ["cake", "dessert", "ნამცხ", "ტკბ"] }, search: "ნამცხვარი" }),
   D({ slug: "falafel", name: "ფალაფელი", category: "სტრიტფუდი", cuisine: "ახლოაღმოსავლური", price: 1, spicy: 0, vegetarian: true, vegan: true,
       meals: ["სადილი", "ვახშამი"], heaviness: "ნორმალური", baseWeight: 1, tags: ["fast", "lenten"], icon: "shawarma",
-      venue: { cats: ["falafel", "middle_eastern", "vegan"], names: ["falafel", "ფალაფ"] }, search: "ფალაფელი" }),
+      venue: { cats: ["falafel", "lebanese", "syrian", "israeli"], names: ["falafel", "ფალაფ", "beirut", "saj"] }, search: "ფალაფელი" }),
 ];
 
 const slugs = new Set(DISHES.map((d) => d.slug));
