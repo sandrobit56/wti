@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v1.0 — weighted wheel + winner, filters, time of day, "not today"
+ * Version:     v2.0 — location: only dishes with a venue in the radius; GEL price bands
  * Description: Pure spin logic. The winner is decided HERE, before any animation;
  *              the wheel only travels to it. Randomness is injected (rng) so tests
  *              are deterministic.
@@ -11,7 +11,7 @@
  *   weight = baseWeight × timeOfDay × tasteChips(×1.5 each) — clamped to 0.1…5
  *   hard filters (budget, diet, "not today") remove a dish entirely.
  */
-import type { Dish, MealTime } from "./catalog.ts";
+import { priceBand, type Dish, type MealTime } from "./catalog.ts";
 
 export type Taste = "spicy" | "light" | "georgian" | "sweet" | "fast";
 export type Diet = "vegetarian" | "vegan";
@@ -28,7 +28,8 @@ export type SpinContext = {
   filters: Filters;
   now: Date;
   excluded: string[];          // slugs hidden for 24h ("დღეს არა")
-  random: boolean;             // "შემთხვევით": ignores filters and weights; "not today" still applies
+  random: boolean;             // "შემთხვევით": ignores filters and weights; location + "not today" still apply
+  available: Set<string> | null; // slugs with ≥1 venue in the chosen radius; null = no place chosen (whole city)
 };
 
 export type Rng = () => number; // [0, 1)
@@ -55,9 +56,10 @@ const TASTE_MATCH: Record<Taste, (d: Dish) => boolean> = {
 /** Hard filters: true = the dish may appear on the wheel. */
 export function isAllowed(d: Dish, ctx: SpinContext): boolean {
   if (ctx.excluded.includes(d.slug)) return false;
+  if (ctx.available && !ctx.available.has(d.slug)) return false;
   if (ctx.random) return true;
   const f = ctx.filters;
-  if (d.price > f.priceMax) return false;
+  if (priceBand(d) > f.priceMax) return false;
   if (f.diet.includes("vegan") && !d.vegan) return false;
   if (f.diet.includes("vegetarian") && !d.vegetarian) return false;
   return true;
@@ -84,7 +86,12 @@ function weightedIndex(weights: number[], rng: Rng): number {
   return weights.length - 1;
 }
 
-export type SpinResult = { wheel: Dish[]; winnerIndex: number };
+export type SpinResult = { wheel: Dish[]; winnerIndex: number; matching: number };
+
+/** How many dishes pass the hard filters — shown under the wheel. */
+export function countMatching(dishes: Dish[], ctx: SpinContext): number {
+  return dishes.filter((d) => isAllowed(d, ctx)).length;
+}
 
 /**
  * Picks up to 8 dishes (weighted, no repeats) and a winner among them (weighted).
@@ -93,6 +100,7 @@ export type SpinResult = { wheel: Dish[]; winnerIndex: number };
  */
 export function spin(dishes: Dish[], ctx: SpinContext, rng: Rng): SpinResult {
   const pool = dishes.filter((d) => isAllowed(d, ctx));
+  const matching = pool.length;
   if (pool.length < MIN_WHEEL) {
     throw new SpinError(`only ${pool.length} dishes match the filters`, pool.length);
   }
@@ -106,7 +114,7 @@ export function spin(dishes: Dish[], ctx: SpinContext, rng: Rng): SpinResult {
     pool.splice(i, 1);
     weights.splice(i, 1);
   }
-  return { wheel, winnerIndex: weightedIndex(wheelWeights, rng) };
+  return { wheel, winnerIndex: weightedIndex(wheelWeights, rng), matching };
 }
 
 export class SpinError extends Error {

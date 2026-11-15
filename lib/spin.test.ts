@@ -8,12 +8,12 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { DISHES } from "./catalog.ts";
-import { DEFAULT_FILTERS, SpinError, mealTimeAt, seeded, spin, targetRotation, weightOf, type SpinContext } from "./spin.ts";
-import { matchVenues, distanceKm, type Venue } from "./places.ts";
+import { DISHES, priceBand } from "./catalog.ts";
+import { DEFAULT_FILTERS, SpinError, countMatching, mealTimeAt, seeded, spin, targetRotation, weightOf, type SpinContext } from "./spin.ts";
+import { matchVenues, distanceKm, countByDish, type Venue } from "./places.ts";
 
 const ctx = (over: Partial<SpinContext> = {}): SpinContext => ({
-  filters: DEFAULT_FILTERS, now: new Date("2026-11-15T13:00:00"), excluded: [], random: false, ...over,
+  filters: DEFAULT_FILTERS, now: new Date("2026-11-15T13:00:00"), excluded: [], random: false, available: null, ...over,
 });
 
 test("wheel has 8 unique dishes and the winner is on it", () => {
@@ -30,13 +30,13 @@ test("hard filters: vegan + ₾ never shows meat or pricey dishes", () => {
   for (let s = 0; s < 100; s++) {
     for (const d of spin(DISHES, c, seeded(s)).wheel) {
       assert.ok(d.vegan, d.slug);
-      assert.ok(d.price <= 1, d.slug);
+      assert.ok(priceBand(d) <= 1, d.slug);
     }
   }
 });
 
 test("too strict filters fail fast instead of spinning a tiny wheel", () => {
-  const c = ctx({ filters: { priceMax: 1, tastes: [], diet: ["vegan"] }, excluded: ["lobiani", "lobio", "pkhali", "falafel"] });
+  const c = ctx({ filters: { priceMax: 1, tastes: [], diet: ["vegan"] }, excluded: ["lobiani", "lobio", "pkhali", "falafel", "hummus"] });
   assert.throws(() => spin(DISHES, c, seeded(1)), SpinError);
 });
 
@@ -98,4 +98,34 @@ test("real-data quirks: Georgian restaurant tagged middle_eastern is not a falaf
   assert.deepEqual(matchVenues(venues, by("falafel"), origin, 2).map((v) => v.id), []);
   assert.deepEqual(matchVenues(venues, by("shawarma"), origin, 2).map((v) => v.id), []);
   assert.deepEqual(matchVenues(venues, by("khinkali"), origin, 2).map((v) => v.id), ["x", "g"]);
+});
+
+test("location: only dishes with a venue in the radius can appear", () => {
+  const available = new Set(["sushi", "ramen", "pizza", "burger"]);
+  for (let s = 0; s < 50; s++) {
+    for (const d of spin(DISHES, ctx({ available }), seeded(s)).wheel) assert.ok(available.has(d.slug), d.slug);
+    for (const d of spin(DISHES, ctx({ available, random: true }), seeded(s)).wheel) assert.ok(available.has(d.slug), d.slug);
+  }
+  assert.equal(countMatching(DISHES, ctx({ available })), 4);
+});
+
+test("budget ₾ removes pricey dishes (sushi, steak) and keeps cheap ones", () => {
+  const c = ctx({ filters: { ...DEFAULT_FILTERS, priceMax: 1 } });
+  const n = countMatching(DISHES, c);
+  assert.ok(n >= 10 && n < DISHES.length - 10, `₾ keeps ${n}`);
+  for (let s = 0; s < 50; s++) for (const d of spin(DISHES, c, seeded(s)).wheel) assert.ok(!["sushi", "steak", "seafood"].includes(d.slug));
+});
+
+test("countByDish counts venues per dish inside the radius only", () => {
+  const base = { address: null, website: null, source: "meta", license: "CDLA-Permissive-2.0" };
+  const venues: Venue[] = [
+    { ...base, id: "1", name: "Sushi Bar", lat: 41.7095, lng: 44.756, cats: ["sushi_restaurant"] },
+    { ...base, id: "2", name: "Far Sushi", lat: 41.80, lng: 44.756, cats: ["sushi_restaurant"] },
+    { ...base, id: "3", name: "Subway Vake", lat: 41.71, lng: 44.757, cats: ["sandwich_shop"] },
+  ];
+  const r = countByDish(venues, DISHES, { lat: 41.7095, lng: 44.756 }, 2);
+  assert.equal(r.venuesInRadius, 2);
+  assert.equal(r.counts["sushi"], 1);
+  assert.equal(r.counts["sandwich"], 1);
+  assert.equal(r.counts["khinkali"], undefined);
 });

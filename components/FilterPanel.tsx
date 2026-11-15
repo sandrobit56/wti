@@ -3,10 +3,11 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v1.0
- * Description: Figma "v3/Filter panel": სად / ბიუჯეტი / გემო / დიეტა.
- *              Budget + diet are hard filters; taste chips only boost (×1.5).
- *              Controlled component — owns no state.
+ * Version:     v2.0 — Figma "v3/Filter panel" layout: place pill + radius in one
+ *              row, budget segmented, taste + diet chips, quiz hint, two CTAs
+ * Description: Controlled component, owns no state. Every change is applied to the
+ *              wheel immediately by the parent; "გაფილტრე" spins with the filters,
+ *              "შემთხვევით" spins ignoring taste/budget/diet (location still applies).
  */
 "use client";
 
@@ -14,7 +15,7 @@ import Image from "next/image";
 import { NEIGHBORHOODS, RADII_KM, type LatLng, type RadiusKm } from "@/lib/places.ts";
 import type { Diet, Filters, Taste } from "@/lib/spin.ts";
 
-export type Place = { label: string; center: LatLng };
+export type Place = { label: string; center: LatLng; wolt: string | null };
 
 const TASTES: { id: Taste; label: string }[] = [
   { id: "spicy", label: "ცხარე" },
@@ -27,6 +28,8 @@ const DIETS: { id: Diet; label: string }[] = [
   { id: "vegetarian", label: "ვეგეტარიანული" },
   { id: "vegan", label: "ვეგანური" },
 ];
+const GEO = "__geo";
+export const MY_LOCATION = "ჩემი ლოკაცია";
 
 type Props = {
   filters: Filters;
@@ -47,6 +50,7 @@ const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x
 
 export function FilterPanel(p: Props) {
   const { filters: f } = p;
+  const value = p.locating ? GEO : p.place?.label ?? "";
   return (
     <section className="panel" aria-label="ფილტრები">
       <div className="panel__head">
@@ -56,37 +60,40 @@ export function FilterPanel(p: Props) {
       </div>
 
       <h3>სად</h3>
-      <div className="row">
-        <select
-          className="pill pill--place"
-          value={p.place?.label ?? ""}
-          onChange={(e) => {
-            const n = NEIGHBORHOODS.find((x) => x.name === e.target.value);
-            p.onPlace(n ? { label: n.name, center: n.center } : null);
-          }}
-        >
-          <option value="">აირჩიე უბანი</option>
-          {p.place?.label === "ჩემი ლოკაცია" && <option value="ჩემი ლოკაცია">ჩემი ლოკაცია</option>}
-          {NEIGHBORHOODS.map((n) => <option key={n.name} value={n.name}>{n.name}</option>)}
-        </select>
-        <button className="pill pill--outline" onClick={p.onLocate} disabled={p.locating}>
-          <Image src="/icons/pin.svg" alt="" width={18} height={18} />
-          {p.locating ? "ვეძებ…" : "ჩემი ლოკაცია"}
-        </button>
+      <div className="panel__where">
+        <label className={p.place ? "place place--on" : "place"}>
+          <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12zm0-9a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" fill="#f1435e" /></svg>
+          <span>{p.locating ? "ვეძებ…" : p.place?.label ?? "თბილისი"}</span>
+          <select
+            aria-label="უბანი"
+            value={value}
+            onChange={(e) => {
+              const v = e.target.value;
+              if (v === GEO) return p.onLocate();
+              const n = NEIGHBORHOODS.find((x) => x.name === v);
+              p.onPlace(n ? { label: n.name, center: n.center, wolt: n.wolt } : null);
+            }}
+          >
+            <option value="">მთელი თბილისი</option>
+            <option value={GEO}>📍 {MY_LOCATION}</option>
+            {p.place?.label === MY_LOCATION && <option value={MY_LOCATION}>{MY_LOCATION}</option>}
+            {NEIGHBORHOODS.map((n) => <option key={n.name} value={n.name}>{n.name}</option>)}
+          </select>
+        </label>
+        <div className="segmented" role="radiogroup" aria-label="რადიუსი" aria-disabled={!p.place}>
+          {RADII_KM.map((r) => (
+            <button key={r} role="radio" aria-checked={p.radius === r} disabled={!p.place} className={p.radius === r ? "on" : ""} onClick={() => p.onRadius(r)}>
+              {r} კმ
+            </button>
+          ))}
+        </div>
       </div>
       {p.locateError && <p className="hint hint--error">{p.locateError}</p>}
-      <div className="segmented" role="radiogroup" aria-label="რადიუსი">
-        {RADII_KM.map((r) => (
-          <button key={r} role="radio" aria-checked={p.radius === r} className={p.radius === r ? "on" : ""} onClick={() => p.onRadius(r)}>
-            {r} კმ
-          </button>
-        ))}
-      </div>
 
-      <h3>ბიუჯეტი</h3>
+      <h3>ბიუჯეტი <span className="h3-note">ერთი პორცია</span></h3>
       <div className="segmented" role="radiogroup" aria-label="ბიუჯეტი">
-        {([1, 2, 3] as const).map((v) => (
-          <button key={v} role="radio" aria-checked={f.priceMax === v} className={f.priceMax === v ? "on" : ""} onClick={() => p.onFilters({ ...f, priceMax: v })}>
+        {([[1, "≤15"], [2, "≤35"], [3, "ნებისმიერი"]] as const).map(([v, note]) => (
+          <button key={v} role="radio" aria-checked={f.priceMax === v} className={f.priceMax === v ? "on" : ""} onClick={() => p.onFilters({ ...f, priceMax: v })} title={`${note} ₾`}>
             {"₾".repeat(v)}
           </button>
         ))}
@@ -108,6 +115,12 @@ export function FilterPanel(p: Props) {
             {d.label}
           </button>
         ))}
+      </div>
+
+      <div className="panel__hint">
+        <Image src="/icons/spark.svg" alt="" width={16} height={16} />
+        <span>ტესტი ფილტრებს თავად შეავსებს</span>
+        <span className="badge">მალე</span>
       </div>
 
       <div className="panel__actions">
