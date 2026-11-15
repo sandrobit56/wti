@@ -2,13 +2,19 @@
 # Application: რა ვჭამოთ? (WTI)
 # Author:      Sandro Germanishvili
 # Date:        2026-11-15
-# Version:     v1.0
-# Description: Monthly (and on demand) refresh of data/venues.json from Overture
-#              Maps Places. Opens a commit on main only when the data changed.
+# Version:     v1.1 — also runs when the importer itself changes
+# Description: Refresh of data/venues.json from Overture Maps Places: monthly,
+#              on demand, and whenever the importer changes. Commits to main only
+#              when the data changed.
 name: import-venues
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/import-venues.py
+      - .github/workflows/import-venues.yml
   schedule:
     - cron: "17 3 2 * *" # 03:17 UTC on the 2nd of each month
 
