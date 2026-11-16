@@ -42,7 +42,9 @@ export async function GET(request: Request) {
     return Response.json({ places }, { headers: { "Cache-Control": "no-store" } });
   } catch (e) {
     if (e instanceof QuotaError) return Response.json({ error: "quota" }, { status: 429 });
-    console.error("[google-places]", e); // visible in Vercel → Logs
-    return Response.json({ error: "google" }, { status: 502 });
+    const detail = e instanceof Error ? e.message : String(e);
+    console.error("[google-places]", detail); // visible in Vercel → Logs
+    // Google's message names the cause (API disabled, key restricted…) and never contains the key
+    return Response.json({ error: "google", detail }, { status: 502 });
   }
 }
