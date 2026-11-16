@@ -53,3 +53,7 @@ python scripts/import-venues.py raw-places.jsonl
 - მიტანის აპების ძიების ბმულების ფორმატი დოკუმენტირებული არ არის — ამჟამად ქალაქის გვერდებზე გადავდივართ.
 - უბნების ცენტრები მიახლოებითია (±500 მ).
 - ფასის ზღვრები (₾ ≤15, ₾₾ 15–35, ₾₾₾ 35+) ვარაუდია და რეალურ მენიუებზე უნდა გადამოწმდეს.
+
+## Dish versions & photos (v4)
+- `lib/variants.ts` — 363 real versions across 63 wheel types (our own descriptions, typical Tbilisi ₾ ranges).
+- Photos: `scripts/fetch-photos.ts` (GitHub Action `fetch-photos`) takes each version's English Wikipedia lead image **only if it is on Wikimedia Commons under CC0 / PD / CC BY / CC BY-SA**, downloads a 640px copy to `public/photos/` and stores author + license in `data/photos.json`. The popup shows that credit under every photo — attribution is the license condition. No photo → icon.

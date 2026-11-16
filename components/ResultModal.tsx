@@ -2,8 +2,9 @@
  * File:        components/ResultModal.tsx
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
- * Date:        2026-11-15
- * Version:     v1.1 — "why this" reasons; "არ მიყვარს" hides a dish until restored
+ * Date:        2026-11-16
+ * Version:     v2.0 — 4–5 real versions of the dish (photo + credit, description,
+ *              price, per-version Maps / delivery search); "სხვა ვერსიები" reshuffles
  * Description: Pops up the moment the wheel lands: the dish, where to taste it
  *              nearby, delivery apps, and the two next actions (spin again /
  *              not today). Closes with ×, Esc, or a click on the backdrop.
@@ -13,8 +14,10 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import photos from "@/data/photos.json";
 import { priceBand, type Dish } from "@/lib/catalog.ts";
+import { TYPE_WIKI, type Variant } from "@/lib/variants.ts";
 import { deliveryLinks, mapsDirectionsUrl, mapsSearchUrl, type RadiusKm } from "@/lib/places.ts";
 import { MY_LOCATION, type Place } from "./FilterPanel";
 import { km, useNearbyVenues } from "./Paths";
@@ -29,9 +32,25 @@ type Props = {
   onNever: () => void;
   onPickPlace: () => void;
   why: string[];
+  pickVersions: (n: number) => Variant[];
 };
 
-export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday, onNever, onPickPlace, why }: Props) {
+type Photo = { src: string; author: string; license: string; licenseUrl: string | null; source: string };
+const PHOTOS = photos as Record<string, Photo>;
+const VERSIONS = 5;
+
+/** Attribution is the license condition for CC BY / BY-SA — always shown next to the photo. */
+function Credit({ p }: { p: Photo }) {
+  return (
+    <a className="credit" href={p.source} target="_blank" rel="noreferrer">
+      ფოტო: {p.author} · {p.license}
+    </a>
+  );
+}
+
+export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday, onNever, onPickPlace, why, pickVersions }: Props) {
+  const [versions, setVersions] = useState(() => pickVersions(VERSIONS));
+  const hero = PHOTOS[TYPE_WIKI[dish.slug]];
   const ref = useRef<HTMLDialogElement>(null);
   const venues = useNearbyVenues(dish, place, radius);
   const area = place && place.label !== MY_LOCATION ? place.label : "თბილისი";
@@ -53,8 +72,17 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
       <div className="modal__card">
         <button className="modal__close" onClick={onClose} aria-label="დახურვა" autoFocus>×</button>
 
-        <header className="modal__hero">
-          <Image src={`/icons/${dish.icon}.svg`} alt="" width={88} height={88} />
+        <header className={hero ? "modal__hero modal__hero--photo" : "modal__hero"}>
+          {hero ? (
+            <figure className="modal__photo">
+              {/* plain <img>: local, already 640px; next/image would re-encode for no gain */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={hero.src} alt={dish.name} loading="eager" />
+              <figcaption><Credit p={hero} /></figcaption>
+            </figure>
+          ) : (
+            <Image src={`/icons/${dish.icon}.svg`} alt="" width={88} height={88} />
+          )}
           <p className="caps">დღეს ჭამ</p>
           <h2 id="modal-title" className="modal__name">{dish.name}</h2>
           <p className="modal__meta">
@@ -67,6 +95,39 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
             </ul>
           )}
         </header>
+
+        <section className="modal__section">
+          <h3>
+            <span className="dot dot--pink" />ვერსიები
+            {versions.length > 1 && (
+              <button className="link modal__reshuffle" onClick={() => setVersions(pickVersions(VERSIONS))}>სხვა ვერსიები ↻</button>
+            )}
+          </h3>
+          <ul className="versions">
+            {versions.map((v) => {
+              const p = v.wiki ? PHOTOS[v.wiki] : undefined;
+              return (
+                <li key={v.slug} className="version">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {p ? <img className="version__img" src={p.src} alt="" loading="lazy" /> : <span className="version__icon"><Image src={`/icons/${dish.icon}.svg`} alt="" width={40} height={40} /></span>}
+                  <div className="version__body">
+                    <strong>{v.name}</strong>
+                    <span className="version__desc">{v.desc}</span>
+                    <span className="version__meta">
+                      ≈ {v.priceGel[0]}–{v.priceGel[1]} ₾
+                      {v.spicy === 2 ? " · 🌶🌶" : v.spicy ? " · 🌶" : ""}
+                      {v.vegan ? " · ვეგანური" : v.vegetarian ? " · ვეგეტარიანული" : ""}
+                      {v.healthy ? " · ჯანსაღი" : ""}
+                    </span>
+                    {p && <Credit p={p} />}
+                  </div>
+                  <a className="version__go" href={mapsSearchUrl(`${v.name} ${area}`)} target="_blank" rel="noreferrer" aria-label={`${v.name} Google Maps-ზე`}>↗</a>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="modal__hint">ფასი — ტიპური დიაპაზონი თბილისში, ერთ პორციაზე.</p>
+        </section>
 
         <section className="modal__section">
           <h3><span className="dot dot--green" />გასინჯე ახლოს{place ? <span className="modal__where"> · {area}, {radius} კმ</span> : null}</h3>
@@ -106,7 +167,7 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
               </a>
             ))}
           </div>
-          <p className="modal__hint">აპში მოძებნე: „{dish.search}“</p>
+          <p className="modal__hint">აპში მოძებნე: „{versions[0]?.name ?? dish.search}“</p>
         </section>
 
         <footer className="modal__actions">

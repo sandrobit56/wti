@@ -9,9 +9,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { DISHES, priceBand } from "./catalog.ts";
+import { VARIANTS } from "./variants.ts";
 import { PERSONAS } from "./personas.ts";
 import { applyQuiz, scoreQuiz, PERSONA_IDS } from "./quiz.ts";
-import { CATEGORY_CAP, CUISINE_CAP, DEFAULT_FILTERS, NO_PREFS, SpinError, countMatching, explain, mealTimeAt, seeded, spin, targetRotation, weightOf, type SpinContext } from "./spin.ts";
+import { CATEGORY_CAP, CUISINE_CAP, DEFAULT_FILTERS, NO_PREFS, SpinError, countMatching, explain, pickVariants, mealTimeAt, seeded, spin, targetRotation, weightOf, type SpinContext } from "./spin.ts";
 import { matchVenues, distanceKm, countByDish, type Venue } from "./places.ts";
 
 const ctx = (over: Partial<SpinContext> = {}): SpinContext => ({
@@ -31,14 +32,15 @@ test("hard filters: vegan + ₾ never shows meat or pricey dishes", () => {
   const c = ctx({ filters: { priceMax: 1, tastes: [], diet: ["vegan"] } });
   for (let s = 0; s < 100; s++) {
     for (const d of spin(DISHES, c, seeded(s)).wheel) {
-      assert.ok(d.vegan, d.slug);
-      assert.ok(priceBand(d) <= 1, d.slug);
+      const vs = pickVariants(d, c, seeded(s));
+      assert.ok(vs.length > 0, d.slug);
+      for (const v of vs) { assert.ok(v.vegan, v.slug); assert.ok(priceBand(v) <= 1, v.slug); }
     }
   }
 });
 
 test("too strict filters fail fast instead of spinning a tiny wheel", () => {
-  const c = ctx({ filters: { priceMax: 1, tastes: [], diet: ["vegan"] }, excluded: ["lobiani", "lobio", "pkhali", "falafel", "hummus"] });
+  const c = ctx({ filters: { priceMax: 1, tastes: [], diet: ["vegan"] }, available: new Set(["steak", "sushi", "khinkali"]) });
   assert.throws(() => spin(DISHES, c, seeded(1)), SpinError);
 });
 
@@ -111,11 +113,17 @@ test("location: only dishes with a venue in the radius can appear", () => {
   assert.equal(countMatching(DISHES, ctx({ available })), 4);
 });
 
-test("budget ₾ removes pricey dishes (sushi, steak) and keeps cheap ones", () => {
+test("budget ₾: types with no cheap version disappear; kept types show only cheap versions", () => {
   const c = ctx({ filters: { ...DEFAULT_FILTERS, priceMax: 1 } });
   const n = countMatching(DISHES, c);
-  assert.ok(n >= 10 && n < DISHES.length - 10, `₾ keeps ${n}`);
-  for (let s = 0; s < 50; s++) for (const d of spin(DISHES, c, seeded(s)).wheel) assert.ok(!["sushi", "steak", "seafood"].includes(d.slug));
+  assert.ok(n >= 10 && n < DISHES.length - 5, `₾ keeps ${n}`);
+  for (let s = 0; s < 50; s++) {
+    const r = spin(DISHES, c, seeded(s));
+    for (const d of r.wheel) {
+      assert.ok(!["steak", "seafood", "risotto"].includes(d.slug), d.slug);
+      for (const v of pickVariants(d, c, seeded(s))) assert.ok(priceBand(v) === 1, v.slug);
+    }
+  }
 });
 
 test("countByDish counts venues per dish inside the radius only", () => {
@@ -217,4 +225,33 @@ test("explain gives personal reasons first and ≤3 of them", () => {
   assert.equal(why[0], "შენი პერსონის კერძია — სუშის დიპლომატი");
   assert.ok(why.length <= 3);
   assert.deepEqual(explain(sushi, ctx({ random: true }), null), ["სრულიად შემთხვევით"]);
+});
+
+test("variants: every type has 1–20, vegan khinkali exists, popup gets ≤5 unique matching versions", () => {
+  for (const d of DISHES) {
+    const n = VARIANTS.filter((v) => v.type === d.slug).length;
+    assert.ok(n >= 1 && n <= 20, `${d.slug}: ${n}`);
+  }
+  const khinkali = DISHES.find((d) => d.slug === "khinkali")!;
+  const vegan = ctx({ filters: { ...DEFAULT_FILTERS, diet: ["vegan"] } });
+  assert.ok(countMatching([khinkali], vegan) === 1, "khinkali stays on a vegan wheel via mushroom/potato");
+  const vs = pickVariants(khinkali, vegan, seeded(1));
+  assert.ok(vs.length >= 2 && vs.every((v) => v.vegan));
+  const pizza = DISHES.find((d) => d.slug === "pizza")!;
+  const five = pickVariants(pizza, ctx(), seeded(2));
+  assert.equal(five.length, 5);
+  assert.equal(new Set(five.map((v) => v.slug)).size, 5);
+  const steak = DISHES.find((d) => d.slug === "steak")!;
+  assert.equal(pickVariants(steak, ctx(), seeded(3)).length, 5, "6 versions → 5 shown, not 3");
+});
+
+test("healthy chip pulls healthy variants forward", () => {
+  const sushi = DISHES.find((d) => d.slug === "sushi")!;
+  const c = ctx({ filters: { ...DEFAULT_FILTERS, tastes: ["healthy"] } });
+  let healthy = 0, plain = 0;
+  for (let s = 0; s < 300; s++) {
+    healthy += pickVariants(sushi, c, seeded(s), 1)[0].healthy ? 1 : 0;
+    plain += pickVariants(sushi, ctx(), seeded(s), 1)[0].healthy ? 1 : 0;
+  }
+  assert.ok(healthy > plain * 1.2, `${healthy} vs ${plain}`);
 });

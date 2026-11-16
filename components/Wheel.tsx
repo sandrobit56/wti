@@ -2,9 +2,9 @@
  * File:        components/Wheel.tsx
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
- * Date:        2026-11-15
- * Version:     v2.1 — curved title lives inside the wheel SVG on an arc concentric
- *              with the rim, so it can never sit on top of the wheel
+ * Date:        2026-11-16
+ * Version:     v2.2 — long names → bigger icon only (name lives in the popup and
+ *              aria-label); curved title stays on its own arc above the rim
  * Description: Presentational wheel. It does NOT choose anything: it gets the
  *              dishes and a target rotation and animates there (Figma motion spec:
  *              3.2s, cubic-bezier(0.1, 0.7, 0.15, 1)). onLanded fires when the
@@ -27,10 +27,8 @@ function slicePath(i: number, n: number): string {
   return `M0 0 L${R * Math.cos(a0)} ${R * Math.sin(a0)} A${R} ${R} 0 ${large} 1 ${R * Math.cos(a1)} ${R * Math.sin(a1)} Z`;
 }
 
-const short = (name: string) => {
-  const first = name.length > 9 ? name.split(/[\s/]/)[0] : name;
-  return first.length > 9 ? `${first.slice(0, 8)}…` : first;
-};
+/** Names longer than this are not printed on the wheel — the icon carries the slice. */
+export const LABEL_MAX = 8;
 
 type Props = {
   dishes: Dish[];
@@ -68,8 +66,14 @@ export function Wheel({ dishes, rotation, spinning, winnerIndex, onSpin, onLande
                 <path d={slicePath(i, n)} fill={SLICE_COLORS[i % SLICE_COLORS.length]} stroke="#fff" strokeWidth={6} strokeLinejoin="round" />
                 <g transform={`rotate(${mid})`}>
                   <g transform={isBottom(mid + rotation) ? `rotate(180 0 ${-R + 50})` : undefined}>
-                    <image href={`/icons/${d.icon}.svg`} x={-23} y={-R + 14} width={46} height={46} />
-                    <text y={-R + 80} textAnchor="middle" className={won ? "wheel__label wheel__label--won" : "wheel__label"}>{short(d.name)}</text>
+                    {d.name.length <= LABEL_MAX ? (
+                      <>
+                        <image href={`/icons/${d.icon}.svg`} x={-23} y={-R + 14} width={46} height={46} />
+                        <text y={-R + 80} textAnchor="middle" className={won ? "wheel__label wheel__label--won" : "wheel__label"}>{d.name}</text>
+                      </>
+                    ) : (
+                      <image href={`/icons/${d.icon}.svg`} x={-31} y={-R + 20} width={62} height={62} />
+                    )}
                   </g>
                 </g>
               </g>

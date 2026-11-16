@@ -16,7 +16,7 @@ import { DISHES, type Dish } from "@/lib/catalog.ts";
 import type { RadiusKm } from "@/lib/places.ts";
 import { PERSONAS } from "@/lib/personas.ts";
 import { applyQuiz, scoreQuiz } from "@/lib/quiz.ts";
-import { DEFAULT_FILTERS, NO_PREFS, SpinError, explain, seeded, spin, targetRotation, type Filters, type Mood, type Prefs, type SpinContext, type Win } from "@/lib/spin.ts";
+import { DEFAULT_FILTERS, NO_PREFS, SpinError, explain, pickVariants, seeded, spin, targetRotation, type Filters, type Mood, type Prefs, type SpinContext, type Win } from "@/lib/spin.ts";
 import { FilterPanel, MY_LOCATION, type Place } from "./FilterPanel";
 import { Paths, PersonaTeaser, TrustCard } from "./Paths";
 import { Quiz } from "./Quiz";
@@ -34,7 +34,7 @@ const MOODS: { id: Mood; label: string }[] = [
   { id: "new", label: "ახალი რამე" },
 ];
 type Counts = { key: string; counts: Record<string, number>; venuesInRadius: number } | { key: string; error: string };
-type Spun = { wheel: Dish[]; winner: number; landed: boolean; why: string[] };
+type Spun = { wheel: Dish[]; winner: number; landed: boolean; why: string[]; ctx: SpinContext };
 
 function load(): Stored | null {
   try {
@@ -139,7 +139,7 @@ export function Randomizer() {
       const why = [...explain(dishWon, c, persona?.name ?? null), ...(near ? [`${near} ადგილი ${radius} კმ-ში`] : [])].slice(0, 3);
       setSpinError(null);
       setSheetOpen(false);
-      setSpun({ wheel: r.wheel, winner: r.winnerIndex, landed: false, why });
+      setSpun({ wheel: r.wheel, winner: r.winnerIndex, landed: false, why, ctx: c });
       setRotation((cur) => targetRotation(cur, r.winnerIndex, r.wheel.length));
     } catch (e) {
       if (!(e instanceof SpinError)) throw e;
@@ -304,6 +304,7 @@ export function Randomizer() {
         <ResultModal
           dish={dish} place={place} radius={radius}
           why={spun?.why ?? []}
+          pickVersions={(n) => (spun ? pickVariants(dish, spun.ctx, Math.random, n) : [])}
           onClose={() => setModalOpen(false)} onAgain={spinAgain} onNotToday={notTodayWinner} onNever={neverWinner} onPickPlace={pickPlace}
         />
       )}

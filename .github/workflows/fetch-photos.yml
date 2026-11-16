@@ -1,0 +1,44 @@
+# File:        .github/workflows/fetch-photos.yml
+# Application: რა ვჭამოთ? (WTI)
+# Author:      Sandro Germanishvili
+# Date:        2026-11-16
+# Version:     v1.0
+# Description: Downloads openly-licensed dish photos from Wikimedia Commons
+#              (scripts/fetch-photos.ts) whenever the variant list or the script
+#              changes, or on demand. Commits only when photos changed.
+name: fetch-photos
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - lib/variants.ts
+      - scripts/fetch-photos.ts
+      - .github/workflows/fetch-photos.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch-photos
+  cancel-in-progress: false
+
+jobs:
+  photos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Fetch photos
+        run: node scripts/fetch-photos.ts
+      - name: Commit if changed
+        run: |
+          git config user.name "wti-bot"
+          git config user.email "wti-bot@users.noreply.github.com"
+          git add public/photos data/photos.json
+          git diff --cached --quiet || git commit -m "data: refresh dish photos from Wikimedia Commons"
+          git pull --rebase origin main
+          git push
