@@ -41,12 +41,21 @@ type Photo = { src: string; author: string; license: string; licenseUrl: string 
 const PHOTOS = photos as Record<string, Photo>;
 const VERSIONS = 5;
 
-/** Attribution is the license condition for CC BY / BY-SA — always shown next to the photo. */
+/**
+ * Photo credit. CC BY / BY-SA require attribution, so it must stay reachable —
+ * but as a small ⓘ next to the photo, opened on tap, not as a line of text.
+ */
 function Credit({ p }: { p: Photo }) {
+  const [open, setOpen] = useState(false);
   return (
-    <a className="credit" href={p.source} target="_blank" rel="noreferrer">
-      ფოტო: {p.author} · {p.license}
-    </a>
+    <span className="credit-wrap">
+      <button type="button" className="credit-btn" aria-expanded={open} aria-label="ფოტოს ავტორი და ლიცენზია" onClick={() => setOpen((o) => !o)}>i</button>
+      {open && (
+        <a className="credit-pop" href={p.source} target="_blank" rel="noreferrer">
+          ფოტო: {p.author} · {p.license} ↗
+        </a>
+      )}
+    </span>
   );
 }
 
@@ -113,6 +122,7 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
                 <li key={v.slug} className="version">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   {p ? <img className="version__img" src={p.src} alt="" loading="lazy" /> : <span className="version__icon"><Image src={`/icons/${dish.icon}.svg`} alt="" width={40} height={40} /></span>}
+                  {p && <Credit p={p} />}
                   <div className="version__body">
                     <strong>{v.name}</strong>
                     <span className="version__desc">{v.desc}</span>
@@ -122,7 +132,6 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
                       {v.vegan ? " · ვეგანური" : v.vegetarian ? " · ვეგეტარიანული" : ""}
                       {v.healthy ? " · ჯანსაღი" : ""}
                     </span>
-                    {p && <Credit p={p} />}
                   </div>
                   <a className="version__go" href={mapsSearchUrl(v.name, nearArea)} target="_blank" rel="noreferrer" aria-label={`${v.name} Google Maps-ზე`}>↗</a>
                 </li>
