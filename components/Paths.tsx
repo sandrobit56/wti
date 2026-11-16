@@ -56,6 +56,7 @@ export function Paths({ dish, place, radius, onPickPlace }: Props) {
   const [tab, setTab] = useState<Tab>("go");
   const venues = useNearbyVenues(dish, place, radius);
   const area = place && place.label !== MY_LOCATION ? place.label : "თბილისი";
+  const nearArea = place && place.label !== MY_LOCATION ? place.label : null;
   const term = dish?.search ?? "";
   const delivery = deliveryLinks(place?.wolt ?? null);
 
@@ -131,7 +132,7 @@ export function Paths({ dish, place, radius, onPickPlace }: Props) {
                 </a>
               ))}
             </div>
-            <a className={dish ? "pill pill--dark pill--block" : "pill pill--dark pill--block is-disabled"} href={dish ? mapsSearchUrl(`${term} ${area}`) : undefined} target="_blank" rel="noreferrer" aria-disabled={!dish}>
+            <a className={dish ? "pill pill--dark pill--block" : "pill pill--dark pill--block is-disabled"} href={dish ? mapsSearchUrl(term, nearArea) : undefined} target="_blank" rel="noreferrer" aria-disabled={!dish}>
               ყველა Google Maps-ზე
             </a>
           </article>

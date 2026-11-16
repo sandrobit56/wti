@@ -13,7 +13,7 @@ import { VARIANTS } from "./variants.ts";
 import { PERSONAS } from "./personas.ts";
 import { applyQuiz, scoreQuiz, PERSONA_IDS } from "./quiz.ts";
 import { CATEGORY_CAP, CUISINE_CAP, DEFAULT_FILTERS, NO_PREFS, SpinError, countMatching, explain, pickVariants, mealTimeAt, seeded, spin, targetRotation, weightOf, type SpinContext } from "./spin.ts";
-import { matchVenues, distanceKm, countByDish, type Venue } from "./places.ts";
+import { matchVenues, distanceKm, countByDish, mapsSearchUrl, type Venue } from "./places.ts";
 
 const ctx = (over: Partial<SpinContext> = {}): SpinContext => ({
   filters: DEFAULT_FILTERS, now: new Date("2026-11-15T13:00:00"), excluded: [], random: false, available: null, prefs: NO_PREFS, mood: null, history: [], ...over,
@@ -254,4 +254,11 @@ test("healthy chip pulls healthy variants forward", () => {
     plain += pickVariants(sushi, ctx(), seeded(s), 1)[0].healthy ? 1 : 0;
   }
   assert.ok(healthy > plain * 1.2, `${healthy} vs ${plain}`);
+});
+
+test("every Google Maps search is pinned to Tbilisi, Georgia (no London results)", () => {
+  const q = (u: string) => decodeURIComponent(new URL(u).searchParams.get("query")!);
+  assert.equal(q(mapsSearchUrl("ფიშ ენდ ჩიფსი")), "ფიშ ენდ ჩიფსი, Tbilisi, Georgia");
+  assert.equal(q(mapsSearchUrl("ხინკალი", "ვაკე")), "ხინკალი, ვაკე, Tbilisi, Georgia");
+  assert.throws(() => mapsSearchUrl("  "));
 });

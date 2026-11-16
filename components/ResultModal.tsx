@@ -54,6 +54,7 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
   const ref = useRef<HTMLDialogElement>(null);
   const venues = useNearbyVenues(dish, place, radius);
   const area = place && place.label !== MY_LOCATION ? place.label : "თბილისი";
+  const nearArea = place && place.label !== MY_LOCATION ? place.label : null;
   const delivery = deliveryLinks(place?.wolt ?? null);
 
   useEffect(() => {
@@ -121,7 +122,7 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
                     </span>
                     {p && <Credit p={p} />}
                   </div>
-                  <a className="version__go" href={mapsSearchUrl(`${v.name} ${area}`)} target="_blank" rel="noreferrer" aria-label={`${v.name} Google Maps-ზე`}>↗</a>
+                  <a className="version__go" href={mapsSearchUrl(v.name, nearArea)} target="_blank" rel="noreferrer" aria-label={`${v.name} Google Maps-ზე`}>↗</a>
                 </li>
               );
             })}
@@ -151,7 +152,7 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
               <span className="row-card__side">{km(v.distanceKm)} ↗</span>
             </a>
           ))}
-          <a className="modal__maps" href={mapsSearchUrl(`${dish.search} ${area}`)} target="_blank" rel="noreferrer">
+          <a className="modal__maps" href={mapsSearchUrl(dish.search, nearArea)} target="_blank" rel="noreferrer">
             ყველა „{dish.name}“ Google Maps-ზე ↗
           </a>
         </section>

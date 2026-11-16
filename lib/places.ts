@@ -99,12 +99,21 @@ export function matchVenues(venues: Venue[], dish: Dish, origin: LatLng, radiusK
 }
 
 /** Google Maps URL (documented "Maps URLs", api=1, no key). */
-export function mapsSearchUrl(query: string): string {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+/**
+ * Google Maps search, always pinned to Tbilisi, Georgia. The Maps URLs API has no
+ * location-bias parameter, so the city + country go into the query itself —
+ * without them "ფიშ ენდ ჩიფსი ვაკე" was resolved to London and other countries.
+ * `area` = neighborhood label (e.g. "ვაკე"); null = whole city.
+ */
+export const MAPS_CITY = "Tbilisi, Georgia";
+export function mapsSearchUrl(term: string, area: string | null = null): string {
+  if (!term.trim()) throw new Error("mapsSearchUrl: empty search term");
+  const q = [term.trim(), area, MAPS_CITY].filter(Boolean).join(", ");
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
 }
 
 export function mapsVenueUrl(v: Venue): string {
-  return mapsSearchUrl(`${v.name}, ${v.address ?? "თბილისი"}`);
+  return mapsSearchUrl(v.name, v.address ?? null);
 }
 
 export function mapsDirectionsUrl(v: Venue): string {
