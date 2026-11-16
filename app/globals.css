@@ -244,3 +244,28 @@ a.row-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
   .modal__delivery { grid-template-columns: 1fr; }
   .modal__actions { bottom: -18px; }
 }
+
+/* ── Persona quiz ───────────────────────────────────── */
+.quiz .modal__card { gap: 16px; min-height: min(620px, calc(100dvh - 24px)); }
+.quiz__top { display: flex; justify-content: space-between; align-items: center; padding-right: 48px; }
+.quiz__top .link:disabled { visibility: hidden; }
+.quiz__bar { height: 8px; border-radius: 99px; background: var(--bg); overflow: hidden; }
+.quiz__bar span { display: block; height: 100%; background: var(--brand); border-radius: 99px; transition: width 0.3s ease; }
+.quiz__q { font-size: clamp(30px, 7vw, 40px); font-weight: 900; font-stretch: 62.5%; line-height: 1.08; margin: 8px 0 4px; animation: rise 0.3s ease-out; }
+.quiz__answers { display: flex; flex-direction: column; gap: 10px; }
+.quiz__a { display: flex; align-items: center; gap: 14px; text-align: left; min-height: 64px; padding: 12px 16px; border-radius: 20px; border: 2px solid var(--line); background: var(--surface); font-size: 16px; font-weight: 700; cursor: pointer; transition: border-color 0.15s, background 0.15s, transform 0.1s; }
+.quiz__a:hover { border-color: var(--text); background: var(--cream); }
+.quiz__a:active { transform: scale(0.98); }
+.quiz__letter { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: var(--pink-soft); color: var(--brand); font-weight: 900; }
+.quiz__result { display: flex; flex-direction: column; gap: 18px; }
+.quiz__hero { background: var(--lavender); }
+.quiz__hero .modal__name { color: var(--text); }
+.quiz__line { font-size: 16px; font-weight: 600; max-width: 380px; }
+.quiz__changes { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; }
+.quiz__changes li { background: var(--cream); border-radius: 99px; padding: 6px 12px; font-size: 14px; font-weight: 700; }
+.chip--static { cursor: default; display: inline-flex; align-items: center; }
+button.panel__hint { border: 0; width: 100%; text-align: left; cursor: pointer; }
+button.panel__hint:hover { background: #ffeec4; }
+.panel__hint-arrow { margin-left: auto; font-weight: 800; }
+.persona .caps { color: rgba(18, 18, 18, 0.6); margin-bottom: 4px; }
+.modal__actions .pill { white-space: normal; line-height: 1.15; text-align: center; }

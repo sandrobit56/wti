@@ -44,6 +44,8 @@ type Props = {
   onApply: () => void;
   onRandom: () => void;
   onClose?: () => void;
+  personaName: string | null;
+  onQuiz: () => void;
 };
 
 const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
@@ -117,11 +119,11 @@ export function FilterPanel(p: Props) {
         ))}
       </div>
 
-      <div className="panel__hint">
+      <button className="panel__hint" onClick={p.onQuiz}>
         <Image src="/icons/spark.svg" alt="" width={16} height={16} />
-        <span>ტესტი ფილტრებს თავად შეავსებს</span>
-        <span className="badge">მალე</span>
-      </div>
+        <span>{p.personaName ? <>პერსონა: <strong>{p.personaName}</strong> · ტესტი თავიდან</> : "ტესტი ფილტრებს თავად შეავსებს"}</span>
+        <span aria-hidden="true" className="panel__hint-arrow">→</span>
+      </button>
 
       <div className="panel__actions">
         <button className="pill pill--dark" onClick={p.onApply}>გაფილტრე</button>

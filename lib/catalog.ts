@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v2.0 — 56 dishes; price ranges in GEL; categories taken from the
+ * Version:     v2.1 — 58 dishes (mushroom + cheese khinkali); price ranges in GEL; categories taken from the
  *              real Tbilisi Overture import (2,458 venues)
  * Description: The dish catalog. Plain typed data — the compiler validates it.
  *   venue.cats  substrings of Overture taxonomy ids present in data/venues.json
@@ -65,6 +65,8 @@ const D = (d: In): Dish => ({
 export const DISHES: Dish[] = [
   // ── ქართული ───────────────────────────────────────────────
   D({ slug: "khinkali", name: "ხინკალი", category: "ხორცი", cuisine: "ქართული", priceGel: [8, 18], meals: LATE, heaviness: "მძიმე", baseWeight: 3, tags: ["dumpling", "supra"], icon: "khinkali", venue: { cats: GEO, names: ["ხინკ", "hinkal", "xinkl"] }, search: "ხინკალი" }),
+  D({ slug: "khinkali-mushroom", name: "სოკოს ხინკალი", category: "კერძი", cuisine: "ქართული", priceGel: [8, 16], vegetarian: true, vegan: true, meals: LATE, tags: ["dumpling", "lenten"], icon: "khinkali", venue: { cats: GEO, names: ["ხინკ", "hinkal", "xinkl"] }, search: "სოკოს ხინკალი" }),
+  D({ slug: "khinkali-cheese", name: "ყველის ხინკალი", category: "კერძი", cuisine: "ქართული", priceGel: [8, 16], vegetarian: true, meals: LATE, heaviness: "მძიმე", tags: ["dumpling"], icon: "khinkali", venue: { cats: GEO, names: ["ხინკ", "hinkal", "xinkl"] }, search: "ყველის ხინკალი" }),
   D({ slug: "khachapuri-imeruli", name: "იმერული ხაჭაპური", category: "ცომეული", cuisine: "ქართული", priceGel: [12, 22], vegetarian: true, meals: ["საუზმე", "სადილი", "ვახშამი"], heaviness: "მძიმე", baseWeight: 3, tags: ["bakery", "supra"], icon: "khachapuri", venue: { cats: [...GEO, "bakery"], names: ["ხაჭაპ", "achap"] }, search: "იმერული ხაჭაპური" }),
   D({ slug: "khachapuri-adjaruli", name: "აჭარული ხაჭაპური", category: "ცომეული", cuisine: "ქართული", priceGel: [15, 30], vegetarian: true, heaviness: "მძიმე", baseWeight: 3, tags: ["regional"], icon: "khachapuri", venue: { cats: GEO, names: ["აჭარ", "adjar", "achar", "ხაჭაპ", "achap"] }, search: "აჭარული ხაჭაპური" }),
   D({ slug: "khachapuri-megruli", name: "მეგრული ხაჭაპური", category: "ცომეული", cuisine: "ქართული", priceGel: [15, 28], vegetarian: true, heaviness: "მძიმე", baseWeight: 2, tags: ["regional", "supra"], icon: "khachapuri", venue: { cats: GEO, names: ["მეგრ", "megrel", "ხაჭაპ", "achap"] }, search: "მეგრული ხაჭაპური" }),

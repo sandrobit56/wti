@@ -15,6 +15,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { priceBand, type Dish } from "@/lib/catalog.ts";
+import type { Persona } from "@/lib/personas.ts";
 import { deliveryLinks, mapsDirectionsUrl, mapsSearchUrl, type RadiusKm, type VenueMatch } from "@/lib/places.ts";
 import { MY_LOCATION, type Place } from "./FilterPanel";
 
@@ -159,31 +160,45 @@ export function Paths({ dish, place, radius, onPickPlace }: Props) {
   );
 }
 
-export function PersonaTeaser() {
+export function PersonaTeaser({ persona, onStart }: { persona: Persona | null; onStart: () => void }) {
   return (
     <section className="container" id="persona">
       <div className="persona">
         <div className="persona__copy">
-          <Image className="only-mobile" src="/icons/mascot.svg" alt="" width={64} height={66} />
-          <h2>გაიგე შენი პერსონა</h2>
-          <p>7 კითხვა, ერთი წუთი. პასუხების მიხედვით ბორბალი თავად დააყენებს ფილტრებს — ბიუჯეტს, გემოს, მანძილს. რეგისტრაცია არ სჭირდება.</p>
-          <div className="row">
-            <button className="pill pill--dark" disabled>ტესტის დაწყება · მალე</button>
-            <span className="pill pill--white only-desktop">12 პერსონა</span>
-          </div>
+          <Image className="only-mobile" src={`/icons/${persona?.icon ?? "mascot"}.svg`} alt="" width={64} height={66} />
+          {persona ? (
+            <>
+              <p className="caps">შენი პერსონა</p>
+              <h2>{persona.name}</h2>
+              <p>{persona.line} ბორბალი შენს გემოზეა აწყობილი — მისი კერძები უფრო ხშირად ამოდის.</p>
+              <div className="row">
+                <button className="pill pill--dark" onClick={onStart}>ტესტი თავიდან</button>
+                <a className="pill pill--white" href="#wheel">დაატრიალე</a>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2>გაიგე შენი პერსონა</h2>
+              <p>7 კითხვა, ერთი წუთი. პასუხების მიხედვით ბორბალი თავად დააყენებს ფილტრებს — ბიუჯეტს, გემოს, დიეტას. რეგისტრაცია არ სჭირდება.</p>
+              <div className="row">
+                <button className="pill pill--dark" onClick={onStart}>ტესტის დაწყება</button>
+                <span className="pill pill--white only-desktop">12 პერსონა</span>
+              </div>
+            </>
+          )}
         </div>
         <div className="persona__art only-desktop" aria-hidden="true">
           <div className="qcard">
-            <p className="caps">კითხვა 3 / 7</p>
-            <p className="qcard__q">რამდენად მშიერი ხარ?</p>
-            <span className="qcard__a">ცოტა</span>
-            <span className="qcard__a qcard__a--on">მგელივით</span>
+            <p className="caps">კითხვა 4 / 7</p>
+            <p className="qcard__q">აჯიკა მაგიდაზეა. შენ?</p>
+            <span className="qcard__a">ცოტას, გემოსთვის</span>
+            <span className="qcard__a qcard__a--on">ყველაფერს ვუსვამ</span>
           </div>
           <div className="pcard">
-            <Image src="/icons/mascot.svg" alt="" width={56} height={58} />
+            <Image src={`/icons/${persona?.icon ?? "mascot"}.svg`} alt="" width={56} height={58} />
             <p className="caps">შენი პერსონა</p>
-            <p className="pcard__name">სუფრის თამადა</p>
-            <div className="row"><span className="mini">₾₾</span><span className="mini mini--dark">ქართული</span></div>
+            <p className="pcard__name">{persona?.name ?? "ცხარის მონადირე"}</p>
+            <div className="row"><span className="mini">₾₾</span><span className="mini mini--dark">ცხარე</span></div>
           </div>
         </div>
       </div>

@@ -3,15 +3,17 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v2.0 — location: only dishes with a venue in the radius; GEL price bands
+ * Version:     v2.1 — persona boost ×1.6 and quiz preferences (spice-avoid, lenten, novelty)
  * Description: Pure spin logic. The winner is decided HERE, before any animation;
  *              the wheel only travels to it. Randomness is injected (rng) so tests
  *              are deterministic.
  *
- *   weight = baseWeight × timeOfDay × tasteChips(×1.5 each) — clamped to 0.1…5
+ *   weight = baseWeight × timeOfDay × tasteChips(×1.5 each) × persona(×1.6) × quiz prefs — clamped to 0.1…5
  *   hard filters (budget, diet, "not today") remove a dish entirely.
  */
 import { priceBand, type Dish, type MealTime } from "./catalog.ts";
+import { PERSONA_BOOST, PERSONAS } from "./personas.ts";
+import type { PersonaId } from "./quiz.ts";
 
 export type Taste = "spicy" | "light" | "georgian" | "sweet" | "fast";
 export type Diet = "vegetarian" | "vegan";
@@ -24,12 +26,23 @@ export type Filters = {
 
 export const DEFAULT_FILTERS: Filters = { priceMax: 3, tastes: [], diet: [] };
 
+/** Soft preferences that come from the quiz (not visible as filter controls). */
+export type Prefs = {
+  persona: PersonaId | null;
+  spiceAvoid: boolean;   // q4d "ცხარე არ მიყვარს": very hot dishes ×0.3
+  lenten: boolean;       // q5a: vegan / lenten dishes ×1.5
+  novelty: boolean;      // q2d: everything base weight 2, non-Georgian ×1.3
+};
+
+export const NO_PREFS: Prefs = { persona: null, spiceAvoid: false, lenten: false, novelty: false };
+
 export type SpinContext = {
   filters: Filters;
   now: Date;
   excluded: string[];          // slugs hidden for 24h ("დღეს არა")
   random: boolean;             // "შემთხვევით": ignores filters and weights; location + "not today" still apply
   available: Set<string> | null; // slugs with ≥1 venue in the chosen radius; null = no place chosen (whole city)
+  prefs: Prefs;
 };
 
 export type Rng = () => number; // [0, 1)
@@ -69,7 +82,12 @@ export function isAllowed(d: Dish, ctx: SpinContext): boolean {
 export function weightOf(d: Dish, ctx: SpinContext): number {
   if (ctx.random) return 1;
   const slot = mealTimeAt(ctx.now);
-  let w: number = d.baseWeight;
+  const p = ctx.prefs;
+  let w: number = p.novelty ? 2 : d.baseWeight;
+  if (p.persona && PERSONAS[p.persona].matches(d)) w *= PERSONA_BOOST;
+  if (p.spiceAvoid && d.spicy === 2) w *= 0.3;
+  if (p.lenten && (d.vegan || d.tags.includes("lenten"))) w *= 1.5;
+  if (p.novelty && d.cuisine !== "ქართული") w *= 1.3;
   if (!d.meals.includes(slot)) w *= 0.3;
   else if (slot === "საუზმე" || slot === "ღამე") w *= 2;
   for (const t of ctx.filters.tastes) if (TASTE_MATCH[t](d)) w *= 1.5;

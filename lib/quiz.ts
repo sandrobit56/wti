@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v1.0 — first persona quiz: 12 personas, 7 questions × 4 answers
+ * Version:     v1.1 — applyQuiz(): result → filters + soft prefs for the wheel
  * Description: Persona quiz data + pure scoring function.
  *              Each answer gives (a) points to 1–2 personas and (b) optional
  *              "signals" that pre-fill the filter panel and tune wheel weights.
@@ -128,4 +128,21 @@ export function scoreQuiz(answerIds: string[]): QuizResult {
     lastPrimaryIndex(b) - lastPrimaryIndex(a));
 
   return { persona: ranked[0], runnerUp: ranked[1], scores, signals };
+}
+
+/**
+ * Quiz result → what the wheel uses. Visible controls (budget, taste chips, diet)
+ * are pre-filled; the user can change them afterwards and the panel wins.
+ * Invisible preferences (persona, spice-avoid, lenten, novelty) only shift weights.
+ */
+export function applyQuiz(r: QuizResult) {
+  const s = r.signals;
+  const tastes: ("spicy" | "light" | "fast")[] = [];
+  if (s.spice === 2) tastes.push("spicy");
+  if (s.light) tastes.push("light");
+  if (s.fast) tastes.push("fast");
+  return {
+    filters: { priceMax: s.priceMax ?? 3, tastes, diet: s.vegetarian ? (["vegetarian"] as const).slice() : [] },
+    prefs: { persona: r.persona, spiceAvoid: s.spice === 0, lenten: Boolean(s.lenten), novelty: Boolean(s.novelty) },
+  };
 }

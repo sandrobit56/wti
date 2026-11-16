@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v2.1 — result pops up as a modal the moment the wheel lands
+ * Version:     v3.0 — persona quiz: answers pre-fill filters and tune the wheel
  * Description: Page state: filters, place, radius → available dishes → wheel →
  *              spin → three paths. Logic lives in lib/spin.ts.
  *              Client-only (RandomizerClient) so initial state can read storage.
@@ -14,16 +14,19 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { DISHES, type Dish } from "@/lib/catalog.ts";
 import type { RadiusKm } from "@/lib/places.ts";
-import { DEFAULT_FILTERS, SpinError, seeded, spin, targetRotation, type Filters, type SpinContext } from "@/lib/spin.ts";
+import { PERSONAS } from "@/lib/personas.ts";
+import { applyQuiz, scoreQuiz } from "@/lib/quiz.ts";
+import { DEFAULT_FILTERS, NO_PREFS, SpinError, seeded, spin, targetRotation, type Filters, type Prefs, type SpinContext } from "@/lib/spin.ts";
 import { FilterPanel, MY_LOCATION, type Place } from "./FilterPanel";
 import { Paths, PersonaTeaser, TrustCard } from "./Paths";
+import { Quiz } from "./Quiz";
 import { ResultModal } from "./ResultModal";
 import { Wheel } from "./Wheel";
 
 const KEY = "wti:v2";
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-type Stored = { filters: Filters; place: Place | null; radius: RadiusKm; notToday: Record<string, number> };
+type Stored = { filters: Filters; place: Place | null; radius: RadiusKm; notToday: Record<string, number>; quizAnswers?: string[] | null };
 type Counts = { key: string; counts: Record<string, number>; venuesInRadius: number } | { key: string; error: string };
 type Spun = { wheel: Dish[]; winner: number; landed: boolean };
 
@@ -42,7 +45,12 @@ function initial(): Stored & { now: Date; seed: number } {
   const s = load();
   const now = Date.now();
   const notToday = Object.fromEntries(Object.entries(s?.notToday ?? {}).filter(([, until]) => until > now));
-  return { filters: s?.filters ?? DEFAULT_FILTERS, place: s?.place ?? null, radius: s?.radius ?? 2, notToday, now: new Date(), seed: Math.floor(Math.random() * 1e9) };
+  return { filters: s?.filters ?? DEFAULT_FILTERS, place: s?.place ?? null, radius: s?.radius ?? 2, notToday, quizAnswers: s?.quizAnswers ?? null, now: new Date(), seed: Math.floor(Math.random() * 1e9) };
+}
+/** Stored answers → soft prefs. Answers from an older quiz version are dropped (fail safe, not silent: user just sees no persona). */
+function prefsFrom(answers: string[] | null | undefined): Prefs {
+  if (!answers) return NO_PREFS;
+  try { return applyQuiz(scoreQuiz(answers)).prefs; } catch { return NO_PREFS; }
 }
 const placeKey = (p: Place | null, r: RadiusKm) => (p ? `${p.center.lat},${p.center.lng},${r}` : null);
 
@@ -59,12 +67,18 @@ export function Randomizer() {
   const [spinError, setSpinError] = useState<string | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [quizOpen, setQuizOpen] = useState(false);
+  const [quizAnswers, setQuizAnswers] = useState<string[] | null>(init.quizAnswers ?? null);
+  const prefs = useMemo(() => prefsFrom(quizAnswers), [quizAnswers]);
+  const persona = prefs.persona ? PERSONAS[prefs.persona] : null;
+  const [pendingSpin, setPendingSpin] = useState(0);
+  const doSpinRef = useRef<(random: boolean) => void>(() => {});
   const [locating, setLocating] = useState(false);
   const [locateError, setLocateError] = useState<string | null>(null);
   const pathsRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
 
-  useEffect(() => { save({ filters, place, radius, notToday }); }, [filters, place, radius, notToday]);
+  useEffect(() => { save({ filters, place, radius, notToday, quizAnswers }); }, [filters, place, radius, notToday, quizAnswers]);
 
   // Which dishes exist near the chosen place (server counts venues per dish).
   const key = placeKey(place, radius);
@@ -86,17 +100,17 @@ export function Randomizer() {
   const loadingCounts = Boolean(key) && !current;
   const available = useMemo(() => (current && "counts" in current ? new Set(Object.keys(current.counts)) : null), [current]);
 
-  const ctx = (random: boolean): SpinContext => ({ filters, now: init.now, excluded: Object.keys(notToday), random, available });
+  const ctx = (random: boolean): SpinContext => ({ filters, now: init.now, excluded: Object.keys(notToday), random, available, prefs });
 
   // Live preview: recomputed on every filter / place / radius change.
   const preview = useMemo(() => {
     try {
-      return { result: spin(DISHES, { filters, now: init.now, excluded: Object.keys(notToday), random: false, available }, seeded(seed)), error: null };
+      return { result: spin(DISHES, { filters, now: init.now, excluded: Object.keys(notToday), random: false, available, prefs }, seeded(seed)), error: null };
     } catch (e) {
       if (!(e instanceof SpinError)) throw e;
       return { result: null, error: e.matching };
     }
-  }, [filters, notToday, available, seed, init.now]);
+  }, [filters, notToday, available, seed, init.now, prefs]);
 
   // Any input change drops the last result and reshuffles the preview.
   function changed() { setSpun(null); setSpinError(null); setSeed((s) => s + 1); }
@@ -144,6 +158,24 @@ export function Randomizer() {
     window.setTimeout(() => doSpin(false), 300);
   }
 
+  // Spin once the quiz's filters have been rendered (the latest doSpin sees them).
+  useEffect(() => { doSpinRef.current = doSpin; });
+  useEffect(() => {
+    if (!pendingSpin) return;
+    const t = window.setTimeout(() => doSpinRef.current(false), 450);
+    return () => window.clearTimeout(t);
+  }, [pendingSpin]);
+
+  function applyPersona(answers: string[]) {
+    const a = applyQuiz(scoreQuiz(answers));
+    setFilters({ ...a.filters, diet: [...a.filters.diet] });
+    setQuizAnswers(answers);
+    changed();
+    setQuizOpen(false);
+    heroRef.current?.scrollIntoView({ behavior: "smooth" });
+    setPendingSpin((n) => n + 1);
+  }
+
   function locate() {
     if (!("geolocation" in navigator)) { setLocateError("ბრაუზერს ლოკაცია არ აქვს. აირჩიე უბანი."); return; }
     setLocating(true);
@@ -171,7 +203,7 @@ export function Randomizer() {
     if (current && "error" in current) return `ადგილები ვერ ჩაიტვირთა (${current.error}) — ბორბალი მთელ თბილისს იყენებს.`;
     if (loadingCounts) return "ვამოწმებ, რა არის ახლოს…";
     const where = place ? `${place.label}, ${radius} კმ${current && "venuesInRadius" in current ? ` · ${current.venuesInRadius} ადგილი` : ""}` : "მთელი თბილისი";
-    return `${matching} კერძი ერგება · ${where}`;
+    return `${matching} კერძი ერგება · ${where}${persona ? ` · ${persona.name}` : ""}`;
   })();
 
   const panel = (onClose?: () => void) => (
@@ -179,6 +211,7 @@ export function Randomizer() {
       filters={filters} place={place} radius={radius} locating={locating} locateError={locateError}
       onFilters={onFilters} onPlace={onPlace} onRadius={onRadius} onLocate={locate}
       onApply={() => doSpin(false)} onRandom={() => doSpin(true)} onClose={onClose}
+      personaName={persona?.name ?? null} onQuiz={() => { setSheetOpen(false); setQuizOpen(true); }}
     />
   );
 
@@ -233,7 +266,9 @@ export function Randomizer() {
         />
       )}
 
-      <PersonaTeaser />
+      {quizOpen && <Quiz onClose={() => setQuizOpen(false)} onApply={applyPersona} />}
+
+      <PersonaTeaser persona={persona} onStart={() => setQuizOpen(true)} />
       <TrustCard />
 
       <div ref={pathsRef} className="paths-anchor">

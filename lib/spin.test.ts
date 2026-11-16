@@ -9,11 +9,13 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { DISHES, priceBand } from "./catalog.ts";
-import { DEFAULT_FILTERS, SpinError, countMatching, mealTimeAt, seeded, spin, targetRotation, weightOf, type SpinContext } from "./spin.ts";
+import { PERSONAS } from "./personas.ts";
+import { applyQuiz, scoreQuiz, PERSONA_IDS } from "./quiz.ts";
+import { DEFAULT_FILTERS, NO_PREFS, SpinError, countMatching, mealTimeAt, seeded, spin, targetRotation, weightOf, type SpinContext } from "./spin.ts";
 import { matchVenues, distanceKm, countByDish, type Venue } from "./places.ts";
 
 const ctx = (over: Partial<SpinContext> = {}): SpinContext => ({
-  filters: DEFAULT_FILTERS, now: new Date("2026-11-15T13:00:00"), excluded: [], random: false, available: null, ...over,
+  filters: DEFAULT_FILTERS, now: new Date("2026-11-15T13:00:00"), excluded: [], random: false, available: null, prefs: NO_PREFS, ...over,
 });
 
 test("wheel has 8 unique dishes and the winner is on it", () => {
@@ -128,4 +130,31 @@ test("countByDish counts venues per dish inside the radius only", () => {
   assert.equal(r.counts["sushi"], 1);
   assert.equal(r.counts["sandwich"], 1);
   assert.equal(r.counts["khinkali"], undefined);
+});
+
+test("persona boost ×1.6 for matching dishes only", () => {
+  const sushi = DISHES.find((d) => d.slug === "sushi")!;
+  const khinkali = DISHES.find((d) => d.slug === "khinkali")!;
+  const prefs = { ...NO_PREFS, persona: "sushi" as const };
+  assert.equal(weightOf(sushi, ctx({ prefs })), weightOf(sushi, ctx()) * 1.6);
+  assert.equal(weightOf(khinkali, ctx({ prefs })), weightOf(khinkali, ctx()));
+});
+
+test("every persona matches at least 3 dishes (its wheel can show its taste)", () => {
+  for (const id of PERSONA_IDS) {
+    const n = DISHES.filter(PERSONAS[id].matches).length;
+    assert.ok(n >= 3, `${id} matches only ${n}`);
+  }
+});
+
+test("applyQuiz: vegetarian + ₾ + spicy pre-fill the panel; spice-avoid stays a soft pref", () => {
+  const veg = applyQuiz(scoreQuiz(["q1a", "q2b", "q3c", "q4a", "q5b", "q6a", "q7d"]));
+  assert.deepEqual(veg.filters, { priceMax: 1, tastes: ["spicy"], diet: ["vegetarian"] });
+  assert.notEqual(veg.prefs.persona, "mtsvadi");
+  const mild = applyQuiz(scoreQuiz(["q1b", "q2d", "q3b", "q4d", "q5d", "q6c", "q7b"]));
+  assert.equal(mild.prefs.spiceAvoid, true);
+  assert.equal(mild.prefs.novelty, true);
+  assert.deepEqual(mild.filters.tastes, ["light"]);
+  const ostri = DISHES.find((d) => d.slug === "ostri")!;
+  assert.ok(weightOf(ostri, ctx({ prefs: mild.prefs })) < weightOf(ostri, ctx()));
 });
