@@ -383,3 +383,11 @@ button.panel__hint:hover .panel__hint-arrow { transform: translateX(4px); }
 .version .credit-btn { width: 18px; height: 18px; font-size: 10px; }
 .version .credit-pop { left: 0; right: auto; bottom: 24px; }
 .gnear .pill--block { box-sizing: border-box; min-width: 0; max-width: 100%; white-space: normal; line-height: 1.2; padding: 10px 16px; }
+
+/* Filter v3.1 — lighter outlines: hairline grey border + soft shadow; dark only on hover */
+:root { --edge: rgba(18, 18, 18, .14); --edge-hover: rgba(18, 18, 18, .35); --soft-shadow: 0 2px 0 rgba(18, 18, 18, .10); }
+.chip--icon, .place, .segmented[style], .panel__actions .pill { border-width: 1.5px; border-color: var(--edge); box-shadow: var(--soft-shadow); }
+.chip--icon:hover, .place:hover, .panel__actions .pill:hover { border-color: var(--edge-hover); box-shadow: 0 4px 0 rgba(18, 18, 18, .12); }
+.chip--icon:active, .place:active, .panel__actions .pill:active { box-shadow: none; }
+.chip--icon.on { border-color: #c92c45; box-shadow: 0 2px 0 #c92c45; }
+.panel__actions .pill--dark { border-color: #c92c45; box-shadow: 0 2px 0 #c92c45; }
