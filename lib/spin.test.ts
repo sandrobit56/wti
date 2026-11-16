@@ -14,6 +14,7 @@ import { PERSONAS } from "./personas.ts";
 import { applyQuiz, scoreQuiz, PERSONA_IDS } from "./quiz.ts";
 import { CATEGORY_CAP, CUISINE_CAP, DEFAULT_FILTERS, NO_PREFS, SpinError, countMatching, explain, pickVariants, mealTimeAt, seeded, spin, targetRotation, weightOf, type SpinContext } from "./spin.ts";
 import { matchVenues, distanceKm, countByDish, mapsSearchUrl, type Venue } from "./places.ts";
+import { embedSearchUrl, parsePlaces, TBILISI } from "./google.ts";
 
 const ctx = (over: Partial<SpinContext> = {}): SpinContext => ({
   filters: DEFAULT_FILTERS, now: new Date("2026-11-15T13:00:00"), excluded: [], random: false, available: null, prefs: NO_PREFS, mood: null, history: [], ...over,
@@ -261,4 +262,18 @@ test("every Google Maps search is pinned to Tbilisi, Georgia (no London results)
   assert.equal(q(mapsSearchUrl("ფიშ ენდ ჩიფსი")), "ფიშ ენდ ჩიფსი, Tbilisi, Georgia");
   assert.equal(q(mapsSearchUrl("ხინკალი", "ვაკე")), "ხინკალი, ვაკე, Tbilisi, Georgia");
   assert.throws(() => mapsSearchUrl("  "));
+});
+
+test("Google: embed URL pinned to Tbilisi; parsePlaces drops non-Tbilisi and incomplete results", () => {
+  const u = new URL(embedSearchUrl("k", "ხინკალი", "ვაკე", { lat: 41.71, lng: 44.756 }));
+  assert.equal(u.searchParams.get("q"), "ხინკალი, ვაკე, Tbilisi, Georgia");
+  assert.equal(u.searchParams.get("region"), "GE");
+  assert.throws(() => embedSearchUrl("", "x", null, TBILISI));
+  const raw = { places: [
+    { id: "a", displayName: { text: "Far" }, googleMapsUri: "u", location: { latitude: 41.73, longitude: 44.78 } },
+    { id: "b", displayName: { text: "Near" }, googleMapsUri: "u", location: { latitude: 41.694, longitude: 44.802 } },
+    { id: "c", displayName: { text: "London" }, googleMapsUri: "u", location: { latitude: 51.5, longitude: -0.12 } },
+    { id: "d", displayName: { text: "No location" }, googleMapsUri: "u" },
+  ] };
+  assert.deepEqual(parsePlaces(raw, TBILISI).map((p) => p.name), ["Near", "Far"]);
 });

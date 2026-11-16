@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-16
- * Version:     v2.0 — 4–5 real versions of the dish (photo + credit, description,
+ * Version:     v2.1 — live Google map + on-tap Google Places nearby;
+ *              v2.0 — 4–5 real versions of the dish (photo + credit, description,
  *              price, per-version Maps / delivery search); "სხვა ვერსიები" reshuffles
  * Description: Pops up the moment the wheel lands: the dish, where to taste it
  *              nearby, delivery apps, and the two next actions (spin again /
@@ -21,6 +22,7 @@ import { TYPE_WIKI, type Variant } from "@/lib/variants.ts";
 import { deliveryLinks, mapsDirectionsUrl, mapsSearchUrl, type RadiusKm } from "@/lib/places.ts";
 import { MY_LOCATION, type Place } from "./FilterPanel";
 import { km, useNearbyVenues } from "./Paths";
+import { GoogleNearby } from "./GoogleNearby";
 
 type Props = {
   dish: Dish;
@@ -152,6 +154,7 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
               <span className="row-card__side">{km(v.distanceKm)} ↗</span>
             </a>
           ))}
+          <GoogleNearby term={dish.search} area={nearArea} place={place} radius={radius} />
           <a className="modal__maps" href={mapsSearchUrl(dish.search, nearArea)} target="_blank" rel="noreferrer">
             ყველა „{dish.name}“ Google Maps-ზე ↗
           </a>
