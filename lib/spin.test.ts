@@ -11,11 +11,11 @@ import assert from "node:assert/strict";
 import { DISHES, priceBand } from "./catalog.ts";
 import { PERSONAS } from "./personas.ts";
 import { applyQuiz, scoreQuiz, PERSONA_IDS } from "./quiz.ts";
-import { DEFAULT_FILTERS, NO_PREFS, SpinError, countMatching, mealTimeAt, seeded, spin, targetRotation, weightOf, type SpinContext } from "./spin.ts";
+import { CATEGORY_CAP, CUISINE_CAP, DEFAULT_FILTERS, NO_PREFS, SpinError, countMatching, explain, mealTimeAt, seeded, spin, targetRotation, weightOf, type SpinContext } from "./spin.ts";
 import { matchVenues, distanceKm, countByDish, type Venue } from "./places.ts";
 
 const ctx = (over: Partial<SpinContext> = {}): SpinContext => ({
-  filters: DEFAULT_FILTERS, now: new Date("2026-11-15T13:00:00"), excluded: [], random: false, available: null, prefs: NO_PREFS, ...over,
+  filters: DEFAULT_FILTERS, now: new Date("2026-11-15T13:00:00"), excluded: [], random: false, available: null, prefs: NO_PREFS, mood: null, history: [], ...over,
 });
 
 test("wheel has 8 unique dishes and the winner is on it", () => {
@@ -157,4 +157,64 @@ test("applyQuiz: vegetarian + ₾ + spicy pre-fill the panel; spice-avoid stays 
   assert.deepEqual(mild.filters.tastes, ["light"]);
   const ostri = DISHES.find((d) => d.slug === "ostri")!;
   assert.ok(weightOf(ostri, ctx({ prefs: mild.prefs })) < weightOf(ostri, ctx()));
+});
+
+test("diversity: ≤3 per cuisine and ≤2 per category on every full wheel", () => {
+  for (let s = 0; s < 300; s++) {
+    const w = spin(DISHES, ctx(), seeded(s)).wheel;
+    const by = (k: (d: (typeof w)[number]) => string) => w.reduce<Record<string, number>>((m, d) => ((m[k(d)] = (m[k(d)] ?? 0) + 1), m), {});
+    assert.ok(Math.max(...Object.values(by((d) => d.cuisine))) <= CUISINE_CAP, `cuisine cap, seed ${s}`);
+    assert.ok(Math.max(...Object.values(by((d) => d.category))) <= CATEGORY_CAP, `category cap, seed ${s}`);
+  }
+});
+
+test("diversity yields when the pool is small (vegan ₾ still fills the wheel)", () => {
+  const r = spin(DISHES, ctx({ filters: { priceMax: 1, tastes: [], diet: ["vegan"] } }), seeded(3));
+  assert.equal(r.wheel.length, Math.min(8, r.matching));
+});
+
+test("memory: last 3 winners ×0.3, won within 3 days ×0.5, older = full weight", () => {
+  const now = new Date("2026-11-16T13:00:00");
+  const pasta = DISHES.find((d) => d.slug === "pasta")!;
+  const base = weightOf(pasta, ctx({ now }));
+  const recent = [{ slug: "pasta", at: now.getTime() - 60_000 }];
+  assert.equal(weightOf(pasta, ctx({ now, history: recent })), base * 0.3);
+  const twoDays = [{ slug: "pasta", at: now.getTime() - 2 * 864e5 }, { slug: "a", at: 1 }, { slug: "b", at: 2 }, { slug: "c", at: 3 }];
+  assert.equal(weightOf(pasta, ctx({ now, history: twoDays })), base * 0.5);
+  const old = [{ slug: "pasta", at: now.getTime() - 9 * 864e5 }, { slug: "a", at: 1 }, { slug: "b", at: 2 }, { slug: "c", at: 3 }];
+  assert.equal(weightOf(pasta, ctx({ now, history: old })), base);
+});
+
+test("the same dish rarely wins twice in a row once memory is on", () => {
+  let repeats = 0, last: string | null = null;
+  const history: { slug: string; at: number }[] = [];
+  const now = new Date("2026-11-16T13:00:00");
+  for (let s = 0; s < 400; s++) {
+    const r = spin(DISHES, ctx({ now, history: [...history] }), seeded(s));
+    const win = r.wheel[r.winnerIndex].slug;
+    if (win === last) repeats++;
+    last = win; history.push({ slug: win, at: now.getTime() });
+  }
+  assert.ok(repeats < 8, `repeats: ${repeats}/400`);
+});
+
+test("mood + healthy chip shift weights the right way", () => {
+  const salad = DISHES.find((d) => d.slug === "salad-bowl")!;
+  const ojakhuri = DISHES.find((d) => d.slug === "ojakhuri")!;
+  assert.ok(weightOf(ojakhuri, ctx({ mood: "hungry" })) > weightOf(ojakhuri, ctx()));
+  assert.ok(weightOf(salad, ctx({ mood: "hungry" })) < weightOf(salad, ctx()));
+  assert.ok(weightOf(salad, ctx({ mood: "light" })) > weightOf(salad, ctx()));
+  const healthy = ctx({ filters: { ...DEFAULT_FILTERS, tastes: ["healthy"] } });
+  assert.equal(weightOf(salad, healthy), Math.min(5, weightOf(salad, ctx()) * 1.5));
+  assert.equal(weightOf(ojakhuri, healthy), weightOf(ojakhuri, ctx()));
+  assert.ok(DISHES.filter((d) => d.tags.includes("healthy")).length >= 10);
+});
+
+test("explain gives personal reasons first and ≤3 of them", () => {
+  const sushi = DISHES.find((d) => d.slug === "sushi")!;
+  const c = ctx({ prefs: { ...NO_PREFS, persona: "sushi" }, mood: "light", filters: { ...DEFAULT_FILTERS, tastes: ["healthy", "light"] } });
+  const why = explain(sushi, c, "სუშის დიპლომატი");
+  assert.equal(why[0], "შენი პერსონის კერძია — სუშის დიპლომატი");
+  assert.ok(why.length <= 3);
+  assert.deepEqual(explain(sushi, ctx({ random: true }), null), ["სრულიად შემთხვევით"]);
 });

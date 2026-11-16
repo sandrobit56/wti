@@ -23,6 +23,7 @@ const TASTES: { id: Taste; label: string }[] = [
   { id: "georgian", label: "ქართული" },
   { id: "sweet", label: "ტკბილი" },
   { id: "fast", label: "სწრაფი" },
+  { id: "healthy", label: "ჯანსაღი" },
 ];
 const DIETS: { id: Diet; label: string }[] = [
   { id: "vegetarian", label: "ვეგეტარიანული" },

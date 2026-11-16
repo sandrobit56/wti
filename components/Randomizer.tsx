@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v3.0 — persona quiz: answers pre-fill filters and tune the wheel
+ * Version:     v3.1 — mood chips, memory of past winners, "never" list, "why this"
  * Description: Page state: filters, place, radius → available dishes → wheel →
  *              spin → three paths. Logic lives in lib/spin.ts.
  *              Client-only (RandomizerClient) so initial state can read storage.
@@ -16,7 +16,7 @@ import { DISHES, type Dish } from "@/lib/catalog.ts";
 import type { RadiusKm } from "@/lib/places.ts";
 import { PERSONAS } from "@/lib/personas.ts";
 import { applyQuiz, scoreQuiz } from "@/lib/quiz.ts";
-import { DEFAULT_FILTERS, NO_PREFS, SpinError, seeded, spin, targetRotation, type Filters, type Prefs, type SpinContext } from "@/lib/spin.ts";
+import { DEFAULT_FILTERS, NO_PREFS, SpinError, explain, seeded, spin, targetRotation, type Filters, type Mood, type Prefs, type SpinContext, type Win } from "@/lib/spin.ts";
 import { FilterPanel, MY_LOCATION, type Place } from "./FilterPanel";
 import { Paths, PersonaTeaser, TrustCard } from "./Paths";
 import { Quiz } from "./Quiz";
@@ -26,9 +26,15 @@ import { Wheel } from "./Wheel";
 const KEY = "wti:v2";
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-type Stored = { filters: Filters; place: Place | null; radius: RadiusKm; notToday: Record<string, number>; quizAnswers?: string[] | null };
+type Stored = { filters: Filters; place: Place | null; radius: RadiusKm; notToday: Record<string, number>; quizAnswers?: string[] | null; never?: string[]; history?: Win[] };
+const HISTORY_MAX = 30;
+const MOODS: { id: Mood; label: string }[] = [
+  { id: "hungry", label: "მგელივით მშიერი" },
+  { id: "light", label: "რაღაც მსუბუქი" },
+  { id: "new", label: "ახალი რამე" },
+];
 type Counts = { key: string; counts: Record<string, number>; venuesInRadius: number } | { key: string; error: string };
-type Spun = { wheel: Dish[]; winner: number; landed: boolean };
+type Spun = { wheel: Dish[]; winner: number; landed: boolean; why: string[] };
 
 function load(): Stored | null {
   try {
@@ -45,13 +51,14 @@ function initial(): Stored & { now: Date; seed: number } {
   const s = load();
   const now = Date.now();
   const notToday = Object.fromEntries(Object.entries(s?.notToday ?? {}).filter(([, until]) => until > now));
-  return { filters: s?.filters ?? DEFAULT_FILTERS, place: s?.place ?? null, radius: s?.radius ?? 2, notToday, quizAnswers: s?.quizAnswers ?? null, now: new Date(), seed: Math.floor(Math.random() * 1e9) };
+  return { filters: s?.filters ?? DEFAULT_FILTERS, place: s?.place ?? null, radius: s?.radius ?? 2, notToday, quizAnswers: s?.quizAnswers ?? null, never: s?.never ?? [], history: s?.history ?? [], now: new Date(), seed: Math.floor(Math.random() * 1e9) };
 }
 /** Stored answers → soft prefs. Answers from an older quiz version are dropped (fail safe, not silent: user just sees no persona). */
 function prefsFrom(answers: string[] | null | undefined): Prefs {
   if (!answers) return NO_PREFS;
   try { return applyQuiz(scoreQuiz(answers)).prefs; } catch { return NO_PREFS; }
 }
+const nameOf = (slug: string) => DISHES.find((d) => d.slug === slug)?.name ?? slug;
 const placeKey = (p: Place | null, r: RadiusKm) => (p ? `${p.center.lat},${p.center.lng},${r}` : null);
 
 export function Randomizer() {
@@ -72,13 +79,17 @@ export function Randomizer() {
   const prefs = useMemo(() => prefsFrom(quizAnswers), [quizAnswers]);
   const persona = prefs.persona ? PERSONAS[prefs.persona] : null;
   const [pendingSpin, setPendingSpin] = useState(0);
+  const [never, setNever] = useState<string[]>(init.never ?? []);
+  const [history, setHistory] = useState<Win[]>(init.history ?? []);
+  const [mood, setMood] = useState<Mood | null>(null);
+  const excluded = useMemo(() => [...Object.keys(notToday), ...never], [notToday, never]);
   const doSpinRef = useRef<(random: boolean) => void>(() => {});
   const [locating, setLocating] = useState(false);
   const [locateError, setLocateError] = useState<string | null>(null);
   const pathsRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
 
-  useEffect(() => { save({ filters, place, radius, notToday, quizAnswers }); }, [filters, place, radius, notToday, quizAnswers]);
+  useEffect(() => { save({ filters, place, radius, notToday, quizAnswers, never, history }); }, [filters, place, radius, notToday, quizAnswers, never, history]);
 
   // Which dishes exist near the chosen place (server counts venues per dish).
   const key = placeKey(place, radius);
@@ -100,17 +111,17 @@ export function Randomizer() {
   const loadingCounts = Boolean(key) && !current;
   const available = useMemo(() => (current && "counts" in current ? new Set(Object.keys(current.counts)) : null), [current]);
 
-  const ctx = (random: boolean): SpinContext => ({ filters, now: init.now, excluded: Object.keys(notToday), random, available, prefs });
+  const ctx = (random: boolean): SpinContext => ({ filters, now: new Date(), excluded, random, available, prefs, mood, history });
 
   // Live preview: recomputed on every filter / place / radius change.
   const preview = useMemo(() => {
     try {
-      return { result: spin(DISHES, { filters, now: init.now, excluded: Object.keys(notToday), random: false, available, prefs }, seeded(seed)), error: null };
+      return { result: spin(DISHES, { filters, now: init.now, excluded, random: false, available, prefs, mood, history }, seeded(seed)), error: null };
     } catch (e) {
       if (!(e instanceof SpinError)) throw e;
       return { result: null, error: e.matching };
     }
-  }, [filters, notToday, available, seed, init.now, prefs]);
+  }, [filters, excluded, available, seed, init.now, prefs, mood, history]);
 
   // Any input change drops the last result and reshuffles the preview.
   function changed() { setSpun(null); setSpinError(null); setSeed((s) => s + 1); }
@@ -118,13 +129,17 @@ export function Randomizer() {
   const onPlace = (p: Place | null) => { setPlace(p); setLocateError(null); changed(); };
   const onRadius = (r: RadiusKm) => { setRadius(r); changed(); };
 
-  function doSpin(random: boolean, nt = notToday) {
+  function doSpin(random: boolean, extraExcluded: string[] = []) {
     if (spun && !spun.landed) return;
     try {
-      const r = spin(DISHES, { ...ctx(random), excluded: Object.keys(nt) }, Math.random);
+      const c = { ...ctx(random), excluded: [...excluded, ...extraExcluded] };
+      const r = spin(DISHES, c, Math.random);
+      const dishWon = r.wheel[r.winnerIndex];
+      const near = current && "counts" in current ? current.counts[dishWon.slug] : undefined;
+      const why = [...explain(dishWon, c, persona?.name ?? null), ...(near ? [`${near} ადგილი ${radius} კმ-ში`] : [])].slice(0, 3);
       setSpinError(null);
       setSheetOpen(false);
-      setSpun({ wheel: r.wheel, winner: r.winnerIndex, landed: false });
+      setSpun({ wheel: r.wheel, winner: r.winnerIndex, landed: false, why });
       setRotation((cur) => targetRotation(cur, r.winnerIndex, r.wheel.length));
     } catch (e) {
       if (!(e instanceof SpinError)) throw e;
@@ -134,6 +149,7 @@ export function Randomizer() {
 
   function onLanded() {
     setSpun((s) => (s ? { ...s, landed: true } : s));
+    if (spun) setHistory((h) => [...h, { slug: spun.wheel[spun.winner].slug, at: Date.now() }].slice(-HISTORY_MAX));
     window.setTimeout(() => setModalOpen(true), 350); // let the eye see the pointer settle first
   }
 
@@ -145,11 +161,25 @@ export function Randomizer() {
 
   function notTodayWinner() {
     if (!spun) return;
-    const nt = { ...notToday, [spun.wheel[spun.winner].slug]: Date.now() + DAY_MS };
+    const slug = spun.wheel[spun.winner].slug;
     setModalOpen(false);
-    setNotToday(nt);
+    setNotToday({ ...notToday, [slug]: Date.now() + DAY_MS });
     heroRef.current?.scrollIntoView({ behavior: "smooth" });
-    window.setTimeout(() => doSpin(false, nt), 400);
+    window.setTimeout(() => doSpin(false, [slug]), 400);
+  }
+
+  function neverWinner() {
+    if (!spun) return;
+    const slug = spun.wheel[spun.winner].slug;
+    setModalOpen(false);
+    setNever((n) => (n.includes(slug) ? n : [...n, slug]));
+    heroRef.current?.scrollIntoView({ behavior: "smooth" });
+    window.setTimeout(() => doSpin(false, [slug]), 400);
+  }
+
+  function pickMood(m: Mood) {
+    setMood((cur) => (cur === m ? null : m));
+    changed();
   }
 
   function spinAgain() {
@@ -224,13 +254,24 @@ export function Randomizer() {
             {wheel.length > 0
               ? <Wheel dishes={wheel} rotation={rotation} spinning={spinning} winnerIndex={winner} onSpin={() => doSpin(false)} onLanded={onLanded} />
               : <div className="wheel wheel--empty"><p>ფილტრებს მხოლოდ {matching} კერძი ერგება.<br />შეარბილე ბიუჯეტი, დიეტა ან გაზარდე რადიუსი.</p></div>}
+            <div className="moods" role="group" aria-label="განწყობა">
+              {MOODS.map((m) => (
+                <button key={m.id} className={mood === m.id ? "mood on" : "mood"} aria-pressed={mood === m.id} onClick={() => pickMood(m.id)}>{m.label}</button>
+              ))}
+            </div>
             <p className="hero__status" aria-live="polite">{status}</p>
-            {Object.keys(notToday).length > 0 && (
+            {(Object.keys(notToday).length > 0 || never.length > 0) && (
               <div className="hidden-today">
-                <span>დღეს დამალული:</span>
+                {Object.keys(notToday).length > 0 && <span>დღეს დამალული:</span>}
                 {Object.keys(notToday).map((slug) => (
-                  <button key={slug} className="chip chip--sm" onClick={() => { const { [slug]: _gone, ...rest } = notToday; void _gone; setNotToday(rest); changed(); }} aria-label={`დააბრუნე ${DISHES.find((d) => d.slug === slug)?.name}`}>
-                    {DISHES.find((d) => d.slug === slug)?.name ?? slug} ×
+                  <button key={slug} className="chip chip--sm" onClick={() => { const { [slug]: _gone, ...rest } = notToday; void _gone; setNotToday(rest); changed(); }} aria-label={`დააბრუნე ${nameOf(slug)}`}>
+                    {nameOf(slug)} ×
+                  </button>
+                ))}
+                {never.length > 0 && <span>არ მიყვარს:</span>}
+                {never.map((slug) => (
+                  <button key={slug} className="chip chip--sm chip--never" onClick={() => { setNever((n) => n.filter((x) => x !== slug)); changed(); }} aria-label={`დააბრუნე ${nameOf(slug)}`}>
+                    {nameOf(slug)} ×
                   </button>
                 ))}
               </div>
@@ -262,7 +303,8 @@ export function Randomizer() {
       {modalOpen && dish && (
         <ResultModal
           dish={dish} place={place} radius={radius}
-          onClose={() => setModalOpen(false)} onAgain={spinAgain} onNotToday={notTodayWinner} onPickPlace={pickPlace}
+          why={spun?.why ?? []}
+          onClose={() => setModalOpen(false)} onAgain={spinAgain} onNotToday={notTodayWinner} onNever={neverWinner} onPickPlace={pickPlace}
         />
       )}
 

@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v1.0
+ * Version:     v1.1 — "why this" reasons; "არ მიყვარს" hides a dish until restored
  * Description: Pops up the moment the wheel lands: the dish, where to taste it
  *              nearby, delivery apps, and the two next actions (spin again /
  *              not today). Closes with ×, Esc, or a click on the backdrop.
@@ -26,10 +26,12 @@ type Props = {
   onClose: () => void;
   onAgain: () => void;
   onNotToday: () => void;
+  onNever: () => void;
   onPickPlace: () => void;
+  why: string[];
 };
 
-export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday, onPickPlace }: Props) {
+export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday, onNever, onPickPlace, why }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   const venues = useNearbyVenues(dish, place, radius);
   const area = place && place.label !== MY_LOCATION ? place.label : "თბილისი";
@@ -59,6 +61,11 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
             ≈ {dish.priceGel[0]}–{dish.priceGel[1]} ₾ · {"₾".repeat(priceBand(dish))} · {dish.cuisine}
             {dish.spicy ? " · ცხარე" : ""}{dish.vegan ? " · ვეგანური" : dish.vegetarian ? " · ვეგეტარიანული" : ""}
           </p>
+          {why.length > 0 && (
+            <ul className="why" aria-label="რატომ ეს კერძი">
+              {why.map((w) => <li key={w}>{w}</li>)}
+            </ul>
+          )}
         </header>
 
         <section className="modal__section">
@@ -105,6 +112,7 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
         <footer className="modal__actions">
           <button className="pill pill--dark" onClick={onAgain}>↻ ხელახლა</button>
           <button className="pill pill--outline" onClick={onNotToday}>დღეს არა</button>
+          <button className="link modal__never" onClick={onNever}>„{dish.name}“ არ მიყვარს — აღარ შემომთავაზო</button>
         </footer>
       </div>
     </dialog>

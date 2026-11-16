@@ -269,3 +269,12 @@ button.panel__hint:hover { background: #ffeec4; }
 .panel__hint-arrow { margin-left: auto; font-weight: 800; }
 .persona .caps { color: rgba(18, 18, 18, 0.6); margin-bottom: 4px; }
 .modal__actions .pill { white-space: normal; line-height: 1.15; text-align: center; }
+
+/* ── Moods, why, never ──────────────────────────────── */
+.moods { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.mood { min-height: 40px; padding: 0 16px; border-radius: 999px; border: 0; background: rgba(255, 255, 255, 0.7); font-weight: 800; font-size: 14px; cursor: pointer; }
+.mood.on { background: var(--text); color: var(--surface); }
+.why { list-style: none; padding: 0; margin-top: 8px; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.why li { background: var(--surface); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 700; }
+.modal__never { grid-column: 1 / -1; justify-self: center; font-size: 13px; padding: 6px 0 2px; }
+.chip--never { border-style: dashed; }

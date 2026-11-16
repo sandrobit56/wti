@@ -2,20 +2,27 @@
  * File:        lib/spin.ts
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
- * Date:        2026-11-15
- * Version:     v2.1 — persona boost ×1.6 and quiz preferences (spice-avoid, lenten, novelty)
+ * Date:        2026-11-16
+ * Version:     v3.0 — memory (no repeats), diverse wheel, mood, healthy, "why this"
  * Description: Pure spin logic. The winner is decided HERE, before any animation;
  *              the wheel only travels to it. Randomness is injected (rng) so tests
  *              are deterministic.
  *
- *   weight = baseWeight × timeOfDay × tasteChips(×1.5 each) × persona(×1.6) × quiz prefs — clamped to 0.1…5
- *   hard filters (budget, diet, "not today") remove a dish entirely.
+ *   weight = baseWeight × timeOfDay × tasteChips(×1.5 each) × persona(×1.6)
+ *            × quiz prefs × mood × memory — clamped to 0.1…5
+ *   hard filters (budget, diet, location, "not today", "never") remove a dish entirely.
+ *   diversity: one wheel holds ≤3 dishes of a cuisine and ≤2 of a category,
+ *              relaxed only when the pool is too small to fill 8 slices.
  */
 import { priceBand, type Dish, type MealTime } from "./catalog.ts";
 import { PERSONA_BOOST, PERSONAS } from "./personas.ts";
 import type { PersonaId } from "./quiz.ts";
 
-export type Taste = "spicy" | "light" | "georgian" | "sweet" | "fast";
+export type Taste = "spicy" | "light" | "georgian" | "sweet" | "fast" | "healthy";
+/** One-tap, momentary mode above the wheel (not saved). */
+export type Mood = "hungry" | "light" | "new";
+/** A past winner, for "don't repeat yourself". */
+export type Win = { slug: string; at: number };
 export type Diet = "vegetarian" | "vegan";
 
 export type Filters = {
@@ -39,16 +46,21 @@ export const NO_PREFS: Prefs = { persona: null, spiceAvoid: false, lenten: false
 export type SpinContext = {
   filters: Filters;
   now: Date;
-  excluded: string[];          // slugs hidden for 24h ("დღეს არა")
+  excluded: string[];          // slugs hidden: "დღეს არა" (24h) + "არ მიყვარს" (until restored)
   random: boolean;             // "შემთხვევით": ignores filters and weights; location + "not today" still apply
   available: Set<string> | null; // slugs with ≥1 venue in the chosen radius; null = no place chosen (whole city)
   prefs: Prefs;
+  mood: Mood | null;
+  history: Win[];              // past winners, oldest first
 };
 
 export type Rng = () => number; // [0, 1)
 
 export const WHEEL_SIZE = 8;
 export const MIN_WHEEL = 3;
+export const CUISINE_CAP = 3;
+export const CATEGORY_CAP = 2;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 export function mealTimeAt(d: Date): MealTime {
   const h = d.getHours();
@@ -64,7 +76,26 @@ const TASTE_MATCH: Record<Taste, (d: Dish) => boolean> = {
   georgian: (d) => d.cuisine === "ქართული",
   sweet: (d) => d.category === "დესერტი" || d.tags.includes("brunch"),
   fast: (d) => d.tags.includes("fast"),
+  healthy: (d) => d.tags.includes("healthy"),
 };
+
+export const TASTE_LABEL: Record<Taste, string> = {
+  spicy: "ცხარე", light: "მსუბუქი", georgian: "ქართული", sweet: "ტკბილი", fast: "სწრაფი", healthy: "ჯანსაღი",
+};
+
+const MOOD_WEIGHT: Record<Mood, (d: Dish, ctx: SpinContext) => number> = {
+  hungry: (d) => (d.heaviness === "მძიმე" ? 1.6 : d.heaviness === "მსუბუქი" ? 0.5 : 1),
+  light: (d) => (d.heaviness === "მსუბუქი" ? 1.6 : d.heaviness === "მძიმე" ? 0.5 : 1),
+  new: (d, ctx) => (ctx.history.some((w) => w.slug === d.slug) ? 0.4 : 1.8),
+};
+
+/** Recent winners come back rarely: last 3 spins ×0.3, anything won in the last 3 days ×0.5. */
+function memoryWeight(d: Dish, ctx: SpinContext): number {
+  if (ctx.history.slice(-3).some((w) => w.slug === d.slug)) return 0.3;
+  const since = ctx.now.getTime() - 3 * DAY_MS;
+  if (ctx.history.some((w) => w.slug === d.slug && w.at >= since)) return 0.5;
+  return 1;
+}
 
 /** Hard filters: true = the dish may appear on the wheel. */
 export function isAllowed(d: Dish, ctx: SpinContext): boolean {
@@ -91,6 +122,8 @@ export function weightOf(d: Dish, ctx: SpinContext): number {
   if (!d.meals.includes(slot)) w *= 0.3;
   else if (slot === "საუზმე" || slot === "ღამე") w *= 2;
   for (const t of ctx.filters.tastes) if (TASTE_MATCH[t](d)) w *= 1.5;
+  if (ctx.mood) w *= MOOD_WEIGHT[ctx.mood](d, ctx);
+  w *= memoryWeight(d, ctx);
   return Math.min(5, Math.max(0.1, w));
 }
 
@@ -125,14 +158,39 @@ export function spin(dishes: Dish[], ctx: SpinContext, rng: Rng): SpinResult {
   const weights = pool.map((d) => weightOf(d, ctx));
   const wheel: Dish[] = [];
   const wheelWeights: number[] = [];
-  while (wheel.length < Math.min(WHEEL_SIZE, pool.length)) {
-    const i = weightedIndex(weights, rng);
+  const count = (key: (d: Dish) => string, v: string) => wheel.filter((d) => key(d) === v).length;
+  const size = Math.min(WHEEL_SIZE, pool.length); // fixed up front: `pool` shrinks as we pick
+  while (wheel.length < size) {
+    // Diversity caps zero out over-represented candidates; if that leaves nothing, the caps yield.
+    const capped = pool.map((d, k) =>
+      count((x) => x.cuisine, d.cuisine) >= CUISINE_CAP || count((x) => x.category, d.category) >= CATEGORY_CAP ? 0 : weights[k]);
+    const i = weightedIndex(capped.some((w) => w > 0) ? capped : weights, rng);
     wheel.push(pool[i]);
     wheelWeights.push(weights[i]);
     pool.splice(i, 1);
     weights.splice(i, 1);
   }
   return { wheel, winnerIndex: weightedIndex(wheelWeights, rng), matching };
+}
+
+/**
+ * Up to 3 short reasons why this dish landed — shown in the result popup so the
+ * wheel feels like it listened. Ordered by how personal the reason is.
+ */
+export function explain(d: Dish, ctx: SpinContext, personaName: string | null): string[] {
+  if (ctx.random) return ["სრულიად შემთხვევით"];
+  const out: string[] = [];
+  if (ctx.prefs.persona && personaName && PERSONAS[ctx.prefs.persona].matches(d)) out.push(`შენი პერსონის კერძია — ${personaName}`);
+  if (ctx.mood === "hungry" && d.heaviness === "მძიმე") out.push("მგელივით მშიერი ხარ — ეს გაგაძღებს");
+  if (ctx.mood === "light" && d.heaviness === "მსუბუქი") out.push("მსუბუქი გინდოდა");
+  if (ctx.mood === "new" && !ctx.history.some((w) => w.slug === d.slug)) out.push("ჯერ არ ამოგსვლია");
+  const tastes = ctx.filters.tastes.filter((t) => TASTE_MATCH[t](d)).map((t) => TASTE_LABEL[t]);
+  if (tastes.length) out.push(`ემთხვევა: ${tastes.join(", ")}`);
+  if (ctx.prefs.lenten && (d.vegan || d.tags.includes("lenten"))) out.push("მარხვის კერძია");
+  const slot = mealTimeAt(ctx.now);
+  if (slot === "საუზმე" && d.meals.includes(slot)) out.push("დილისთვის კარგია");
+  if (slot === "ღამე" && d.meals.includes(slot)) out.push("ღამითაც ღიაა მსგავსი ადგილები");
+  return out.slice(0, 3);
 }
 
 export class SpinError extends Error {

@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v2.1 — 58 dishes (mushroom + cheese khinkali); price ranges in GEL; categories taken from the
+ * Version:     v2.2 — 60 dishes; "healthy" tag (+ grilled chicken salad, smoothie bowl); price ranges in GEL; categories taken from the
  *              real Tbilisi Overture import (2,458 venues)
  * Description: The dish catalog. Plain typed data — the compiler validates it.
  *   venue.cats  substrings of Overture taxonomy ids present in data/venues.json
@@ -21,7 +21,7 @@ export type Category = "ცომეული" | "ხორცი" | "ზღვ�
 export type Cuisine = "ქართული" | "აზიური" | "იტალიური" | "ახლოაღმოსავლური" | "ამერიკული" | "ლათინური" | "ინდური" | "ევროპული";
 export type MealTime = "საუზმე" | "სადილი" | "ვახშამი" | "ღამე";
 export type Heaviness = "მსუბუქი" | "ნორმალური" | "მძიმე";
-export type Tag = "supra" | "dumpling" | "bakery" | "homestyle" | "regional" | "lenten" | "grill" | "bowl" | "brunch" | "fast";
+export type Tag = "supra" | "dumpling" | "bakery" | "homestyle" | "regional" | "lenten" | "grill" | "bowl" | "brunch" | "fast" | "healthy";
 export type IconName =
   | "khinkali" | "khachapuri" | "lobiani" | "mtsvadi" | "shawarma" | "pizza" | "sushi" | "salad"
   | "sandwich" | "taco" | "noodles" | "soup" | "burger" | "cake" | "mascot";
@@ -83,9 +83,9 @@ export const DISHES: Dish[] = [
   D({ slug: "kharcho", name: "ხარჩო", category: "წვნიანი", cuisine: "ქართული", priceGel: [12, 22], spicy: 2, tags: ["homestyle"], icon: "soup", venue: { cats: [...GEO, "soup"], names: [] }, search: "ხარჩო" }),
   D({ slug: "chikhirtma", name: "ჩიხირთმა", category: "წვნიანი", cuisine: "ქართული", priceGel: [8, 15], meals: ["საუზმე", "სადილი", "ვახშამი"], tags: ["homestyle"], icon: "soup", venue: { cats: [...GEO, "soup"], names: [] }, search: "ჩიხირთმა" }),
   D({ slug: "khashi", name: "ხაში", category: "წვნიანი", cuisine: "ქართული", priceGel: [8, 15], meals: ["საუზმე"], heaviness: "მძიმე", tags: ["homestyle"], icon: "soup", venue: { cats: GEO, names: ["ხაშ", "khash", "xash"] }, search: "ხაში" }),
-  D({ slug: "lobio", name: "ლობიო ქოთანში", category: "კერძი", cuisine: "ქართული", priceGel: [8, 15], vegetarian: true, vegan: true, baseWeight: 2, tags: ["lenten", "homestyle"], icon: "soup", venue: { cats: GEO, names: [] }, search: "ლობიო ქოთანში" }),
-  D({ slug: "pkhali", name: "ფხალი", category: "სალათი", cuisine: "ქართული", priceGel: [10, 18], vegetarian: true, vegan: true, heaviness: "მსუბუქი", tags: ["lenten", "supra"], icon: "salad", venue: { cats: GEO, names: [] }, search: "ფხალი" }),
-  D({ slug: "badrijani", name: "ბადრიჯანი ნიგვზით", category: "სალათი", cuisine: "ქართული", priceGel: [12, 20], vegetarian: true, vegan: true, heaviness: "მსუბუქი", tags: ["lenten", "supra"], icon: "salad", venue: { cats: GEO, names: [] }, search: "ბადრიჯანი ნიგვზით" }),
+  D({ slug: "lobio", name: "ლობიო ქოთანში", category: "კერძი", cuisine: "ქართული", priceGel: [8, 15], vegetarian: true, vegan: true, baseWeight: 2, tags: ["healthy", "lenten", "homestyle"], icon: "soup", venue: { cats: GEO, names: [] }, search: "ლობიო ქოთანში" }),
+  D({ slug: "pkhali", name: "ფხალი", category: "სალათი", cuisine: "ქართული", priceGel: [10, 18], vegetarian: true, vegan: true, heaviness: "მსუბუქი", tags: ["healthy", "lenten", "supra"], icon: "salad", venue: { cats: GEO, names: [] }, search: "ფხალი" }),
+  D({ slug: "badrijani", name: "ბადრიჯანი ნიგვზით", category: "სალათი", cuisine: "ქართული", priceGel: [12, 20], vegetarian: true, vegan: true, heaviness: "მსუბუქი", tags: ["healthy", "lenten", "supra"], icon: "salad", venue: { cats: GEO, names: [] }, search: "ბადრიჯანი ნიგვზით" }),
   D({ slug: "elarji", name: "ელარჯი", category: "კერძი", cuisine: "ქართული", priceGel: [10, 18], spicy: 1, vegetarian: true, heaviness: "მძიმე", tags: ["regional"], icon: "khachapuri", venue: { cats: GEO, names: ["მეგრ", "megrel"] }, search: "ელარჯი" }),
   D({ slug: "mchadi-cheese", name: "მჭადი ყველით", category: "ცომეული", cuisine: "ქართული", priceGel: [6, 14], vegetarian: true, tags: ["homestyle"], icon: "lobiani", venue: { cats: GEO, names: [] }, search: "მჭადი ყველით" }),
   D({ slug: "tolma", name: "ტოლმა", category: "კერძი", cuisine: "ქართული", priceGel: [12, 22], tags: ["homestyle"], icon: "salad", venue: { cats: GEO, names: [] }, search: "ტოლმა" }),
@@ -96,7 +96,7 @@ export const DISHES: Dish[] = [
   D({ slug: "doner", name: "დონერი", category: "სტრიტფუდი", cuisine: "ახლოაღმოსავლური", priceGel: [10, 18], meals: LATE, heaviness: "მძიმე", tags: ["fast"], icon: "shawarma", venue: { cats: ["doner", "kebab", "turkish"], names: ["doner", "döner", "დონერ", "kebab", "ქაბაბ"] }, search: "დონერი" }),
   D({ slug: "lahmacun", name: "ლაჰმაჯუნი / პიდე", category: "ცომეული", cuisine: "ახლოაღმოსავლური", priceGel: [8, 18], tags: ["fast"], icon: "pizza", venue: { cats: ["turkish"], names: ["lahmac", "pide", "ლაჰმაჯ", "türk", "turk"] }, search: "ლაჰმაჯუნი" }),
   D({ slug: "falafel", name: "ფალაფელი", category: "სტრიტფუდი", cuisine: "ახლოაღმოსავლური", priceGel: [8, 14], vegetarian: true, vegan: true, tags: ["fast", "lenten"], icon: "shawarma", venue: { cats: ["falafel", "lebanese", "israeli", "kosher"], names: ["falafel", "ფალაფ", "beirut", "saj"] }, search: "ფალაფელი" }),
-  D({ slug: "hummus", name: "ჰუმუსი", category: "სალათი", cuisine: "ახლოაღმოსავლური", priceGel: [10, 20], vegetarian: true, vegan: true, heaviness: "მსუბუქი", tags: ["lenten"], icon: "salad", venue: { cats: ["lebanese", "israeli", "persian", "kosher", "greek"], names: ["hummus", "ჰუმუს", "beirut"] }, search: "ჰუმუსი" }),
+  D({ slug: "hummus", name: "ჰუმუსი", category: "სალათი", cuisine: "ახლოაღმოსავლური", priceGel: [10, 20], vegetarian: true, vegan: true, heaviness: "მსუბუქი", tags: ["healthy", "lenten"], icon: "salad", venue: { cats: ["lebanese", "israeli", "persian", "kosher", "greek"], names: ["hummus", "ჰუმუს", "beirut"] }, search: "ჰუმუსი" }),
   D({ slug: "burger", name: "ბურგერი", category: "სტრიტფუდი", cuisine: "ამერიკული", priceGel: [15, 30], meals: LATE, heaviness: "მძიმე", baseWeight: 2, tags: ["fast"], icon: "burger", venue: { cats: ["burger", "american", "diner"], names: ["burger", "ბურგ"] }, search: "ბურგერი" }),
   D({ slug: "fried-chicken", name: "შემწვარი ქათამი / ფრთები", category: "სტრიტფუდი", cuisine: "ამერიკული", priceGel: [12, 25], spicy: 1, meals: LATE, heaviness: "მძიმე", tags: ["fast"], icon: "burger", venue: { cats: ["chicken"], names: ["chicken", "wings", "kfc", "ქათამ"] }, search: "ქათმის ფრთები" }),
   D({ slug: "hot-dog", name: "ჰოთდოგი", category: "სტრიტფუდი", cuisine: "ამერიკული", priceGel: [6, 12], meals: LATE, tags: ["fast"], icon: "sandwich", venue: { cats: ["hot_dog"], names: ["hot dog", "hotdog", "ჰოთდოგ", "ჰოტ-დოგ"] }, search: "ჰოთდოგი" }),
@@ -104,15 +104,15 @@ export const DISHES: Dish[] = [
   D({ slug: "pizza", name: "პიცა", category: "სტრიტფუდი", cuisine: "იტალიური", priceGel: [15, 35], vegetarian: true, meals: LATE, heaviness: "მძიმე", baseWeight: 2, tags: ["fast"], icon: "pizza", venue: { cats: ["pizza"], names: ["pizza", "პიც"] }, search: "პიცა" }),
 
   // ── აზიური ───────────────────────────────────────────────
-  D({ slug: "sushi", name: "სუში", category: "ზღვის", cuisine: "აზიური", priceGel: [25, 60], heaviness: "მსუბუქი", baseWeight: 2, icon: "sushi", venue: { cats: ["sushi", "japanese"], names: ["sushi", "სუშ"] }, search: "სუში" }),
+  D({ slug: "sushi", name: "სუში", category: "ზღვის", cuisine: "აზიური", priceGel: [25, 60], heaviness: "მსუბუქი", baseWeight: 2, tags: ["healthy"], icon: "sushi", venue: { cats: ["sushi", "japanese"], names: ["sushi", "სუშ"] }, search: "სუში" }),
   D({ slug: "ramen", name: "რამენი", category: "წვნიანი", cuisine: "აზიური", priceGel: [20, 35], spicy: 1, icon: "noodles", venue: { cats: ["ramen", "japanese"], names: ["ramen", "რამენ"] }, search: "რამენი" }),
   D({ slug: "wok", name: "ვოკი / ნუდლი", category: "კერძი", cuisine: "აზიური", priceGel: [15, 28], spicy: 1, baseWeight: 2, tags: ["fast"], icon: "noodles", venue: { cats: ["chinese", "east_asian", "asian", "noodle"], names: ["wok", "ვოკ", "noodle", "ნუდლ"] }, search: "ვოკი" }),
   D({ slug: "dumplings-asian", name: "გიოზა / დიმსამი", category: "კერძი", cuisine: "აზიური", priceGel: [15, 28], tags: ["dumpling"], icon: "khinkali", venue: { cats: ["chinese", "japanese", "dim_sum"], names: ["dumpling", "gyoza", "dim sum", "გიოზ"] }, search: "გიოზა" }),
   D({ slug: "pad-thai", name: "ფად თაი", category: "კერძი", cuisine: "აზიური", priceGel: [20, 35], spicy: 1, icon: "noodles", venue: { cats: ["thai", "southeast_asian"], names: ["thai", "ტაი", "ტაილანდ"] }, search: "ფად თაი" }),
-  D({ slug: "pho", name: "ფო", category: "წვნიანი", cuisine: "აზიური", priceGel: [18, 30], icon: "noodles", venue: { cats: ["vietnamese", "southeast_asian"], names: ["pho", "vietnam", "ვიეტნამ"] }, search: "ფო ვიეტნამური" }),
-  D({ slug: "bibimbap", name: "ბიბიმბაპი", category: "კერძი", cuisine: "აზიური", priceGel: [22, 35], spicy: 1, tags: ["bowl"], icon: "salad", venue: { cats: ["korean"], names: ["korea", "კორე", "kimchi", "bibimbap", "seoul"] }, search: "კორეული ბიბიმბაპი" }),
+  D({ slug: "pho", name: "ფო", category: "წვნიანი", cuisine: "აზიური", priceGel: [18, 30], tags: ["healthy"], icon: "noodles", venue: { cats: ["vietnamese", "southeast_asian"], names: ["pho", "vietnam", "ვიეტნამ"] }, search: "ფო ვიეტნამური" }),
+  D({ slug: "bibimbap", name: "ბიბიმბაპი", category: "კერძი", cuisine: "აზიური", priceGel: [22, 35], spicy: 1, tags: ["healthy", "bowl"], icon: "salad", venue: { cats: ["korean"], names: ["korea", "კორე", "kimchi", "bibimbap", "seoul"] }, search: "კორეული ბიბიმბაპი" }),
   D({ slug: "korean-chicken", name: "კორეული ქათამი", category: "ხორცი", cuisine: "აზიური", priceGel: [20, 35], spicy: 2, meals: LATE, heaviness: "მძიმე", icon: "burger", venue: { cats: ["korean"], names: ["korea", "კორე", "chimaek", "seoul"] }, search: "კორეული ქათამი" }),
-  D({ slug: "poke", name: "პოკე ბოული", category: "სალათი", cuisine: "აზიური", priceGel: [20, 32], heaviness: "მსუბუქი", tags: ["bowl"], icon: "salad", venue: { cats: ["poke", "hawaiian", "health"], names: ["poke", "პოკე", "bowl"] }, search: "პოკე" }),
+  D({ slug: "poke", name: "პოკე ბოული", category: "სალათი", cuisine: "აზიური", priceGel: [20, 32], heaviness: "მსუბუქი", tags: ["healthy", "bowl"], icon: "salad", venue: { cats: ["poke", "hawaiian", "health"], names: ["poke", "პოკე", "bowl"] }, search: "პოკე" }),
   D({ slug: "curry", name: "ინდური კარი", category: "კერძი", cuisine: "ინდური", priceGel: [20, 38], spicy: 2, vegetarian: true, icon: "soup", venue: { cats: ["indian", "south_asian", "pakistani", "nepal"], names: ["india", "masala", "curry", "ინდურ"] }, search: "ინდური რესტორანი" }),
 
   // ── ლათინური ─────────────────────────────────────────────
@@ -123,8 +123,11 @@ export const DISHES: Dish[] = [
   D({ slug: "pasta", name: "პასტა", category: "კერძი", cuisine: "იტალიური", priceGel: [18, 35], vegetarian: true, baseWeight: 2, icon: "noodles", venue: { cats: ["italian", "pasta"], names: ["pasta", "trattoria", "პასტ"] }, search: "პასტა" }),
   D({ slug: "risotto", name: "რიზოტო", category: "კერძი", cuisine: "იტალიური", priceGel: [25, 42], vegetarian: true, icon: "soup", venue: { cats: ["italian"], names: ["risott", "trattoria"] }, search: "რიზოტო" }),
   D({ slug: "steak", name: "სტეიკი", category: "ხორცი", cuisine: "ევროპული", priceGel: [40, 95], heaviness: "მძიმე", tags: ["grill"], icon: "mtsvadi", venue: { cats: ["steakhouse", "meat_restaurant", "bar_and_grill"], names: ["steak", "სტეიკ"] }, search: "სტეიკი" }),
-  D({ slug: "seafood", name: "თევზი / ზღვის პროდუქტი", category: "ზღვის", cuisine: "ევროპული", priceGel: [30, 70], heaviness: "მსუბუქი", icon: "sushi", venue: { cats: ["seafood", "fish"], names: ["fish", "თევზ", "seafood", "oyster"] }, search: "თევზის რესტორანი" }),
-  D({ slug: "salad-bowl", name: "სალათი", category: "სალათი", cuisine: "ევროპული", priceGel: [14, 26], vegetarian: true, heaviness: "მსუბუქი", tags: ["bowl", "fast"], icon: "salad", venue: { cats: ["salad", "health", "vegan", "vegetarian", "special_diet"], names: ["salad", "სალათ"] }, search: "სალათი" }),
+  D({ slug: "seafood", name: "თევზი / ზღვის პროდუქტი", category: "ზღვის", cuisine: "ევროპული", priceGel: [30, 70], heaviness: "მსუბუქი", tags: ["healthy"], icon: "sushi", venue: { cats: ["seafood", "fish"], names: ["fish", "თევზ", "seafood", "oyster"] }, search: "თევზის რესტორანი" }),
+  D({ slug: "salad-bowl", name: "სალათი", category: "სალათი", cuisine: "ევროპული", priceGel: [14, 26], vegetarian: true, heaviness: "მსუბუქი", tags: ["healthy", "bowl", "fast"], icon: "salad", venue: { cats: ["salad", "health", "vegan", "vegetarian", "special_diet"], names: ["salad", "სალათ"] }, search: "სალათი" }),
+
+  D({ slug: "grilled-chicken-salad", name: "გრილის ქათამი სალათით", category: "სალათი", cuisine: "ევროპული", priceGel: [18, 30], heaviness: "მსუბუქი", tags: ["healthy", "bowl", "grill"], icon: "salad", venue: { cats: ["health", "salad", "special_diet"], names: ["fit", "healthy", "grill", "ჯანსაღ"] }, search: "ქათამი გრილზე სალათით" }),
+  D({ slug: "smoothie-bowl", name: "სმუზი ბოული", category: "საუზმე", cuisine: "ევროპული", priceGel: [14, 25], vegetarian: true, vegan: true, meals: ["საუზმე", "სადილი"], heaviness: "მსუბუქი", tags: ["healthy", "brunch"], icon: "salad", venue: { cats: ["smoothie", "juice", "acai", "health"], names: ["smoothie", "acai", "სმუზ", "fresh"] }, search: "სმუზი ბოული" }),
 
   // ── საუზმე / ტკბილი ─────────────────────────────────────
   D({ slug: "brunch", name: "ბრანჩი", category: "საუზმე", cuisine: "ევროპული", priceGel: [15, 30], vegetarian: true, meals: ["საუზმე"], baseWeight: 2, tags: ["brunch"], icon: "cake", venue: { cats: ["breakfast", "brunch"], names: ["brunch", "ბრანჩ", "breakfast"] }, search: "ბრანჩი" }),
