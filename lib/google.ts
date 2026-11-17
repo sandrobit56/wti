@@ -69,6 +69,11 @@ export async function searchPlaces(apiKey: string, term: string, origin: LatLng,
     cache: "no-store", // Google terms: no storing of Places content
   });
   if (res.status === 429) throw new QuotaError("Google Places daily/minute quota reached");
-  if (!res.ok) throw new Error(`Google Places ${res.status}: ${(await res.text()).slice(0, 300)}`);
+  if (!res.ok) {
+    // Google's ErrorInfo: reason + metadata name the exact cause (API disabled, key restricted, billing…)
+    const body = await res.json().catch(() => null);
+    const info = body?.error?.details?.find((d: { reason?: string }) => d.reason);
+    throw new Error(`Google Places ${res.status} ${info?.reason ?? ""} ${JSON.stringify(info?.metadata ?? {})} ${body?.error?.message ?? ""}`.trim());
+  }
   return parsePlaces(await res.json(), origin);
 }
