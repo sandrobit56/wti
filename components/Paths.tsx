@@ -165,7 +165,7 @@ export function Paths({ dish, place, radius, onPickPlace }: Props) {
   );
 }
 
-export function PersonaTeaser({ persona, onStart }: { persona: Persona | null; onStart: () => void }) {
+export function PersonaTeaser({ persona, onStart, onGallery }: { persona: Persona | null; onStart: () => void; onGallery: () => void }) {
   return (
     <section className="container" id="persona">
       <div className="persona reveal-pop">
@@ -178,7 +178,7 @@ export function PersonaTeaser({ persona, onStart }: { persona: Persona | null; o
               <p>{persona.line} ბორბალი შენს გემოზეა აწყობილი — მისი კერძები უფრო ხშირად ამოდის.</p>
               <div className="row">
                 <button className="pill pill--dark" onClick={onStart}>ტესტი თავიდან</button>
-                <a className="pill pill--white" href="#wheel">დაატრიალე</a>
+                <button className="pill pill--white" onClick={onGallery}>12 პერსონა</button>
               </div>
             </>
           ) : (
@@ -187,7 +187,7 @@ export function PersonaTeaser({ persona, onStart }: { persona: Persona | null; o
               <p>7 კითხვა, ერთი წუთი. პასუხების მიხედვით ბორბალი თავად დააყენებს ფილტრებს — ბიუჯეტს, გემოს, დიეტას. რეგისტრაცია არ სჭირდება.</p>
               <div className="row">
                 <button className="pill pill--dark" onClick={onStart}>ტესტის დაწყება</button>
-                <a className="pill pill--white only-desktop" href="#persona-list" onClick={(e) => { e.preventDefault(); onStart(); }}>12 პერსონა</a>
+                <button className="pill pill--white" onClick={onGallery}>12 პერსონა</button>
               </div>
             </>
           )}
@@ -211,16 +211,3 @@ export function PersonaTeaser({ persona, onStart }: { persona: Persona | null; o
   );
 }
 
-export function TrustCard() {
-  return (
-    <section className="container" id="trust">
-      <div className="trust reveal">
-        <div>
-          <h2>„ჩანგალი“ შეფასება, რომელსაც ვერ იყიდი</h2>
-          <p>ანონიმური ვიზიტები, ვიხდით ჩვენ, მინიმუმ 2 ინსპექტორი, ხელახლა ყოველ 6 თვეში. პირველი შეფასებები მალე.</p>
-        </div>
-        <Image src="/icons/rosette.svg" alt="" width={64} height={64} />
-      </div>
-    </section>
-  );
-}

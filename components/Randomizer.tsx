@@ -18,9 +18,11 @@ import { PERSONAS } from "@/lib/personas.ts";
 import { applyQuiz, scoreQuiz } from "@/lib/quiz.ts";
 import { DEFAULT_FILTERS, NO_PREFS, SpinError, explain, pickVariants, seeded, spin, targetRotation, type Filters, type Mood, type Prefs, type SpinContext, type Win } from "@/lib/spin.ts";
 import { FilterPanel, MY_LOCATION, type Place } from "./FilterPanel";
-import { Paths, PersonaTeaser, TrustCard } from "./Paths";
+import { Paths, PersonaTeaser } from "./Paths";
+import { TrustCard } from "./TrustCard";
 import { Quiz } from "./Quiz";
 import { FoodRibbon } from "./FoodRibbon";
+import { PersonaGallery } from "./PersonaGallery";
 import { ResultModal } from "./ResultModal";
 import { Wheel } from "./Wheel";
 
@@ -76,6 +78,7 @@ export function Randomizer() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [quizOpen, setQuizOpen] = useState(false);
+  const [galleryOpen, setGalleryOpen] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState<string[] | null>(init.quizAnswers ?? null);
   const prefs = useMemo(() => prefsFrom(quizAnswers), [quizAnswers]);
   const persona = prefs.persona ? PERSONAS[prefs.persona] : null;
@@ -313,7 +316,8 @@ export function Randomizer() {
       {quizOpen && <Quiz onClose={() => setQuizOpen(false)} onApply={applyPersona} />}
 
       <FoodRibbon />
-      <PersonaTeaser persona={persona} onStart={() => setQuizOpen(true)} />
+      <PersonaTeaser persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />
+      {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} />}
       <TrustCard />
 
       <div ref={pathsRef} className="paths-anchor">
