@@ -14,7 +14,7 @@ import { PERSONAS } from "./personas.ts";
 import { applyQuiz, scoreQuiz, PERSONA_IDS } from "./quiz.ts";
 import { CATEGORY_CAP, CUISINE_CAP, DEFAULT_FILTERS, NO_PREFS, SpinError, countMatching, explain, pickVariants, mealTimeAt, seeded, spin, targetRotation, weightOf, type SpinContext } from "./spin.ts";
 import { matchVenues, distanceKm, countByDish, mapsSearchUrl, type Venue } from "./places.ts";
-import { embedSearchUrl, parsePlaces, TBILISI } from "./google.ts";
+import { embedSearchUrl, parsePlaces, placesQuery, TBILISI } from "./google.ts";
 
 const ctx = (over: Partial<SpinContext> = {}): SpinContext => ({
   filters: DEFAULT_FILTERS, now: new Date("2026-11-15T13:00:00"), excluded: [], random: false, available: null, prefs: NO_PREFS, mood: null, history: [], ...over,
@@ -276,4 +276,9 @@ test("Google: embed URL pinned to Tbilisi; parsePlaces drops non-Tbilisi and inc
     { id: "d", displayName: { text: "No location" }, googleMapsUri: "u" },
   ] };
   assert.deepEqual(parsePlaces(raw, TBILISI).map((p) => p.name), ["Near", "Far"]);
+});
+
+test("Google query: meal dishes get the cuisine, pastry/street food stay as typed", () => {
+  assert.equal(placesQuery("ოჯახური", "კერძი", "ქართული"), "ოჯახური ქართული სამზარეულო");
+  assert.equal(placesQuery("ლობიანი", "ცომეული", "ქართული"), "ლობიანი");
 });

@@ -61,6 +61,14 @@ export class QuotaError extends Error {}
  */
 export const RESTAURANT_ONLY = new Set(["ხორცი", "კერძი", "წვნიანი", "ზღვის", "სალათი"]);
 
+/**
+ * Meal dishes: "<dish> <cuisine> სამზარეულო" — tested live: "ოჯახური" alone matched
+ * restaurants NAMED "ოჯახური…"; with the cuisine Google returns Georgian restaurants.
+ */
+export function placesQuery(term: string, category: string, cuisine: string): string {
+  return RESTAURANT_ONLY.has(category) && cuisine ? `${term} ${cuisine} სამზარეულო` : term;
+}
+
 export async function searchPlaces(apiKey: string, term: string, origin: LatLng, radiusKm: number, restaurantOnly: boolean): Promise<GooglePlace[]> {
   if (!apiKey) throw new Error("GOOGLE_PLACES_API_KEY is not set on the server");
   const res = await fetch("https://places.googleapis.com/v1/places:searchText", {

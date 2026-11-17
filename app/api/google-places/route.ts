@@ -5,13 +5,13 @@
  * Date:        2026-11-17
  * Version:     v1.0
  * Description: GET /api/google-places?q=ხინკალი&lat=41.71&lng=44.75&r=2
- *              &cat=<dish category>   → { places: GooglePlace[] }   (live Google Maps data, never stored)
+ *              &cat=<dish category>&cuisine=<dish cuisine>   → { places: GooglePlace[] }   (live Google Maps data, never stored)
  *              The paid key stays here on the server. Spend is capped by the daily
  *              quota in Google Cloud; this route adds a per-IP limit so one bot
  *              cannot burn the whole day's quota.
  *              429 { error: "quota" } → the UI falls back to our own venue list.
  */
-import { QuotaError, RESTAURANT_ONLY, searchPlaces } from "@/lib/google.ts";
+import { QuotaError, RESTAURANT_ONLY, placesQuery, searchPlaces } from "@/lib/google.ts";
 import { RADII_KM } from "@/lib/places.ts";
 
 const PER_IP_PER_MINUTE = 5;
@@ -38,7 +38,8 @@ export async function GET(request: Request) {
   if (tooMany(ip)) return Response.json({ error: "rate" }, { status: 429 });
 
   try {
-    const places = await searchPlaces(process.env.GOOGLE_PLACES_API_KEY ?? "", term, { lat, lng }, r, RESTAURANT_ONLY.has(p.get("cat") ?? ""));
+    const cat = p.get("cat") ?? "", cuisine = (p.get("cuisine") ?? "").slice(0, 30);
+    const places = await searchPlaces(process.env.GOOGLE_PLACES_API_KEY ?? "", placesQuery(term, cat, cuisine), { lat, lng }, r, RESTAURANT_ONLY.has(cat));
     return Response.json({ places }, { headers: { "Cache-Control": "no-store" } });
   } catch (e) {
     if (e instanceof QuotaError) return Response.json({ error: "quota" }, { status: 429 });
