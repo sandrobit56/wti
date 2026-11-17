@@ -54,7 +54,14 @@ export function parsePlaces(json: { places?: RawPlace[] }, origin: LatLng): Goog
 
 export class QuotaError extends Error {}
 
-export async function searchPlaces(apiKey: string, term: string, origin: LatLng, radiusKm: number): Promise<GooglePlace[]> {
+/**
+ * Meal-type dishes are restricted to restaurants (stops "ოჯახური" matching shops
+ * that merely carry the word). Pastry, sweets, street food stay unrestricted —
+ * they are sold by bakeries, cafés and kiosks too.
+ */
+export const RESTAURANT_ONLY = new Set(["ხორცი", "კერძი", "წვნიანი", "ზღვის", "სალათი"]);
+
+export async function searchPlaces(apiKey: string, term: string, origin: LatLng, radiusKm: number, restaurantOnly: boolean): Promise<GooglePlace[]> {
   if (!apiKey) throw new Error("GOOGLE_PLACES_API_KEY is not set on the server");
   const res = await fetch("https://places.googleapis.com/v1/places:searchText", {
     method: "POST",
@@ -64,6 +71,7 @@ export async function searchPlaces(apiKey: string, term: string, origin: LatLng,
       languageCode: "ka",
       regionCode: "GE",
       pageSize: 10,
+      ...(restaurantOnly ? { includedType: "restaurant", strictTypeFiltering: true } : {}),
       locationBias: { circle: { center: { latitude: origin.lat, longitude: origin.lng }, radius: Math.min(radiusKm * 1000, 50000) } },
     }),
     cache: "no-store", // Google terms: no storing of Places content

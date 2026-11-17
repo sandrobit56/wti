@@ -25,14 +25,14 @@ type State =
   | { kind: "limit" }
   | { kind: "error" };
 
-export function GoogleNearby({ term, area, place, radius }: { term: string; area: string | null; place: Place | null; radius: RadiusKm }) {
+export function GoogleNearby({ term, category, area, place, radius }: { term: string; category: string; area: string | null; place: Place | null; radius: RadiusKm }) {
   const [state, setState] = useState<State>({ kind: "idle" });
   const center = place?.center ?? TBILISI;
   const r = place ? radius : 10; // whole city when no area chosen
 
   async function search() {
     setState({ kind: "loading" });
-    const qs = new URLSearchParams({ q: term, lat: String(center.lat), lng: String(center.lng), r: String(r) });
+    const qs = new URLSearchParams({ q: term, cat: category, lat: String(center.lat), lng: String(center.lng), r: String(r) });
     const res = await fetch(`/api/google-places?${qs}`);
     if (res.status === 429) return setState({ kind: "limit" });
     if (!res.ok) return setState({ kind: "error" });

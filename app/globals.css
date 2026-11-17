@@ -187,6 +187,7 @@ a.row-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
   .only-desktop { display: revert !important; }
   .only-mobile { display: none !important; }
   .header__nav.only-desktop, .header__nav .only-desktop { display: flex !important; }
+  .row .pill.only-desktop { display: inline-flex !important; }
   .hero { padding: 48px 0 64px; }
   .hero__inner { grid-template-columns: 1fr 460px; align-items: start; gap: 64px; justify-items: stretch; }
   .hero__stage { justify-self: center; margin-top: 24px; }
@@ -391,3 +392,75 @@ button.panel__hint:hover .panel__hint-arrow { transform: translateX(4px); }
 .chip--icon:active, .place:active, .panel__actions .pill:active { box-shadow: none; }
 .chip--icon.on { border-color: #c92c45; box-shadow: 0 2px 0 #c92c45; }
 .panel__actions .pill--dark { border-color: #c92c45; box-shadow: 0 2px 0 #c92c45; }
+
+/* ══ v4 page visuals: no black fills, tactile buttons, scroll-driven motion ══ */
+/* Buttons: the old black pill becomes the brand red, same tactile language as the filter */
+.pill--dark { background: var(--brand); color: #fff; box-shadow: 0 3px 0 #c92c45; transition: transform .15s ease, box-shadow .15s ease, filter .2s; }
+.pill--dark:hover { transform: translateY(-2px); box-shadow: 0 5px 0 #c92c45; filter: saturate(1.1); }
+.pill--dark:active { transform: translateY(3px); box-shadow: 0 0 0 #c92c45; }
+.pill--white { box-shadow: 0 3px 0 rgba(18,18,18,.12); display: inline-flex; align-items: center; justify-content: center; text-decoration: none; color: inherit; transition: transform .15s ease, box-shadow .15s ease; }
+.pill--white:hover { transform: translateY(-2px); box-shadow: 0 5px 0 rgba(18,18,18,.14); }
+.pill--white:active { transform: translateY(3px); box-shadow: none; }
+.row .pill { display: inline-flex; align-items: center; justify-content: center; }
+.card .pill--dark { background: #fff; color: var(--text); box-shadow: 0 3px 0 rgba(18,18,18,.18); }
+.card .pill--dark:hover { box-shadow: 0 5px 0 rgba(18,18,18,.2); }
+
+.hero__winner { transition: transform .2s var(--spring), box-shadow .2s; }
+.hero__winner:hover { transform: translateY(-2px) rotate(-1deg); }
+.hero__winner-go { display: inline-block; color: var(--brand); font-weight: 800; transition: transform .2s ease; }
+.hero__winner:hover .hero__winner-go { transform: translateX(4px); }
+
+/* Highlighted words in section titles: marker swipe */
+.hl { position: relative; z-index: 0; white-space: nowrap; }
+.hl::after { content: ""; position: absolute; z-index: -1; left: -4px; right: -4px; bottom: .08em; height: .42em; border-radius: 8px; transform-origin: left; }
+.hl--green::after { background: var(--green); }
+.hl--orange::after { background: var(--orange); }
+
+/* Paths cards: art in the empty corner, "soon" sticker, row-card hover */
+.card { position: relative; overflow: hidden; isolation: isolate; }
+.card__art { position: absolute; right: -14px; bottom: 64px; z-index: -1; opacity: .9; transform: rotate(-12deg); animation: bob 4s ease-in-out infinite; pointer-events: none; }
+.card--green .card__art { animation-delay: -1.3s; }
+.card--orange .card__art { animation-delay: -2.6s; }
+@keyframes bob { 50% { transform: rotate(-6deg) translateY(-10px); } }
+.soon { margin-top: auto; align-self: center; padding: 10px 18px; border: 2px dashed rgba(18,18,18,.35); border-radius: 999px; font-weight: 800; font-size: 14px; background: rgba(255,255,255,.55); transform: rotate(-2deg); }
+.row-card { transition: transform .15s ease, box-shadow .15s ease; }
+a.row-card:hover { transform: translateX(4px); box-shadow: 0 3px 0 rgba(18,18,18,.08); }
+
+/* Food ribbon: stickers slide with scroll, mascot chomps along */
+.ribbon { position: relative; overflow: hidden; margin: 40px 0 8px; padding: 18px 0; background: var(--yellow); transform: rotate(-2deg); box-shadow: 0 4px 0 #e6b800; }
+.ribbon__track { display: flex; gap: 22px; width: max-content; padding-left: 90px; }
+.ribbon__item { width: 64px; height: 64px; border-radius: 50%; background: #fff; display: grid; place-items: center; box-shadow: 0 3px 0 rgba(18,18,18,.1); transform: rotate(calc((var(--k) - 1.5) * 8deg)); }
+.ribbon__mascot { position: absolute; left: 12px; top: 50%; translate: 0 -50%; animation: chomp .5s steps(2) infinite; }
+@keyframes chomp { 50% { scale: 1 .86; } }
+
+/* Scroll-driven motion (progressive: only where supported, never for reduced motion) */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ribbon__track { animation: ribbon-slide linear both; animation-timeline: view(); animation-range: entry 0% exit 100%; }
+    @keyframes ribbon-slide { from { translate: 0 0; } to { translate: -45% 0; } }
+
+    .reveal { animation: reveal-up linear both; animation-timeline: view(); animation-range: entry 0% cover 30%; }
+    @keyframes reveal-up { from { opacity: 0; translate: 0 48px; } to { opacity: 1; translate: 0 0; } }
+    .reveal .hl::after { animation: marker linear both; animation-timeline: view(); animation-range: entry 40% cover 40%; }
+    @keyframes marker { from { scale: 0 1; } to { scale: 1 1; } }
+
+    .reveal-pop { animation: pop-in linear both; animation-timeline: view(); animation-range: entry 0% cover 35%; }
+    @keyframes pop-in { from { opacity: 0; scale: .9; border-radius: 120px; } to { opacity: 1; scale: 1; border-radius: var(--r-xl); } }
+    .reveal-pop .qcard { animation: fan-q linear both; animation-timeline: view(); animation-range: entry 10% cover 50%; }
+    .reveal-pop .pcard { animation: fan-p linear both; animation-timeline: view(); animation-range: entry 10% cover 50%; }
+    @keyframes fan-q { from { transform: translate(60px, 40px) rotate(6deg); } to { transform: rotate(-4deg); } }
+    @keyframes fan-p { from { transform: translate(-80px, 60px) rotate(-10deg); opacity: 0; } to { transform: rotate(3deg); opacity: 1; } }
+
+    .stagger > * { animation: card-rise linear both; animation-timeline: view(); }
+    .stagger > :nth-child(1) { animation-range: entry 0% cover 25%; }
+    .stagger > :nth-child(2) { animation-range: entry 8% cover 32%; }
+    .stagger > :nth-child(3) { animation-range: entry 16% cover 40%; }
+    @keyframes card-rise { from { opacity: 0; translate: 0 80px; rotate: 3deg; } to { opacity: 1; translate: 0 0; rotate: 0deg; } }
+
+    .trust img { animation: rosette linear both; animation-timeline: view(); animation-range: entry 0% cover 45%; }
+    @keyframes rosette { from { rotate: -180deg; scale: .4; } to { rotate: 0deg; scale: 1; } }
+  }
+}
+@supports not (animation-timeline: view()) { .hl::after { scale: 1 1; } }
+@media (prefers-reduced-motion: reduce) { .card__art, .ribbon__mascot { animation: none; } }
+@media (max-width: 1023px) { .ribbon { margin: 28px 0 0; } .ribbon__item { width: 52px; height: 52px; } .card__art { width: 90px; height: 90px; bottom: 70px; } }

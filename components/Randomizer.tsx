@@ -20,6 +20,7 @@ import { DEFAULT_FILTERS, NO_PREFS, SpinError, explain, pickVariants, seeded, sp
 import { FilterPanel, MY_LOCATION, type Place } from "./FilterPanel";
 import { Paths, PersonaTeaser, TrustCard } from "./Paths";
 import { Quiz } from "./Quiz";
+import { FoodRibbon } from "./FoodRibbon";
 import { ResultModal } from "./ResultModal";
 import { Wheel } from "./Wheel";
 
@@ -279,7 +280,7 @@ export function Randomizer() {
             {spinError && <p className="hero__error" role="alert">{spinError}</p>}
             {dish && (
               <button className="hero__winner" onClick={() => setModalOpen(true)}>
-                ბორბალმა აირჩია: <strong>{dish.name}</strong> · ნახე
+                ბორბალმა აირჩია: <strong>{dish.name}</strong> <span className="hero__winner-go">ნახე →</span>
               </button>
             )}
             <div className="hero__actions only-mobile">
@@ -311,6 +312,7 @@ export function Randomizer() {
 
       {quizOpen && <Quiz onClose={() => setQuizOpen(false)} onApply={applyPersona} />}
 
+      <FoodRibbon />
       <PersonaTeaser persona={persona} onStart={() => setQuizOpen(true)} />
       <TrustCard />
 

@@ -163,7 +163,7 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
               <span className="row-card__side">{km(v.distanceKm)} ↗</span>
             </a>
           ))}
-          <GoogleNearby term={dish.search} area={nearArea} place={place} radius={radius} />
+          <GoogleNearby term={dish.search} category={dish.category} area={nearArea} place={place} radius={radius} />
           <a className="modal__maps" href={mapsSearchUrl(dish.search, nearArea)} target="_blank" rel="noreferrer">
             ყველა „{dish.name}“ Google Maps-ზე ↗
           </a>

@@ -2,8 +2,9 @@
  * File:        components/Paths.tsx
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
- * Date:        2026-11-15
- * Version:     v1.0 — Figma "ნახე, გამოიძახე ან მიდი": three cards
+ * Date:        2026-11-17
+ * Version:     v3.0 — card art, "მალე" sticker, scroll-reveal hooks (CSS only);
+ *              (was v1.0 — Figma "ნახე, გამოიძახე ან მიდი": three cards)
  * Description: The three paths for the dish the wheel picked:
  *   წაიკითხე (yellow) — verified blogs (none yet: honest empty state)
  *   მიდი     (green)  — our Overture venues in the radius + Google Maps search
@@ -63,7 +64,7 @@ export function Paths({ dish, place, radius, onPickPlace }: Props) {
   return (
     <section className="paths" id="paths" aria-labelledby="paths-title">
       <div className="container">
-        <h2 id="paths-title" className="section-title">ნახე, გამოიძახე ან მიდი</h2>
+        <h2 id="paths-title" className="section-title reveal">ნახე, <span className="hl hl--green">მიდი</span> ან <span className="hl hl--orange">გამოიძახე</span></h2>
         {dish ? (
           <div className="pick">
             <Image src={`/icons/${dish.icon}.svg`} alt="" width={56} height={56} />
@@ -89,8 +90,9 @@ export function Paths({ dish, place, radius, onPickPlace }: Props) {
           ))}
         </div>
 
-        <div className="cards">
+        <div className="cards stagger">
           <article className={`card card--yellow${tab === "read" ? " on" : ""}`}>
+            <Image className="card__art" src="/icons/book.svg" alt="" width={120} height={120} aria-hidden="true" />
             <header className="card__head">
               <Image src="/icons/book.svg" alt="" width={44} height={44} />
               <div><h3>წაიკითხე</h3><p>ვერიფიცირებული გამოცდილება</p></div>
@@ -101,10 +103,11 @@ export function Paths({ dish, place, radius, onPickPlace }: Props) {
                 <span>პირველ ავტორებს ახლა ვამოწმებთ: საკუთარი ხარჯით, ჩეკით.</span>
               </div>
             </div>
-            <button className="pill pill--dark pill--block" disabled>ყველა ბლოგი · მალე</button>
+            <span className="soon">✦ ბლოგები მალე ✦</span>
           </article>
 
           <article className={`card card--green${tab === "go" ? " on" : ""}`}>
+            <Image className="card__art" src="/icons/pin.svg" alt="" width={120} height={120} aria-hidden="true" />
             <header className="card__head">
               <Image src="/icons/pin.svg" alt="" width={44} height={44} />
               <div><h3>მიდი</h3><p>{place ? `${area} · ${radius} კმ` : "ადგილები ახლოს"}</p></div>
@@ -138,6 +141,7 @@ export function Paths({ dish, place, radius, onPickPlace }: Props) {
           </article>
 
           <article className={`card card--orange${tab === "order" ? " on" : ""}`}>
+            <Image className="card__art" src="/icons/scooter.svg" alt="" width={120} height={120} aria-hidden="true" />
             <header className="card__head">
               <Image src="/icons/scooter.svg" alt="" width={44} height={44} />
               <div><h3>გამოიძახე</h3><p>მიტანა 30–50 წუთში</p></div>
@@ -164,7 +168,7 @@ export function Paths({ dish, place, radius, onPickPlace }: Props) {
 export function PersonaTeaser({ persona, onStart }: { persona: Persona | null; onStart: () => void }) {
   return (
     <section className="container" id="persona">
-      <div className="persona">
+      <div className="persona reveal-pop">
         <div className="persona__copy">
           <Image className="only-mobile" src={`/icons/${persona?.icon ?? "mascot"}.svg`} alt="" width={64} height={66} />
           {persona ? (
@@ -183,7 +187,7 @@ export function PersonaTeaser({ persona, onStart }: { persona: Persona | null; o
               <p>7 კითხვა, ერთი წუთი. პასუხების მიხედვით ბორბალი თავად დააყენებს ფილტრებს — ბიუჯეტს, გემოს, დიეტას. რეგისტრაცია არ სჭირდება.</p>
               <div className="row">
                 <button className="pill pill--dark" onClick={onStart}>ტესტის დაწყება</button>
-                <span className="pill pill--white only-desktop">12 პერსონა</span>
+                <a className="pill pill--white only-desktop" href="#persona-list" onClick={(e) => { e.preventDefault(); onStart(); }}>12 პერსონა</a>
               </div>
             </>
           )}
@@ -210,7 +214,7 @@ export function PersonaTeaser({ persona, onStart }: { persona: Persona | null; o
 export function TrustCard() {
   return (
     <section className="container" id="trust">
-      <div className="trust">
+      <div className="trust reveal">
         <div>
           <h2>„ჩანგალი“ შეფასება, რომელსაც ვერ იყიდი</h2>
           <p>ანონიმური ვიზიტები, ვიხდით ჩვენ, მინიმუმ 2 ინსპექტორი, ხელახლა ყოველ 6 თვეში. პირველი შეფასებები მალე.</p>
