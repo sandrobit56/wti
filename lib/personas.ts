@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-18
- * Version:     v1.2 — Sandro's names: ჭამის ოსტატი, წიწაკის რისხვა, შამფურის კაცი, შაურმის ხულიგანი;
+ * Version:     v1.3 — Sandro's names: ჭამის ოსტატი, კუჭების მთვლელი, ცომის მოტრფიალე,
+ *              წიწაკის რისხვა, შამფურის კაცი, შაურმის ხულიგანი, გემოებზე მონადირე;
  *              v1.1 — 8 persona names localized (კუდების მთვლელი, თონის სტუმარი, …);
  *              v1.0 — 12 personas from the "12 პერსონა და ტესტი" doc
  * Description: Persona card copy + the wheel rule. A dish that matches the
@@ -27,9 +28,9 @@ export const PERSONA_BOOST = 1.6;
 export const PERSONAS: Record<PersonaId, Persona> = {
   tamada: { id: "tamada", name: "ჭამის ოსტატი", line: "სუფრა შენთვის ჭამა კი არა, ღონისძიებაა.", icon: "khachapuri", georgianHabit: true,
     matches: (d) => d.tags.includes("supra") || (d.cuisine === "ქართული" && d.heaviness === "მძიმე") },
-  khinkali: { id: "khinkali", name: "კუდების მთვლელი", line: "კუდებს ითვლი და ერთით მეტს უკვეთავ.", icon: "khinkali", georgianHabit: true,
+  khinkali: { id: "khinkali", name: "კუჭების მთვლელი", line: "კუდებს ითვლი და ერთით მეტს უკვეთავ.", icon: "khinkali", georgianHabit: true,
     matches: (d) => d.tags.includes("dumpling") },
-  bakery: { id: "bakery", name: "თონის სტუმარი", line: "საუზმე ცხელია, იაფია და ხელში ეტევა.", icon: "lobiani", georgianHabit: true,
+  bakery: { id: "bakery", name: "ცომის მოტრფიალე", line: "საუზმე ცხელია, იაფია და ხელში ეტევა.", icon: "lobiani", georgianHabit: true,
     matches: (d) => d.tags.includes("bakery") },
   grandma: { id: "grandma", name: "ბებიის რეცეპტების მცველი", line: "ჩაქაფული, ჩახოხბილი, ელარჯი — სახლის გემო.", icon: "soup", georgianHabit: true,
     matches: (d) => d.tags.includes("homestyle") || d.tags.includes("regional") },
@@ -47,6 +48,6 @@ export const PERSONAS: Record<PersonaId, Persona> = {
     matches: (d) => (d.heaviness === "მსუბუქი" && d.meals.includes("სადილი")) || d.tags.includes("bowl") },
   brunch: { id: "brunch", name: "ზარმაცი დილის მოყვარული", line: "ყავა, კვერცხი, ნამცხვარი — დღე ლამაზად იწყება.", icon: "cake", georgianHabit: false,
     matches: (d) => d.tags.includes("brunch") || d.category === "დესერტი" },
-  world: { id: "world", name: "გემოს მოგზაური", line: "მენიუში ის გაინტერესებს, რაც ჯერ არ გაგისინჯავს.", icon: "taco", georgianHabit: false,
+  world: { id: "world", name: "გემოებზე მონადირე", line: "მენიუში ის გაინტერესებს, რაც ჯერ არ გაგისინჯავს.", icon: "taco", georgianHabit: false,
     matches: (d) => d.cuisine !== "ქართული" },
 };
