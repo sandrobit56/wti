@@ -202,7 +202,7 @@ export function PersonaTeaser({ persona, onStart, onGallery }: { persona: Person
           <div className="pcard">
             <Image src={`/icons/${persona?.icon ?? "mascot"}.svg`} alt="" width={56} height={58} />
             <p className="caps">შენი პერსონა</p>
-            <p className="pcard__name">{persona?.name ?? "ცხარის მონადირე"}</p>
+            <p className="pcard__name">{persona?.name ?? "წიწაკის რისხვა"}</p>
             <div className="row"><span className="mini">₾₾</span><span className="mini mini--dark">ცხარე</span></div>
           </div>
         </div>

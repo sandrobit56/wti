@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-18
- * Version:     v1.1 — 8 persona names localized (კუდების მთვლელი, თონის სტუმარი, …);
+ * Version:     v1.2 — Sandro's names: წიწაკის რისხვა, მწვადის მაესტრო, შაურმის ხულიგანი;
+ *              v1.1 — 8 persona names localized (კუდების მთვლელი, თონის სტუმარი, …);
  *              v1.0 — 12 personas from the "12 პერსონა და ტესტი" doc
  * Description: Persona card copy + the wheel rule. A dish that matches the
  *              persona's rule gets ×1.6 weight (lib/spin.ts). 8 personas are
@@ -34,11 +35,11 @@ export const PERSONAS: Record<PersonaId, Persona> = {
     matches: (d) => d.tags.includes("homestyle") || d.tags.includes("regional") },
   green: { id: "green", name: "მწვანე სუფრის მოყვარული", line: "ფხალი, ლობიო, ბადრიჯანი — ხორცი არ გენატრება.", icon: "salad", georgianHabit: true,
     matches: (d) => d.vegan || d.tags.includes("lenten") },
-  spice: { id: "spice", name: "ცხარის მონადირე", line: "აჯიკა სოუსი კი არა, ცხოვრების წესია.", icon: "soup", georgianHabit: true,
+  spice: { id: "spice", name: "წიწაკის რისხვა", line: "აჯიკა სოუსი კი არა, ცხოვრების წესია.", icon: "soup", georgianHabit: true,
     matches: (d) => d.spicy >= 1 },
-  mtsvadi: { id: "mtsvadi", name: "მწვადის მეფე", line: "ნაკვერჩხალი და ხორცი — დანარჩენი დეტალებია.", icon: "mtsvadi", georgianHabit: true,
+  mtsvadi: { id: "mtsvadi", name: "მწვადის მაესტრო", line: "ნაკვერჩხალი და ხორცი — დანარჩენი დეტალებია.", icon: "mtsvadi", georgianHabit: true,
     matches: (d) => d.tags.includes("grill") || d.category === "ხორცი" },
-  shawarma: { id: "shawarma", name: "ღამის მშიერი", line: "ქალაქი იძინებს, ჯიხური — არა.", icon: "shawarma", georgianHabit: true,
+  shawarma: { id: "shawarma", name: "შაურმის ხულიგანი", line: "ქალაქი იძინებს, ჯიხური — არა.", icon: "shawarma", georgianHabit: true,
     matches: (d) => d.category === "სტრიტფუდი" || d.meals.includes("ღამე") },
   sushi: { id: "sushi", name: "ჩხირების ოსტატი", line: "ჩხირები ჩანგალზე უკეთ გეხერხება.", icon: "sushi", georgianHabit: false,
     matches: (d) => d.cuisine === "აზიური" },
