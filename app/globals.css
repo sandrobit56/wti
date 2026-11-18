@@ -777,3 +777,10 @@ a.row-card:hover { transform: translateX(4px); box-shadow: 0 3px 0 rgba(18,18,18
 /* yellow band text: dark enough on #ffd233 */
 .ribbon__hint { opacity: 1; color: #5c4a00; }
 .ribbon__score b { color: #a8253b; }
+
+/* ── No sideways scroll on phones (Instagram/Facebook in-app browsers scroll the whole page) ──
+   overflow-x: clip (not hidden) — clips without creating a scroll container, so the sticky
+   header keeps working. Sources clipped too: the decorative title arc and the tilted ribbon. */
+html, body { overflow-x: clip; max-width: 100%; }
+.hero, #persona, .paths, section[aria-label="პეკმენის თამაში"] { overflow-x: clip; }
+@media (max-width: 1023px) { #wheel-title-arc-d { display: none; } }
