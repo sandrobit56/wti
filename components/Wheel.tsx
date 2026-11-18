@@ -46,27 +46,7 @@ export function Wheel({ dishes, rotation, spinning, winnerIndex, onSpin, onLande
   return (
     <div className="wheel">
       <svg viewBox="-200 -222 400 422" role="img" aria-label={`ბორბალი: ${dishes.map((d) => d.name).join(", ")}`}>
-        {/* Title on an arc outside the rim (r=218 baseline): reads around the wheel, never across it. */}
-        <path id="wheel-title-arc" d="M -168 -139 A 218 218 0 0 1 168 -139" fill="none" />
-        <text className="wheel__title wheel__title--m" aria-hidden="true">
-          <textPath href="#wheel-title-arc" startOffset="50%" textAnchor="middle">
-            <tspan className="wheel__title-sm">რა ვჭამოთ </tspan><tspan className="wheel__title-lg">დღეს?</tspan>
-          </textPath>
-        </text>
-        {/* Desktop — Figma "1 · Hero" (69:1911): text on a big circle (r 415 → 332 here, centre
-            shifted (14,60) below-right of the wheel), upper-left, pale pink gradient, 67/96 → 54/77. */}
-        <defs>
-          <linearGradient id="wheel-title-grad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" stopColor="#ffd3db" />
-            <stop offset="1" stopColor="#fff1f3" />
-          </linearGradient>
-        </defs>
-        <path id="wheel-title-arc-d" d="M -306.7 -25.9 A 332 332 0 0 1 154.3 -240.9" fill="none" />
-        <text className="wheel__title wheel__title--d" aria-hidden="true">
-          <textPath href="#wheel-title-arc-d" startOffset="50%" textAnchor="middle">
-            <tspan className="wheel__title-dsm">რა ვჭამოთ </tspan><tspan className="wheel__title-dlg">დღეს?</tspan>
-          </textPath>
-        </text>
+        <WheelTitle />
         <circle r={RIM} fill="#fff" />
         <g
           className={spinning ? "wheel__disc wheel__disc--spinning" : "wheel__disc"}
@@ -106,6 +86,50 @@ export function Wheel({ dishes, rotation, spinning, winnerIndex, onSpin, onLande
       <button className="wheel__hub" onClick={onSpin} disabled={spinning} aria-label="დაატრიალე ბორბალი">
         {spinning ? "…" : "დაატრიალე"}
       </button>
+    </div>
+  );
+}
+
+/**
+ * The curved "რა ვჭამოთ დღეს?" title (mobile arc + desktop Figma arc). Exported so the
+ * server-rendered skeleton can paint it before JavaScript loads (it is the LCP element).
+ */
+export function WheelTitle() {
+  return (
+    <>
+        {/* Title on an arc outside the rim (r=218 baseline): reads around the wheel, never across it. */}
+      <path id="wheel-title-arc" d="M -168 -139 A 218 218 0 0 1 168 -139" fill="none" />
+      <text className="wheel__title wheel__title--m" aria-hidden="true">
+        <textPath href="#wheel-title-arc" startOffset="50%" textAnchor="middle">
+          <tspan className="wheel__title-sm">რა ვჭამოთ </tspan><tspan className="wheel__title-lg">დღეს?</tspan>
+        </textPath>
+      </text>
+      {/* Desktop — Figma "1 · Hero" (69:1911): text on a big circle (r 415 → 332 here, centre
+          shifted (14,60) below-right of the wheel), upper-left, pale pink gradient, 67/96 → 54/77. */}
+      <defs>
+        <linearGradient id="wheel-title-grad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#ffd3db" />
+          <stop offset="1" stopColor="#fff1f3" />
+        </linearGradient>
+      </defs>
+      <path id="wheel-title-arc-d" d="M -306.7 -25.9 A 332 332 0 0 1 154.3 -240.9" fill="none" />
+      <text className="wheel__title wheel__title--d" aria-hidden="true">
+        <textPath href="#wheel-title-arc-d" startOffset="50%" textAnchor="middle">
+          <tspan className="wheel__title-dsm">რა ვჭამოთ </tspan><tspan className="wheel__title-dlg">დღეს?</tspan>
+        </textPath>
+      </text>
+    </>
+  );
+}
+
+/** Static shell shown while the interactive wheel loads: same box, title and rim. */
+export function WheelShell() {
+  return (
+    <div className="wheel wheel--skeleton" aria-label="იტვირთება">
+      <svg viewBox="-200 -222 400 422" aria-hidden="true">
+        <WheelTitle />
+        <circle r={RIM} fill="#fff" />
+      </svg>
     </div>
   );
 }

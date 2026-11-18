@@ -134,9 +134,15 @@ export function Paths({ dish, place, radius, onPickPlace }: Props) {
                 </a>
               ))}
             </div>
-            <a className={dish ? "pill pill--dark pill--block" : "pill pill--dark pill--block is-disabled"} href={dish ? mapsSearchUrl(term, nearArea) : undefined} target="_blank" rel="noreferrer" aria-disabled={!dish}>
+            {dish ? (
+              <a className="pill pill--dark pill--block" href={mapsSearchUrl(term, nearArea)} target="_blank" rel="noreferrer">
               ყველა Google Maps-ზე
             </a>
+            ) : (
+              <span className="pill pill--dark pill--block is-disabled" aria-disabled="true">
+              ყველა Google Maps-ზე
+            </span>
+            )}
           </article>
 
           <article className={`card card--orange${tab === "order" ? " on" : ""}`}>

@@ -15,7 +15,8 @@ export function Words({ parts }: { parts: Part[] }) {
   let i = 0;
   const plain = parts.map((p) => (typeof p === "string" ? p : p[0])).join("");
   return (
-    <span className="words" aria-label={plain}>
+    <span className="words">
+      <span className="sr-only">{plain}</span>
       {parts.flatMap((p, pi) => {
         const [text, cls] = typeof p === "string" ? [p, ""] : p;
         return text.split(/(\s+)/).filter(Boolean).map((w, wi) =>

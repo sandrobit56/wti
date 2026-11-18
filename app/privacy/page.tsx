@@ -13,7 +13,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ClearData } from "@/components/ClearData";
 
-export const metadata: Metadata = { title: "კონფიდენციალურობა — რა ვჭამოთ?" };
+export const metadata: Metadata = { title: "კონფიდენციალურობა", alternates: { canonical: "/privacy" } };
 
 export default function PrivacyPage() {
   return (

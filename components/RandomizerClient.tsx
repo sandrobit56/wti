@@ -11,12 +11,13 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { WheelShell } from "./Wheel";
 
 export const RandomizerClient = dynamic(() => import("./Randomizer").then((m) => m.Randomizer), {
   ssr: false,
   loading: () => (
     <section className="hero">
-      <div className="hero__stage"><div className="wheel wheel--skeleton" aria-label="იტვირთება" /></div>
+      <div className="hero__stage"><WheelShell /></div>
     </section>
   ),
 });

@@ -83,7 +83,7 @@ export function SiteHeader() {
       <nav className="header__nav header__nav--right nav-live" aria-label="დამატებითი">
         <a className={`only-desktop${active === "trust" ? " on" : ""}`} href="#trust">როგორ ვაფასებთ</a>
         <span className="only-desktop nav-live__soon" title="მალე">ბლოგი<sup>მალე</sup></span>
-        <span className="header__user" title="პროფილი — მალე" aria-label="პროფილი (მალე)">
+        <span className="header__user" title="პროფილი — მალე" role="img" aria-label="პროფილი (მალე)">
           <Image src="/icons/user.svg" alt="" width={24} height={24} />
         </span>
       </nav>

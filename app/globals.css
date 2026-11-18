@@ -753,3 +753,27 @@ a.row-card:hover { transform: translateX(4px); box-shadow: 0 3px 0 rgba(18,18,18
 .privacy ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; line-height: 1.5; }
 .privacy__clear { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 6px; }
 .privacy__clear span { font-size: 14px; font-weight: 600; }
+
+/* ── 404 ───────────────────────────────────────────────────────── */
+.notfound { min-height: 80vh; display: grid; place-content: center; justify-items: center; gap: 12px; text-align: center; }
+.notfound h1 { font-size: 48px; font-weight: 900; font-stretch: 62.5%; line-height: 1; }
+.notfound p:not(.caps) { max-width: 36ch; color: var(--muted); }
+.notfound .pill { margin-top: 8px; text-decoration: none; }
+.notfound__mascot { animation: chomp .5s steps(2) infinite; filter: drop-shadow(0 6px 0 rgba(18,18,18,.08)); }
+@media (prefers-reduced-motion: reduce) { .notfound__mascot { animation: none; } }
+
+/* ── Contrast (WCAG AA): white text sits on a deeper brand red ─────────────
+   #f1435e + white = 3.68:1 (fails for normal text); #d6334e + white = 4.73:1.
+   --brand stays for accents (text, dots, borders); fills with white text use --brand-ink. */
+:root { --brand-ink: #d6334e; }
+.pill--dark, .wheel__hub, .ribbon__play, .chip--icon.on, .credit-btn:hover, .pc__me { background-color: var(--brand-ink); }
+.pill--dark, .ribbon__play { box-shadow: 0 3px 0 #a8253b; }
+.pill--dark:hover, .ribbon__play:hover { box-shadow: 0 5px 0 #a8253b; }
+.wheel__hub circle, .wheel__hub-bg { fill: var(--brand-ink); }
+.panel__actions .pill--dark { background: var(--brand-ink); border-color: #a8253b; box-shadow: 0 2px 0 #a8253b; }
+.nav-live__soon { opacity: 1; color: #6b6b6b; }
+.nav-live__soon sup { color: var(--brand-ink); }
+.h3-note { color: #6b6b6b; }
+/* yellow band text: dark enough on #ffd233 */
+.ribbon__hint { opacity: 1; color: #5c4a00; }
+.ribbon__score b { color: #a8253b; }
