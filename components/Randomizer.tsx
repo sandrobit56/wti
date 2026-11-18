@@ -128,6 +128,14 @@ export function Randomizer() {
   }, [filters, excluded, available, seed, init.now, prefs, mood, history]);
 
   // Any input change drops the last result and reshuffles the preview.
+  /** The ribbon game hands over the last dish the mascot ate — open it like a wheel result. */
+  function openDish(slug: string) {
+    const d = DISHES.find((x) => x.slug === slug);
+    if (!d) throw new Error(`openDish: unknown dish ${slug}`);
+    setSpun({ wheel: [d], winner: 0, landed: true, why: ["პეკმენმა აირჩია — თამაშში ბოლოს ეს შეჭამა"], ctx: ctx(false) });
+    setModalOpen(true);
+  }
+
   function changed() { setSpun(null); setSpinError(null); setSeed((s) => s + 1); }
   const onFilters = (f: Filters) => { setFilters(f); changed(); };
   const onPlace = (p: Place | null) => { setPlace(p); setLocateError(null); changed(); };
@@ -315,11 +323,6 @@ export function Randomizer() {
 
       {quizOpen && <Quiz onClose={() => setQuizOpen(false)} onApply={applyPersona} />}
 
-      <FoodRibbon />
-      <PersonaTeaser persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />
-      {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} />}
-      <TrustCard />
-
       <div ref={pathsRef} className="paths-anchor">
         <Paths
           dish={dish} place={place} radius={radius}
@@ -332,6 +335,11 @@ export function Randomizer() {
           </div>
         )}
       </div>
+
+      <FoodRibbon onPick={openDish} />
+      <PersonaTeaser persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />
+      {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} />}
+      <TrustCard />
     </>
   );
 }

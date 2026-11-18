@@ -75,6 +75,8 @@ export function Quiz({ onClose, onApply }: Props) {
   );
 }
 
+const BURST = ["khinkali", "pizza", "sushi", "khachapuri", "cake", "taco", "mtsvadi", "icecream", "burger", "churchkhela", "fish", "salad"];
+
 function ResultView({ answers, onApply, onRestart }: { answers: string[]; onApply: (a: string[]) => void; onRestart: () => void }) {
   const r = scoreQuiz(answers);
   const p = PERSONAS[r.persona];
@@ -98,9 +100,17 @@ function ResultView({ answers, onApply, onRestart }: { answers: string[]; onAppl
   return (
     <div className="quiz__result">
       <header className="modal__hero quiz__hero">
-        <Image src={`/icons/${p.icon}.svg`} alt="" width={88} height={88} />
+        {/* reveal: food burst out of the hero, icon spins in, name drops letter by letter */}
+        <span className="burst" aria-hidden="true">
+          {BURST.map((icon, i) => (
+            <Image key={i} src={`/icons/${icon}.svg`} alt="" width={34} height={34} style={{ ["--a" as string]: `${(360 / BURST.length) * i + 8}deg`, ["--d" as string]: `${150 + (i % 3) * 45}px`, ["--i" as string]: i }} />
+          ))}
+        </span>
+        <Image className="quiz__hero-ico" src={`/icons/${p.icon}.svg`} alt="" width={88} height={88} />
         <p className="caps">შენი პერსონა</p>
-        <h2 id="quiz-title" className="modal__name">{p.name}</h2>
+        <h2 id="quiz-title" className="modal__name" aria-label={p.name}>
+          {[...p.name].map((ch, i) => (ch === " " ? " " : <span key={i} className="drop" style={{ ["--i" as string]: i }} aria-hidden="true">{ch}</span>))}
+        </h2>
         <p className="quiz__line">{p.line}</p>
         <p className="modal__meta">ნახევრად — {half.name}</p>
       </header>

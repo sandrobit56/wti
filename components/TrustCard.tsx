@@ -15,6 +15,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { Words } from "./Words";
 
 const LEVELS = [
   { title: "ერთი ჩანგალი", text: "კარგი სამზარეულო თავის კატეგორიაში — ღირს შევლა, თუ ახლოს ხარ." },
@@ -56,7 +57,7 @@ export function TrustCard() {
         <div className="trust2__top">
           <div>
             <p className="caps">როგორ ვაფასებთ</p>
-            <h2>„ჩანგალი“ — შეფასება, რომელსაც ვერ იყიდი</h2>
+            <h2><Words parts={["„ჩანგალი“ — შეფასება, რომელსაც ", ["ვერ იყიდი", "hl hl--pink"]]} /></h2>
           </div>
           <button type="button" className={stamped ? "trust2__seal stamped" : "trust2__seal"} onClick={() => setStamped((s) => !s)} aria-pressed={stamped} aria-label="შემოწმების ბეჭედი">
             <Image src="/icons/rosette.svg" alt="" width={72} height={72} />

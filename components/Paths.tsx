@@ -13,6 +13,7 @@
  */
 "use client";
 
+import { Words } from "./Words";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { priceBand, type Dish } from "@/lib/catalog.ts";
@@ -64,7 +65,7 @@ export function Paths({ dish, place, radius, onPickPlace }: Props) {
   return (
     <section className="paths" id="paths" aria-labelledby="paths-title">
       <div className="container">
-        <h2 id="paths-title" className="section-title reveal">ნახე, <span className="hl hl--green">მიდი</span> ან <span className="hl hl--orange">გამოიძახე</span></h2>
+        <h2 id="paths-title" className="section-title"><Words parts={["ნახე, ", ["მიდი", "hl hl--green"], " ან ", ["გამოიძახე", "hl hl--orange"]]} /></h2>
         {dish ? (
           <div className="pick">
             <Image src={`/icons/${dish.icon}.svg`} alt="" width={56} height={56} />
@@ -181,8 +182,8 @@ export function PersonaTeaser({ persona, onStart, onGallery }: { persona: Person
             </>
           ) : (
             <>
-              <h2>გაიგე შენი პერსონა</h2>
-              <p>7 კითხვა, ერთი წუთი. პასუხების მიხედვით ბორბალი თავად დააყენებს ფილტრებს — ბიუჯეტს, გემოს, დიეტას. რეგისტრაცია არ სჭირდება.</p>
+              <h2><Words parts={["გაიგე შენი პერსონა"]} /></h2>
+              <p><Words parts={["7 კითხვა, ერთი წუთი. პასუხების მიხედვით ბორბალი თავად დააყენებს ფილტრებს — ბიუჯეტს, გემოს, დიეტას. რეგისტრაცია არ სჭირდება."]} /></p>
               <div className="row">
                 <button className="pill pill--dark" onClick={onStart}>ტესტის დაწყება</button>
                 <button className="pill pill--white" onClick={onGallery}>12 პერსონა</button>

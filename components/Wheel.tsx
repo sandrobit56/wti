@@ -8,7 +8,7 @@
  *              aria-label); curved title stays on its own arc above the rim
  * Description: Presentational wheel. It does NOT choose anything: it gets the
  *              dishes and a target rotation and animates there (Figma motion spec:
- *              3.2s, cubic-bezier(0.1, 0.7, 0.15, 1)). onLanded fires when the
+ *              2.3s, cubic-bezier(0.12, 0.75, 0.15, 1), 7 turns). onLanded fires when the
  *              CSS transition ends.
  */
 "use client";

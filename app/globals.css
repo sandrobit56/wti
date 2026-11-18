@@ -52,7 +52,7 @@ img { display: block; }
 .wheel--empty { display: grid; place-items: center; border-radius: 50%; background: rgba(255, 255, 255, 0.6); aspect-ratio: 1; text-align: center; padding: 48px; font-weight: 700; }
 .wheel--skeleton { border-radius: 50%; background: rgba(255, 255, 255, 0.5); aspect-ratio: 1; }
 .wheel__disc { transition: none; }
-.wheel__disc--spinning { transition: transform 3.2s cubic-bezier(0.1, 0.7, 0.15, 1); }
+.wheel__disc--spinning { transition: transform 2.3s cubic-bezier(0.12, 0.75, 0.15, 1); } /* faster: 7 turns in 2.3s */
 .wheel__title { fill: #ffffff; font-weight: 900; font-stretch: 62.5%; letter-spacing: 0.5px; }
 .wheel__title-sm { font-size: 34px; }
 .wheel__title-lg { font-size: 48px; }
@@ -673,3 +673,71 @@ a.row-card:hover { transform: translateX(4px); box-shadow: 0 3px 0 rgba(18,18,18
 .modal__hero--photo { padding: 0 0 24px; }
 .modal__hero--photo .modal__photo { margin: 0 0 14px; }
 .modal__hero--photo > :not(.modal__photo) { margin-left: 20px; margin-right: 20px; }
+
+/* ── Ribbon game mode ──────────────────────────────────────────── */
+.ribbon { min-height: 122px; }
+.ribbon--game, .ribbon--over { cursor: pointer; user-select: none; touch-action: manipulation; }
+.ribbon__play { position: absolute; right: 24px; bottom: 10px; z-index: 3; border: 0; border-radius: 999px; padding: 6px 16px; font: inherit; font-weight: 800; font-size: 14px; color: #fff; background: var(--brand); box-shadow: 0 3px 0 #c92c45; cursor: pointer; transition: transform .15s ease, box-shadow .15s; }
+.ribbon__play:hover { transform: translateY(-2px); box-shadow: 0 5px 0 #c92c45; }
+.ribbon__play:active { transform: translateY(3px); box-shadow: none; }
+.ribbon__lane { position: absolute; inset: 0 0 34px 0; }
+.ribbon__runner { position: absolute; left: 0; top: 50%; margin-top: -32px; width: 64px; height: 64px; border-radius: 50%; background: #fff; display: grid; place-items: center; box-shadow: 0 3px 0 rgba(18,18,18,.1); will-change: transform; }
+.ribbon__mouth { position: absolute; top: 50%; width: 64px; height: 64px; margin-top: -32px; border-radius: 50%; border: 3px dashed rgba(241,67,94,.45); }
+.ribbon__lives { color: var(--brand); letter-spacing: 2px; font-size: 15px; }
+.ribbon__lives i { color: rgba(18,18,18,.18); font-style: normal; }
+.ribbon--hit0, .ribbon--hit1 { animation: hit .3s ease; }
+@keyframes hit { 25% { transform: rotate(-2deg) translateX(-6px); } 75% { transform: rotate(-2deg) translateX(6px); } }
+.ribbon__over { position: absolute; inset: 0 0 0 120px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 10px 20px; cursor: default; animation: fade-up .35s var(--spring); }
+.ribbon__big { font-size: 52px; font-weight: 900; font-stretch: 62.5%; line-height: 1; color: var(--brand); }
+.ribbon__actions { display: inline-flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.ribbon__actions .pill { min-height: 40px; padding: 0 16px; }
+.ribbon--over .ribbon__score { display: none; }
+@media (max-width: 1023px) {
+  .ribbon__play { right: 14px; }
+  .ribbon__over { inset: 0 0 0 90px; gap: 8px; padding: 8px 12px; font-size: 13px; }
+  .ribbon__big { font-size: 38px; }
+}
+
+/* ── Word-by-word scroll reveal (.words from components/Words.tsx) ── */
+.hl--pink::after { background: var(--pink-soft); }
+.w { display: inline-block; transform-origin: 0 100%; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .words .w {
+      animation: word-in linear both; animation-timeline: view();
+      animation-range: entry calc(10% + var(--w) * 4%) cover calc(28% + var(--w) * 2.5%);
+    }
+    @keyframes word-in {
+      from { color: #f3b6c1; translate: 0 .45em; rotate: 6deg; }
+      to   { color: inherit; translate: 0 0; rotate: 0deg; }
+    }
+    .words .hl::after { animation: marker linear both; animation-timeline: view(); animation-range: entry 50% cover 45%; }
+    .persona p .words .w { animation-range: entry calc(5% + var(--w) * 1.5%) cover calc(20% + var(--w) * 1.2%); }
+  }
+}
+
+/* ── Quiz result reveal ────────────────────────────────────────── */
+.quiz__hero { position: relative; overflow: hidden; }
+.burst { position: absolute; left: 50%; top: 92px; width: 0; height: 0; pointer-events: none; }
+.burst img { position: absolute; left: -17px; top: -17px; scale: 0; animation: burst 1.1s cubic-bezier(.15,.8,.3,1) both; animation-delay: calc(120ms + var(--i) * 18ms); }
+@keyframes burst {
+  0%   { translate: 0 0; scale: .2; rotate: 0deg; }
+  55%  { scale: 1; }
+  100% { translate: calc(cos(var(--a)) * var(--d)) calc(sin(var(--a)) * var(--d)); scale: 0; rotate: 220deg; }
+}
+.quiz__hero-ico { animation: hero-spin .7s var(--spring) both; }
+@keyframes hero-spin { from { scale: 0; rotate: -200deg; } to { scale: 1; rotate: 0deg; } }
+.drop { display: inline-block; animation: drop .55s var(--spring) both; animation-delay: calc(300ms + var(--i) * 35ms); }
+@keyframes drop { from { translate: 0 -40px; rotate: -12deg; scale: .6; } to { translate: 0 0; rotate: 0deg; scale: 1; } }
+.quiz__result > .modal__section, .quiz__result > .modal__actions { animation: rise-in .45s var(--spring) both; }
+.quiz__result > .modal__section:nth-of-type(1) { animation-delay: .75s; }
+.quiz__result > .modal__section:nth-of-type(2) { animation-delay: .9s; }
+.quiz__result > .modal__actions { animation-delay: 1.05s; }
+@keyframes rise-in { from { translate: 0 24px; } to { translate: 0 0; } }
+.quiz__changes li, .quiz__result .chips .chip { animation: chip-pop .4s var(--spring) both; }
+.quiz__changes li:nth-child(1) { animation-delay: 1s; } .quiz__changes li:nth-child(2) { animation-delay: 1.08s; }
+.quiz__changes li:nth-child(3) { animation-delay: 1.16s; } .quiz__changes li:nth-child(4) { animation-delay: 1.24s; }
+@media (prefers-reduced-motion: reduce) {
+  .burst { display: none; }
+  .quiz__hero-ico, .drop, .quiz__result > *, .quiz__changes li, .quiz__result .chips .chip { animation: none; }
+}

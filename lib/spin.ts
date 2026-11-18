@@ -253,7 +253,7 @@ export function seeded(seed: number): Rng {
  * Final wheel rotation (deg, clockwise) so slice `index` sits under the top pointer.
  * Slice i spans [i·a, (i+1)·a] measured clockwise from 12 o'clock.
  */
-export function targetRotation(current: number, index: number, count: number, turns = 5): number {
+export function targetRotation(current: number, index: number, count: number, turns = 7): number {
   const a = 360 / count;
   const sliceCenter = index * a + a / 2;
   const wanted = (360 - sliceCenter) % 360;
