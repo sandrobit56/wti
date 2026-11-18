@@ -51,8 +51,8 @@ export function Quiz({ onClose, onApply }: Props) {
         {!done && (
           <>
             <div className="quiz__top">
-              <button className="link" onClick={() => setAnswers((a) => a.slice(0, -1))} disabled={step === 0} aria-label="წინა კითხვა">← უკან</button>
               <span className="caps">კითხვა {step + 1} / {QUESTIONS.length}</span>
+              {step > 0 && <button className="link quiz__back" onClick={() => setAnswers((a) => a.slice(0, -1))} aria-label="წინა კითხვა">← უკან</button>}
             </div>
             <div className="quiz__bar" role="progressbar" aria-valuemin={0} aria-valuemax={QUESTIONS.length} aria-valuenow={step}>
               <span style={{ width: `${(step / QUESTIONS.length) * 100}%` }} />

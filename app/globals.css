@@ -619,3 +619,57 @@ a.row-card:hover { transform: translateX(4px); box-shadow: 0 3px 0 rgba(18,18,18
     @keyframes step-in { from { translate: 0 20px; } to { translate: 0 0; } }
   }
 }
+
+/* ══ Popups v3: one spacing system, styled scroll, no stray frames ══ */
+.modal:focus, .modal:focus-visible { outline: none; }
+.modal__card {
+  padding: 32px; gap: 24px;
+  overscroll-behavior: contain;
+  scrollbar-width: thin; scrollbar-color: var(--brand) transparent; /* Firefox: thin brand thumb, no track */
+}
+/* Chrome/Safari: only a small brand "pill" moves; the track is invisible and stays inside the rounded corners */
+.modal__card::-webkit-scrollbar { width: 10px; }
+.modal__card::-webkit-scrollbar-track { background: transparent; margin: 28px 0; }
+.modal__card::-webkit-scrollbar-thumb { background: var(--brand); border-radius: 99px; border: 3px solid var(--surface); }
+.modal__card::-webkit-scrollbar-thumb:hover { background: #c92c45; }
+/* × : sticky, takes no space (40 − 12 − 28 = 0); the first block reserves room for it */
+.modal__close { margin: -14px -14px -26px 0; }
+.modal__card > .modal__close + * { padding-right: 56px; }
+.modal__card > .modal__close + .modal__hero, .modal__card > .modal__close + .quiz__result { padding-right: 0; }
+
+/* Quiz: counter + back on the left, bar under it, no tall empty card */
+.quiz .modal__card { min-height: 0; gap: 20px; }
+.quiz__top { justify-content: flex-start; gap: 14px; padding-right: 0; min-height: 24px; }
+.quiz__back { font-size: 14px; }
+.quiz__q { margin: 4px 0 0; }
+.quiz__answers { gap: 12px; }
+.quiz__a { border-width: 1.5px; border-color: var(--edge); box-shadow: var(--soft-shadow); }
+.quiz__a:hover { border-color: var(--edge-hover); background: var(--cream); transform: translateY(-1px); }
+
+/* Persona result + dish result heroes */
+.modal__hero { gap: 6px; padding: 28px 24px 24px; }
+.modal__hero .caps { margin-top: 6px; }
+.quiz__line { margin-top: 4px; }
+.modal__section { gap: 12px; }
+.modal__section h3 { font-size: 17px; }
+.modal__actions { grid-template-columns: 3fr 2fr; gap: 12px; padding-top: 12px; bottom: -32px; padding-bottom: 4px; }
+
+/* Gallery header rhythm */
+.gallery .modal__card { gap: 24px; }
+.gallery header { display: grid; gap: 8px; }
+.gallery__lead { line-height: 1.5; }
+.gallery__grid { gap: 16px; }
+.pc { padding: 18px; gap: 8px; }
+
+/* Paths section: title only now — keep space under it */
+#paths-title { margin-bottom: 28px; }
+
+@media (max-width: 1023px) {
+  .modal__card { padding: 22px; gap: 20px; }
+  .modal__actions { bottom: -22px; }
+}
+/* flex column + scrolling card: children must keep their size (the photo hero was being squashed) */
+.modal__card > * { flex-shrink: 0; }
+.modal__hero--photo { padding: 0 0 24px; }
+.modal__hero--photo .modal__photo { margin: 0 0 14px; }
+.modal__hero--photo > :not(.modal__photo) { margin-left: 20px; margin-right: 20px; }

@@ -77,9 +77,7 @@ export function Paths({ dish, place, radius, onPickPlace }: Props) {
               {dish.spicy ? " · ცხარე" : ""}{dish.vegan ? " · ვეგანური" : dish.vegetarian ? " · ვეგეტარიანული" : ""}
             </p>
           </div>
-        ) : (
-          <p className="paths__lead">დაატრიალე ბორბალი — აქ გამოჩნდება, სად ჭამო ახლოს ან საიდან შეუკვეთო.</p>
-        )}
+        ) : null}
 
         <div className="tiles only-mobile" role="tablist" aria-label="გზები">
           {([["read", "წაიკითხე", "ბლოგი", "book", "tile--yellow"], ["go", "მიდი", "ადგილები", "pin", "tile--green"], ["order", "გამოიძახე", "მიტანა", "scooter", "tile--orange"]] as const).map(([id, t, s, icon, cls]) => (
