@@ -24,14 +24,7 @@ export default function Home() {
       <footer className="footer">
         <div className="footer__row container">
           <Image src="/logo.svg" alt="რა ვჭამოთ?" width={48} height={45} />
-          <p>რესტორნები რეიტინგს ვერ ყიდულობენ · 2026</p>
         </div>
-        <p className="footer__legal container">
-          ადგილების მონაცემები: ©{" "}
-          <a href="https://docs.overturemaps.org/attribution/" target="_blank" rel="noreferrer">Overture Maps Foundation</a>
-          {" "}(CDLA-Permissive-2.0, Apache-2.0, CC0 — წყარო მითითებულია თითო ადგილზე). რუკა და მარშრუტი იხსნება Google Maps-ში.
-          Wolt, Glovo და Bolt Food დამოუკიდებელი სერვისებია — მათ გვერდებზე გადაგიყვანთ, მენიუებს არ ვინახავთ. ფასები სავარაუდოა.
-        </p>
       </footer>
 
       <SiteTabbar />
