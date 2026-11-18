@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-18
- * Version:     v1.2 — Sandro's names: წიწაკის რისხვა, მწვადის მაესტრო, შაურმის ხულიგანი;
+ * Version:     v1.2 — Sandro's names: ჭამის ოსტატი, წიწაკის რისხვა, შამფურის კაცი, შაურმის ხულიგანი;
  *              v1.1 — 8 persona names localized (კუდების მთვლელი, თონის სტუმარი, …);
  *              v1.0 — 12 personas from the "12 პერსონა და ტესტი" doc
  * Description: Persona card copy + the wheel rule. A dish that matches the
@@ -25,7 +25,7 @@ export type Persona = {
 export const PERSONA_BOOST = 1.6;
 
 export const PERSONAS: Record<PersonaId, Persona> = {
-  tamada: { id: "tamada", name: "სუფრის თამადა", line: "სუფრა შენთვის ჭამა კი არა, ღონისძიებაა.", icon: "khachapuri", georgianHabit: true,
+  tamada: { id: "tamada", name: "ჭამის ოსტატი", line: "სუფრა შენთვის ჭამა კი არა, ღონისძიებაა.", icon: "khachapuri", georgianHabit: true,
     matches: (d) => d.tags.includes("supra") || (d.cuisine === "ქართული" && d.heaviness === "მძიმე") },
   khinkali: { id: "khinkali", name: "კუდების მთვლელი", line: "კუდებს ითვლი და ერთით მეტს უკვეთავ.", icon: "khinkali", georgianHabit: true,
     matches: (d) => d.tags.includes("dumpling") },
@@ -37,7 +37,7 @@ export const PERSONAS: Record<PersonaId, Persona> = {
     matches: (d) => d.vegan || d.tags.includes("lenten") },
   spice: { id: "spice", name: "წიწაკის რისხვა", line: "აჯიკა სოუსი კი არა, ცხოვრების წესია.", icon: "soup", georgianHabit: true,
     matches: (d) => d.spicy >= 1 },
-  mtsvadi: { id: "mtsvadi", name: "მწვადის მაესტრო", line: "ნაკვერჩხალი და ხორცი — დანარჩენი დეტალებია.", icon: "mtsvadi", georgianHabit: true,
+  mtsvadi: { id: "mtsvadi", name: "შამფურის კაცი", line: "ნაკვერჩხალი და ხორცი — დანარჩენი დეტალებია.", icon: "mtsvadi", georgianHabit: true,
     matches: (d) => d.tags.includes("grill") || d.category === "ხორცი" },
   shawarma: { id: "shawarma", name: "შაურმის ხულიგანი", line: "ქალაქი იძინებს, ჯიხური — არა.", icon: "shawarma", georgianHabit: true,
     matches: (d) => d.category === "სტრიტფუდი" || d.meals.includes("ღამე") },
