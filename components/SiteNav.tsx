@@ -3,23 +3,24 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-18
- * Version:     v1.0
+ * Version:     v1.1 — one consistent link style (was: measured sliding pill)
  * Description: Header (desktop) + tab bar (mobile), made "alive":
  *   - scroll-spy: the section on screen is highlighted
- *   - desktop: a pill slides under the active link (measured, CSS transition)
+ *   - every link (left and right) shares one hover/active style: a pill grows in
+ *     behind the text — no measuring, no layout shift
  *   - header compacts with a soft shadow once you scroll
  *   - mascot logo wiggles on hover; tab icons bounce when they become active
  */
 "use client";
 
 import Image from "next/image";
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 type SectionId = "wheel" | "persona" | "trust" | "paths";
-const LEFT: { id: SectionId; label: string; icon: string }[] = [
-  { id: "wheel", label: "ბორბალი", icon: "pizza" },
-  { id: "persona", label: "ტესტი", icon: "spark" },
-  { id: "paths", label: "ადგილები", icon: "pin" },
+const LEFT: { id: SectionId; label: string }[] = [
+  { id: "wheel", label: "ბორბალი" },
+  { id: "persona", label: "ტესტი" },
+  { id: "paths", label: "ადგილები" },
 ];
 
 const SECTIONS: SectionId[] = ["wheel", "persona", "trust", "paths"];
@@ -66,27 +67,12 @@ function useScrolled(): boolean {
 export function SiteHeader() {
   const active = useActiveSection();
   const scrolled = useScrolled();
-  const navRef = useRef<HTMLElement>(null);
-  const [pill, setPill] = useState<{ x: number; w: number } | null>(null);
-
-  // Measure the active link so the pill can slide to it.
-  useLayoutEffect(() => {
-    const measure = () => {
-      const a = navRef.current?.querySelector<HTMLElement>(`a[data-id="${active}"]`);
-      setPill(a ? { x: a.offsetLeft, w: a.offsetWidth } : null);
-    };
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [active]);
 
   return (
     <header className={scrolled ? "header header--scrolled" : "header"}>
-      <nav ref={navRef} className="header__nav nav-live only-desktop" aria-label="მთავარი">
-        {pill && <span className="nav-live__pill" style={{ transform: `translateX(${pill.x}px)`, width: pill.w }} aria-hidden="true" />}
+      <nav className="header__nav nav-live only-desktop" aria-label="მთავარი">
         {LEFT.map((l) => (
           <a key={l.id} data-id={l.id} href={`#${l.id}`} className={active === l.id ? "on" : undefined} aria-current={active === l.id ? "true" : undefined}>
-            <Image className="nav-live__ico" src={`/icons/${l.icon}.svg`} alt="" width={18} height={18} />
             {l.label}
           </a>
         ))}

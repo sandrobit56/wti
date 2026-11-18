@@ -22,9 +22,9 @@ const LEVELS = [
   { title: "სამი ჩანგალი", text: "განსაკუთრებული — ღირს სპეციალურად წასვლა. ასეთი ცოტა იქნება." },
 ];
 const STEPS = [
-  { icon: "user", title: "ანონიმური ვიზიტი", text: "ინსპექტორი ჩვეულებრივი სტუმარია" },
-  { icon: "coin", title: "ვიხდით ჩვენ", text: "უფასო კერძი = არანაირი შეფასება" },
-  { icon: "rosette", title: "2+ ინსპექტორი, ყოველ 6 თვეში", text: "ერთი აზრი არ კმარა, ხარისხი იცვლება" },
+  { icon: "user", title: "ანონიმური ვიზიტი" },
+  { icon: "coin", title: "ვიხდით ჩვენ" },
+  { icon: "rosette", title: "2+ ინსპექტორი, ყოველ 6 თვეში" },
 ];
 
 export function TrustCard() {
@@ -93,7 +93,6 @@ export function TrustCard() {
             <li key={s.title} className="step" style={{ ["--i" as string]: i }}>
               <span className="step__ico"><Image src={`/icons/${s.icon}.svg`} alt="" width={26} height={26} /></span>
               <strong>{s.title}</strong>
-              <span>{s.text}</span>
             </li>
           ))}
         </ol>

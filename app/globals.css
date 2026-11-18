@@ -477,11 +477,11 @@ a.row-card:hover { transform: translateX(4px); box-shadow: 0 3px 0 rgba(18,18,18
 .nav-live a, .nav-live__soon { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 999px; text-decoration: none !important; transition: color .2s, transform .15s ease; }
 .nav-live a:hover { transform: translateY(-1px); }
 .nav-live a:active { transform: scale(.95); }
-.nav-live__ico { width: 0; opacity: 0; transform: scale(.4) rotate(-30deg); transition: width .25s ease, opacity .2s, transform .35s var(--spring); }
-.nav-live a:hover .nav-live__ico, .nav-live a.on .nav-live__ico { width: 18px; opacity: 1; transform: none; }
+
+
 .nav-live a.on { color: var(--brand); }
-.nav-live__pill { position: absolute; left: 0; top: 50%; height: 38px; margin-top: -19px; border-radius: 999px; background: var(--pink-soft); transition: transform .45s var(--spring), width .45s var(--spring); }
-.header__nav--right a.on { background: var(--pink-soft); }
+
+
 .nav-live__soon { opacity: .55; cursor: default; }
 .nav-live__soon sup { font-size: 9px; margin-left: 2px; color: var(--brand); }
 .header__user { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; transition: background-color .2s, transform .2s; }
@@ -599,3 +599,23 @@ a.row-card:hover { transform: translateX(4px); box-shadow: 0 3px 0 rgba(18,18,18
 .ribbon__mascot { filter: drop-shadow(2.5px 0 0 #fff) drop-shadow(-2.5px 0 0 #fff) drop-shadow(0 2.5px 0 #fff) drop-shadow(0 -2.5px 0 #fff) drop-shadow(0 4px 0 rgba(18,18,18,.15)); }
 /* mobile path tiles: selected = brand outline, not black */
 .tile.on { box-shadow: 0 0 0 3px var(--brand); }
+
+/* Nav v1.1 — one standard for every link: pill grows in behind the text */
+.nav-live a { isolation: isolate; }
+.nav-live a::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: 999px; background: var(--pink-soft); transform: scale(.6); opacity: 0; transition: transform .3s var(--spring), opacity .2s ease; }
+.nav-live a:hover::before, .nav-live a.on::before { transform: scale(1); opacity: 1; }
+.nav-live a.on { color: var(--brand); }
+.nav-live a:hover { transform: none; }
+.nav-live a:active::before { transform: scale(.92); }
+@media (prefers-reduced-motion: reduce) { .nav-live a::before { transition: none; } }
+
+/* Scroll reveals: motion only, no fading — sections stay fully opaque */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes reveal-up { from { translate: 0 48px; } to { translate: 0 0; } }
+    @keyframes pop-in { from { scale: .94; border-radius: 120px; } to { scale: 1; border-radius: var(--r-xl); } }
+    @keyframes fan-p { from { transform: translate(-80px, 60px) rotate(-10deg); } to { transform: rotate(3deg); } }
+    @keyframes card-rise { from { translate: 0 80px; rotate: 3deg; } to { translate: 0 0; rotate: 0deg; } }
+    @keyframes step-in { from { translate: 0 20px; } to { translate: 0 0; } }
+  }
+}
