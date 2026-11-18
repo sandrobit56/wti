@@ -57,3 +57,12 @@ python scripts/import-venues.py raw-places.jsonl
 ## Dish versions & photos (v4)
 - `lib/variants.ts` — 363 real versions across 63 wheel types (our own descriptions, typical Tbilisi ₾ ranges).
 - Photos: `scripts/fetch-photos.ts` (GitHub Action `fetch-photos`) takes each version's English Wikipedia lead image **only if it is on Wikimedia Commons under CC0 / PD / CC BY / CC BY-SA**, downloads a 640px copy to `public/photos/` and stores author + license in `data/photos.json`. The popup shows that credit under every photo — attribution is the license condition. No photo → icon.
+
+## Security & privacy (v1)
+- **Headers** (`next.config.ts`): CSP (own origin only + `www.google.com` frames), HSTS, `X-Frame-Options: DENY`, `nosniff`, strict Referrer-Policy, Permissions-Policy (geolocation self only), no `X-Powered-By`, `no-store` on `/api/*`.
+  CSP uses `'unsafe-inline'` for Next's bootstrap scripts (Next 16 "Without Nonces"). **Switch to `proxy.ts` + nonces when accounts or user content arrive.**
+- **Location**: GPS coarsened to ~110 m at the source (`lib/security.ts → coarse`), never written to localStorage.
+- **APIs**: `/api/google-places` answers same-origin requests only (stops other sites spending our Google quota) + 5/min per IP; `/api/venues`, `/api/available` 60/min per IP. The real spending cap is the daily quota in Google Cloud.
+- **Secrets**: `GOOGLE_PLACES_API_KEY` is server-only (never `NEXT_PUBLIC_`). The embed key is public by design and restricted to our domain + Maps Embed API in Google Cloud.
+- **User data**: no accounts, no cookies, no analytics. localStorage keys start with `wti:`; `/privacy` explains everything and has a one-tap delete.
+- **Dependencies**: Dependabot weekly (`.github/dependabot.yml`); `npm audit` clean at v1.

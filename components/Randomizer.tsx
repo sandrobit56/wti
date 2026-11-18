@@ -7,7 +7,8 @@
  * Description: Page state: filters, place, radius → available dishes → wheel →
  *              spin → three paths. Logic lives in lib/spin.ts.
  *              Client-only (RandomizerClient) so initial state can read storage.
- *              Storage: localStorage "wti:v2" (filters, place, radius, "not today").
+ *              Storage: localStorage "wti:v2" (filters, neighbourhood, radius, "not today").
+ *              GPS is coarsened to ~110 m and never stored (lib/security.ts).
  */
 "use client";
 
@@ -18,6 +19,7 @@ import { PERSONAS } from "@/lib/personas.ts";
 import { applyQuiz, scoreQuiz } from "@/lib/quiz.ts";
 import { DEFAULT_FILTERS, NO_PREFS, SpinError, explain, pickVariants, seeded, spin, targetRotation, type Filters, type Mood, type Prefs, type SpinContext, type Win } from "@/lib/spin.ts";
 import { FilterPanel, MY_LOCATION, type Place } from "./FilterPanel";
+import { coarse } from "@/lib/security.ts";
 import { Paths, PersonaTeaser } from "./Paths";
 import { TrustCard } from "./TrustCard";
 import { Quiz } from "./Quiz";
@@ -48,7 +50,9 @@ function load(): Stored | null {
   }
 }
 function save(s: Stored) {
-  try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* storage unavailable: app still works */ }
+  // Privacy: a GPS position is never written to disk — only chosen neighbourhoods are remembered.
+  const safe = s.place?.label === MY_LOCATION ? { ...s, place: null } : s;
+  try { localStorage.setItem(KEY, JSON.stringify(safe)); } catch { /* storage unavailable: app still works */ }
 }
 function initial(): Stored & { now: Date; seed: number } {
   const s = load();
@@ -223,7 +227,7 @@ export function Randomizer() {
     setLocating(true);
     setLocateError(null);
     navigator.geolocation.getCurrentPosition(
-      (pos) => { setLocating(false); onPlace({ label: MY_LOCATION, center: { lat: pos.coords.latitude, lng: pos.coords.longitude }, wolt: null }); },
+      (pos) => { setLocating(false); onPlace({ label: MY_LOCATION, center: coarse({ lat: pos.coords.latitude, lng: pos.coords.longitude }), wolt: null }); },
       (err) => {
         setLocating(false);
         setLocateError(err.code === err.PERMISSION_DENIED

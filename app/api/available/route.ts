@@ -10,12 +10,16 @@
  *              the neighborhood or radius visibly changes the wheel.
  */
 import { DISHES } from "@/lib/catalog.ts";
+import { clientIp, rateLimiter } from "@/lib/security.ts";
 import { countByDish, RADII_KM, type VenueFile } from "@/lib/places.ts";
 import data from "@/data/venues.json";
 
 const file = data as VenueFile;
 
+const tooMany = rateLimiter(60); // per IP per minute — data is public, this only stops floods
+
 export async function GET(request: Request) {
+  if (tooMany(clientIp(request))) return Response.json({ error: "rate" }, { status: 429 });
   const q = new URL(request.url).searchParams;
   const lat = Number(q.get("lat"));
   const lng = Number(q.get("lng"));

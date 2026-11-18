@@ -741,3 +741,15 @@ a.row-card:hover { transform: translateX(4px); box-shadow: 0 3px 0 rgba(18,18,18
   .burst { display: none; }
   .quiz__hero-ico, .drop, .quiz__result > *, .quiz__changes li, .quiz__result .chips .chip { animation: none; }
 }
+
+/* ── Privacy page ──────────────────────────────────────────────── */
+.footer__link { font-size: 13px; font-weight: 700; color: var(--muted); text-decoration: none; }
+.footer__link:hover { color: var(--brand); }
+.privacy { max-width: 720px; padding-top: 32px; padding-bottom: 64px; display: grid; gap: 22px; }
+.privacy h1 { font-size: 44px; font-weight: 900; font-stretch: 62.5%; line-height: 1; }
+.privacy__lead { font-size: 17px; font-weight: 600; }
+.privacy section { background: var(--surface); border-radius: 24px; padding: 22px 24px; display: grid; gap: 10px; }
+.privacy h2 { font-size: 20px; font-weight: 800; }
+.privacy ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; line-height: 1.5; }
+.privacy__clear { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 6px; }
+.privacy__clear span { font-size: 14px; font-weight: 600; }
