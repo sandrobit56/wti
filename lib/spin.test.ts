@@ -240,8 +240,8 @@ test("mood shifts weights the right way", () => {
 test("explain gives personal reasons first and ≤3 of them", () => {
   const sushi = DISHES.find((d) => d.slug === "sushi")!;
   const c = ctx({ prefs: { ...NO_PREFS, persona: "sushi" }, mood: "light", filters: { ...DEFAULT_FILTERS, tastes: ["healthy", "light"] } });
-  const why = explain(sushi, c, "ჩხირების ოსტატი");
-  assert.equal(why[0], "შენი პერსონის კერძია — ჩხირების ოსტატი");
+  const why = explain(sushi, c, "სუშის კაცი");
+  assert.equal(why[0], "შენი პერსონის კერძია — სუშის კაცი");
   assert.ok(why.length <= 3);
   assert.deepEqual(explain(sushi, ctx({ random: true }), null), ["სრულიად შემთხვევით"]);
 });
