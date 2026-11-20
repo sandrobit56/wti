@@ -18,6 +18,8 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { priceBand, type Dish } from "@/lib/catalog.ts";
 import type { Persona } from "@/lib/personas.ts";
+import { PERSONA_IDS, type PersonaId } from "@/lib/quiz.ts";
+import { TarotCard } from "./TarotCard";
 import { deliveryLinks, mapsDirectionsUrl, mapsSearchUrl, type RadiusKm, type VenueMatch } from "@/lib/places.ts";
 import { MY_LOCATION, type Place } from "./FilterPanel";
 
@@ -170,12 +172,19 @@ export function Paths({ dish, place, radius, onPickPlace }: Props) {
   );
 }
 
+/** Three cards fanned out: the user's persona in the middle, or three crowd favourites. */
+function fanOf(persona: Persona | null): PersonaId[] {
+  if (!persona) return ["spice", "tamada", "khinkali"];
+  const i = PERSONA_IDS.indexOf(persona.id);
+  return [PERSONA_IDS[(i + 11) % 12], persona.id, PERSONA_IDS[(i + 1) % 12]];
+}
+
 export function PersonaTeaser({ persona, onStart, onGallery }: { persona: Persona | null; onStart: () => void; onGallery: () => void }) {
+  const fan = fanOf(persona);
   return (
     <section className="container" id="persona">
       <div className="persona reveal-pop">
         <div className="persona__copy">
-          <Image className="only-mobile" src={`/icons/${persona?.icon ?? "mascot"}.svg`} alt="" width={64} height={66} />
           {persona ? (
             <>
               <p className="caps">შენი პერსონა</p>
@@ -197,20 +206,13 @@ export function PersonaTeaser({ persona, onStart, onGallery }: { persona: Person
             </>
           )}
         </div>
-        <div className="persona__art only-desktop" aria-hidden="true">
-          <div className="qcard">
-            <p className="caps">კითხვა 4 / 7</p>
-            <p className="qcard__q">აჯიკა მაგიდაზეა. შენ?</p>
-            <span className="qcard__a">ცოტას, გემოსთვის</span>
-            <span className="qcard__a qcard__a--on">ყველაფერს ვუსვამ</span>
-          </div>
-          <div className="pcard">
-            <Image src={`/icons/${persona?.icon ?? "mascot"}.svg`} alt="" width={56} height={58} />
-            <p className="caps">შენი პერსონა</p>
-            <p className="pcard__name">{persona?.name ?? "წიწაკის რისხვა"}</p>
-            <div className="row"><span className="mini">₾₾</span><span className="mini mini--dark">ცხარე</span></div>
-          </div>
-        </div>
+        <button type="button" className="persona__fan" onClick={onGallery} aria-label="12 პერსონის ბარათი">
+          {fan.map((id, i) => (
+            <span key={id} className="persona__fan-card" style={{ ["--i" as string]: i - 1 }}>
+              <TarotCard id={id} size="md" tilt={false} me={persona?.id === id} />
+            </span>
+          ))}
+        </button>
       </div>
     </section>
   );

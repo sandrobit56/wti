@@ -3,18 +3,21 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-16
- * Version:     v1.0
+ * Version:     v3.0 — shared Sheet; result = tarot card that turns over;
+ *              v1.0
  * Description: The persona quiz: 7 questions × 4 answers, one per screen, then
  *              the persona card with what it will change on the wheel.
  *              Scoring is lib/quiz.ts (pure, tested); this file is only UI.
- *              Native <dialog>: Esc / × / backdrop close it, focus is handled
+ *              Shell = components/Sheet.tsx: Esc / × / backdrop / drag close it, focus is handled
  *              by the browser.
  */
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { DishTag } from "./DishTag";
+import { Sheet } from "./Sheet";
+import { TarotCard } from "./TarotCard";
 import { DISHES, priceBand } from "@/lib/catalog.ts";
 import { PERSONAS } from "@/lib/personas.ts";
 import { QUESTIONS, applyQuiz, scoreQuiz } from "@/lib/quiz.ts";
@@ -29,25 +32,12 @@ const TASTE_LABEL = { spicy: "ცხარე", light: "მსუბუქი", 
 const BUDGET_LABEL = { 1: "ბიუჯეტი: 15 ₾-მდე", 2: "ბიუჯეტი: 35 ₾-მდე", 3: "ბიუჯეტი: ნებისმიერი" } as const;
 
 export function Quiz({ onClose, onApply, onDish }: Props) {
-  const ref = useRef<HTMLDialogElement>(null);
   const [answers, setAnswers] = useState<string[]>([]);
   const step = answers.length;                 // 0…7; 7 = result screen
   const done = step === QUESTIONS.length;
 
-  useEffect(() => {
-    const d = ref.current;
-    if (d && !d.open) d.showModal();
-  }, []);
-
   return (
-    <dialog
-      ref={ref}
-      className="modal quiz"
-      aria-labelledby="quiz-title"
-      onCancel={(e) => { e.preventDefault(); onClose(); }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div className="modal__card">
+    <Sheet className="quiz" labelledBy="quiz-title" onClose={onClose}>
         <button className="modal__close" onClick={onClose} aria-label="დახურვა">×</button>
 
         {!done && (
@@ -72,8 +62,7 @@ export function Quiz({ onClose, onApply, onDish }: Props) {
         )}
 
         {done && <ResultView answers={answers} onApply={onApply} onDish={onDish} onRestart={() => setAnswers([])} />}
-      </div>
-    </dialog>
+    </Sheet>
   );
 }
 
@@ -84,6 +73,9 @@ function ResultView({ answers, onApply, onDish, onRestart }: { answers: string[]
   const p = PERSONAS[r.persona];
   const half = PERSONAS[r.runnerUp];
   const applied = applyQuiz(r);
+  // Reveal: the card arrives face down and turns over (reduced motion: CSS makes it instant).
+  const [hidden, setHidden] = useState(true);
+  useEffect(() => { const t = window.setTimeout(() => setHidden(false), 650); return () => clearTimeout(t); }, []);
   // Examples must respect the filters this result sets (a vegetarian never sees შაურმა).
   const veg = applied.filters.diet.length > 0;
   const examples = DISHES
@@ -108,10 +100,21 @@ function ResultView({ answers, onApply, onDish, onRestart }: { answers: string[]
             <Image key={i} src={`/icons/${icon}.svg`} alt="" width={34} height={34} style={{ ["--a" as string]: `${(360 / BURST.length) * i + 8}deg`, ["--d" as string]: `${150 + (i % 3) * 45}px`, ["--i" as string]: i }} />
           ))}
         </span>
-        <Image className="quiz__hero-ico" src={`/icons/${p.icon}.svg`} alt="" width={88} height={88} />
+        <TarotCard id={r.persona} size="md" flipped={hidden} className="quiz__card" />
         <p className="caps">შენი პერსონა</p>
         <h2 id="quiz-title" className="modal__name" aria-label={p.name}>
-          {[...p.name].map((ch, i) => (ch === " " ? " " : <span key={i} className="drop" style={{ ["--i" as string]: i }} aria-hidden="true">{ch}</span>))}
+          {/* letters drop one by one; grouped per word so a line never breaks mid-word */}
+          {p.name.split(" ").map((word, w, words) => {
+            const offset = words.slice(0, w).join(" ").length + (w ? 1 : 0);
+            return (
+              <Fragment key={w}>
+                <span className="drop-word" aria-hidden="true">
+                  {[...word].map((ch, i) => <span key={i} className="drop" style={{ ["--i" as string]: offset + i }}>{ch}</span>)}
+                </span>
+                {w < words.length - 1 ? " " : ""}
+              </Fragment>
+            );
+          })}
         </h2>
         <p className="quiz__line">{p.line}</p>
         <p className="modal__meta">ნახევრად — {half.name}</p>

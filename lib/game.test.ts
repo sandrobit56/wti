@@ -9,7 +9,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { DISHES } from "./catalog.ts";
-import { makeTicket, pace, pickSpawn, points, topEaten, TICKET_BONUS } from "./game.ts";
+import { makeTicket, pace, pickSpawn, points, stomachPersona, topEaten, TICKET_BONUS } from "./game.ts";
 import { seeded } from "./spin.ts";
 
 test("ticket = 3 distinct dishes from the wheel, topped up when the wheel is short", () => {
@@ -43,4 +43,10 @@ test("topEaten orders by count and pace speeds up", () => {
   assert.deepEqual(topEaten(["a", "b", "b", "c", "c", "c", "a", "d"]), ["c", "a", "b"]);
   assert.ok(pace(1, false).speed > pace(0, false).speed);
   assert.ok(pace(1, false).gap < pace(0, false).gap);
+});
+
+test("stomachPersona: what you ate picks the card", () => {
+  assert.equal(stomachPersona([]), null);
+  assert.equal(stomachPersona(["sushi", "ramen", "poke", "pizza"]), "sushi");
+  assert.equal(stomachPersona(["khinkali", "khinkali", "pelmeni"]), "khinkali");
 });

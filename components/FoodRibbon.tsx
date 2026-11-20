@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-18
- * Version:     v4.0 — scroll toy only; "▶" leads to the „კუჭის ჩელენჯი" section
+ * Version:     v4.1 — googly-eyed food creatures (lib/creatures.ts) wiggle along the band;
+ *              v4.0 — scroll toy only; "▶" leads to the „კუჭის ჩელენჯი" section
  *              (the arcade mode moved there: user testing said the band was too small)
  * Description: The yellow band: scroll drives dishes + pellets into the mascot's
  *   mouth; tapping a dish feeds it. "▶ კუჭის ჩელენჯი" jumps to the game section.
@@ -14,19 +15,14 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { DISHES } from "@/lib/catalog.ts";
+import { CREATURES } from "@/lib/creatures.ts";
 
-const BASE = ["khinkali", "pizza", "sushi", "khachapuri", "burger", "noodles", "churchkhela", "taco", "salad", "mtsvadi", "cake", "fish", "shawarma", "icecream"];
-const ICONS = [...BASE, ...BASE.slice(7), ...BASE.slice(0, 7)]; // two laps, so the band never runs empty
+// Two laps of the six creatures, offset so neighbours differ, so the band never runs empty.
+const BASE = CREATURES.map((c) => c.name);
+const ICONS = [...BASE, ...BASE.slice(3), ...BASE.slice(0, 3), ...BASE.slice(1), BASE[0]];
 const DISHES_TOTAL = ICONS.length;
 const MOUTH_OFFSET = 14;
-
-/** Ribbon icon → dish type it stands for (validated below). */
-const ICON_DISH: Record<string, string> = {
-  khinkali: "khinkali", pizza: "pizza", sushi: "sushi", khachapuri: "khachapuri", burger: "burger", noodles: "ramen",
-  churchkhela: "georgian-sweets", taco: "tacos", salad: "salad-bowl", mtsvadi: "mtsvadi", cake: "cake", fish: "seafood",
-  shawarma: "shawarma", icecream: "ice-cream",
-};
-for (const [icon, slug] of Object.entries(ICON_DISH)) if (!DISHES.some((d) => d.slug === slug)) throw new Error(`FoodRibbon: ${icon} → unknown dish ${slug}`);
+const ICON_DISH: Record<string, string> = Object.fromEntries(CREATURES.map((c) => [c.name, c.dish]));
 const DISH_NAME = new Map(DISHES.map((d) => [d.slug, d.name]));
 
 
@@ -102,7 +98,7 @@ export function FoodRibbon() {
           {ICONS.map((icon, i) => (
             <span key={i} className="ribbon__cell">
               <button type="button" data-i={i} data-kind="dish" className="ribbon__item" style={{ ["--k" as string]: i % 4 }} onClick={(e) => feed(e, i)} aria-label={`აჭამე: ${DISH_NAME.get(ICON_DISH[icon])}`}>
-                <Image src={`/icons/${icon}.svg`} alt="" width={44} height={44} />
+                <Image src={`/illustrations/creatures/${icon}.webp`} alt="" width={52} height={52} />
               </button>
               <span data-i={100 + i} data-kind="pellet" className="ribbon__pellet" aria-hidden="true" />
               <span data-i={200 + i} data-kind="pellet" className="ribbon__pellet" aria-hidden="true" />

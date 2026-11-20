@@ -214,7 +214,6 @@ a.row-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
 /* ── Result modal ───────────────────────────────────── */
 .modal { border: 0; padding: 0; background: transparent; max-width: min(560px, calc(100% - 24px)); width: 100%; max-height: calc(100dvh - 24px); margin: auto; overflow: visible; }
 .modal::backdrop { background: rgba(30, 10, 16, 0.55); backdrop-filter: blur(3px); }
-.modal[open] .modal__card { animation: pop 0.38s cubic-bezier(0.2, 1.4, 0.4, 1); }
 .modal__card { position: relative; background: var(--surface); border-radius: var(--r-xl); padding: 28px; max-height: calc(100dvh - 24px); overflow: auto; display: flex; flex-direction: column; gap: 20px; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25); }
 .modal__close { position: absolute; top: 14px; right: 14px; width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--bg); font-size: 26px; line-height: 1; cursor: pointer; }
 .modal__hero { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; background: var(--pink-soft); border-radius: 24px; padding: 22px 16px 18px; }
@@ -843,3 +842,91 @@ html, body { overflow-x: clip; max-width: 100%; }
 .credit-chip a:hover { text-decoration: underline; }
 .version__credit { font-size: 10px; color: var(--muted); }
 .version__credit .credit-chip { background: none; color: var(--muted); padding: 0; font-size: 10px; }
+
+/* ── Visual language v4 (2026-11-21): tarot cards, sheet, creatures ───────── */
+
+/* Tarot card (components/TarotCard.tsx) */
+.tarot { position: relative; flex: none; aspect-ratio: 3 / 4; border-radius: 18px; transform-style: preserve-3d; }
+.tarot__inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .65s var(--spring); }
+.tarot.is-flipped .tarot__inner { transform: rotateY(180deg); }
+.tarot__face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 18px; overflow: hidden; background: var(--cream); box-shadow: 0 6px 0 rgba(18,18,18,.06), 0 18px 36px rgba(18,18,18,.12); }
+.tarot__front img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.tarot__back { transform: rotateY(180deg); }
+.tarot--me .tarot__face { box-shadow: 0 0 0 3px var(--brand), 0 6px 0 rgba(18,18,18,.06), 0 18px 36px rgba(18,18,18,.12); }
+.tarot__banner { position: absolute; left: 50%; bottom: 6.5%; translate: -50% 0; max-width: 84%; padding: 5px 18px; text-align: center; font-weight: 900; font-size: 13px; line-height: 1.15; color: #fff; background: var(--brand-ink); clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 50%, 100% 100%, 0 100%, 9px 50%); filter: drop-shadow(0 2px 0 #a8253b); }
+.tarot--sm .tarot__banner { font-size: 11px; padding: 4px 14px; }
+.tarot--lg .tarot__banner { font-size: 15px; }
+.tarot__me { position: absolute; top: 9%; right: 9%; font-size: 11px; font-weight: 900; color: #fff; background: var(--brand-ink); border-radius: 999px; padding: 3px 9px; }
+.tarot__hit { position: absolute; inset: 0; border: 0; background: none; cursor: pointer; border-radius: inherit; }
+.tarot__hit:focus-visible, .tarot__turn:focus-visible { outline: 3px solid var(--brand); outline-offset: -3px; }
+.tarot__shine { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at var(--sx, 50%) var(--sy, 30%), rgba(255,255,255,.45), transparent 55%); opacity: 0; transition: opacity .25s; mix-blend-mode: soft-light; }
+.tarot:hover .tarot__shine { opacity: 1; }
+.tarot__turn { position: absolute; right: 10px; bottom: 10px; width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--brand-ink); color: #fff; font-size: 16px; font-weight: 900; cursor: pointer; box-shadow: 0 3px 0 #a8253b; }
+/* decorative back: lavender field of tiny stars + mascot seal */
+.tarot__cover { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 8px; background: radial-gradient(circle, rgba(255,255,255,.55) 1.5px, transparent 2px) 0 0 / 22px 22px, var(--lavender); box-shadow: inset 0 0 0 8px var(--cream), inset 0 0 0 10px var(--brand); border-radius: 18px; }
+.tarot__cover img { filter: drop-shadow(0 4px 0 rgba(18,18,18,.12)); }
+.tarot__cover-title { font-weight: 900; color: #fff; font-size: 15px; background: var(--brand-ink); padding: 3px 12px; border-radius: 999px; }
+/* gallery card back */
+.pback { position: absolute; inset: 0; display: flex; flex-direction: column; gap: 8px; padding: 18px 16px 50px; overflow: auto; background: var(--cream); box-shadow: inset 0 0 0 6px var(--cream), inset 0 0 0 8px var(--lavender); border-radius: 18px; }
+.pback__name { font-size: 16px; font-weight: 900; line-height: 1.15; }
+.pback__line { font-size: 13px; line-height: 1.35; color: var(--muted); }
+.pback__dishes { display: flex; flex-wrap: wrap; gap: 6px; }
+.pback .pc__tag { align-self: flex-start; }
+
+/* Gallery deck */
+.gallery__deck > li { width: 100%; display: flex; justify-content: center; }
+.gallery__deck { list-style: none; margin: 0; padding: 4px; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px 14px; justify-items: center; }
+
+/* Sheet (components/Sheet.tsx) */
+.modal.bsheet { perspective: 1400px; }
+.bsheet__grab { display: none; }
+@media (max-width: 640px) {
+  .modal.bsheet, .modal.bsheet.gallery { margin: auto 0 0; width: 100%; max-width: 100%; max-height: 92dvh; }
+  .bsheet .modal__card { border-radius: 28px 28px 0 0; max-height: 92dvh; padding-top: 0; }
+  .bsheet__grab { display: flex; justify-content: center; position: sticky; top: 0; z-index: 4; margin: 0 -28px; padding: 10px 0 8px; background: var(--surface); cursor: grab; touch-action: none; }
+  .bsheet__grab span { width: 44px; height: 5px; border-radius: 99px; background: var(--line); }
+  .gallery__deck { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px 10px; }
+  .gallery__deck .tarot { width: 100% !important; max-width: 220px; }
+}
+
+/* Persona teaser: three fanned cards */
+.persona__fan { position: relative; border: 0; background: none; padding: 0; width: 100%; max-width: 440px; height: 340px; display: grid; place-items: center; cursor: pointer; justify-self: center; }
+.persona__fan-card { position: absolute; transform: translateX(calc(var(--i) * 78px)) translateY(calc(var(--i) * var(--i) * 18px)) rotate(calc(var(--i) * 9deg)); transition: transform .45s var(--spring); }
+.persona__fan-card:nth-child(2) { z-index: 2; }
+.persona__fan:hover .persona__fan-card, .persona__fan:focus-visible .persona__fan-card { transform: translateX(calc(var(--i) * 128px)) translateY(calc(var(--i) * var(--i) * 26px)) rotate(calc(var(--i) * 14deg)); }
+.persona__fan:hover .persona__fan-card:nth-child(2) { transform: translateY(-10px) scale(1.04); }
+.persona__fan:focus-visible { outline: none; }
+@media (max-width: 1023px) {
+  .persona__fan { height: 270px; margin-top: 8px; }
+  .persona__fan-card { transform: translateX(calc(var(--i) * 56px)) translateY(calc(var(--i) * var(--i) * 12px)) rotate(calc(var(--i) * 8deg)) scale(.78); }
+  .persona__fan:hover .persona__fan-card { transform: translateX(calc(var(--i) * 70px)) translateY(calc(var(--i) * var(--i) * 14px)) rotate(calc(var(--i) * 11deg)) scale(.78); }
+  .persona__fan:hover .persona__fan-card:nth-child(2) { transform: scale(.8); }
+}
+
+/* Quiz result card */
+.quiz__card { margin: 4px auto 10px; z-index: 1; }
+
+/* Ribbon creatures wiggle (out of phase) */
+.ribbon__item img { animation: wiggle 1.8s ease-in-out infinite; animation-delay: calc(var(--k) * -0.45s); }
+@keyframes wiggle { 0%, 100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg) translateY(-3px); } }
+
+/* Game: creatures + stomach card reveal */
+.game__arena--over { height: auto; min-height: clamp(320px, 52vh, 460px); }
+.game__arena--over .game__screen { position: relative; inset: auto; padding: 28px 20px; }
+.game__reveal { display: flex; align-items: center; gap: 14px; text-align: left; animation: fade-up .45s var(--spring) both; }
+.game__reveal .tarot { animation: deal .7s var(--spring) both; }
+.game__reveal-cap { display: flex; flex-direction: column; font-weight: 700; font-size: 14px; max-width: 180px; }
+.game__reveal-cap b { font-size: 20px; font-weight: 900; line-height: 1.1; color: var(--brand-ink); }
+@keyframes deal { from { transform: translateY(40px) rotate(-14deg) scale(.7); } to { transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tarot__inner, .persona__fan-card { transition: none; }
+  .ribbon__item img, .game__reveal .tarot { animation: none; }
+}
+@media (max-width: 640px) {
+  .gallery__deck .pback { padding: 12px 10px 46px; gap: 6px; }
+  .gallery__deck .pback__name { font-size: 14px; }
+  .gallery__deck .pback__line { font-size: 12px; }
+  .gallery__deck .pback .dtag { font-size: 12px; min-height: 28px; }
+}
+.drop-word { white-space: nowrap; }

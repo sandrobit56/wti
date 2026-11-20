@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-20
- * Version:     v1.0
+ * Version:     v1.1 — stomachPersona(): what you ate → the persona card shown at game over
  * Description: Pure rules of „კუჭის ჩელენჯი" (the 3-lane game section). No DOM, rng
  *   injected → unit-tested. The component only moves things and calls these.
  *
@@ -15,6 +15,8 @@
  */
 import { DISHES, type Dish } from "./catalog.ts";
 import type { Rng } from "./spin.ts";
+import { PERSONAS } from "./personas.ts";
+import { PERSONA_IDS, type PersonaId } from "./quiz.ts";
 
 export const LANES = 3;
 export const ROUND_S = 60;
@@ -69,4 +71,24 @@ export function pace(progress: number, reduceMotion: boolean): { speed: number; 
   const p = Math.min(1, Math.max(0, progress));
   const k = reduceMotion ? 0.7 : 1;
   return { speed: (240 + 200 * p) * k, gap: (0.85 - 0.4 * p) / k };
+}
+
+/** How many catalogue dishes each persona's rule covers (its breadth). */
+const BREADTH = new Map(PERSONA_IDS.map((id) => [id, DISHES.filter((d) => PERSONAS[id].matches(d)).length]));
+
+/**
+ * "შენმა კუჭმა გამოავლინა": which persona fits what was eaten.
+ * Raw counts would always crown the broad catch-alls (გემოს მაძიებელი matches every
+ * non-Georgian dish), so each persona scores matches / √breadth — a narrow persona
+ * that fits beats a wide one that merely includes. Ties → first listed. Nothing eaten → null.
+ */
+export function stomachPersona(eaten: string[]): PersonaId | null {
+  if (!eaten.length) return null;
+  const dishes = eaten.map((s) => { const d = BY_SLUG.get(s); if (!d) throw new Error(`stomachPersona: unknown dish ${s}`); return d; });
+  let best: PersonaId | null = null, top = 0;
+  for (const id of PERSONA_IDS) {
+    const score = dishes.filter((d) => PERSONAS[id].matches(d)).length / Math.sqrt(BREADTH.get(id)!);
+    if (score > top) { top = score; best = id; }
+  }
+  return best;
 }

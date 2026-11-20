@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-20
- * Version:     v1.0
+ * Version:     v1.1 — food creatures in the lanes; game over reveals "your stomach's
+ *              card" (stomachPersona) as a tarot card; start screen = challenge card
  * Description: „კუჭის ჩელენჯი" — the game gets its own section (user testing: the
  *   yellow band was too small to play on).
  *   - 3 lanes, 60 s, 3 hearts. Tap/click a lane (or ↑ ↓ / W S) to move the mascot.
@@ -19,10 +20,12 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DISHES } from "@/lib/catalog.ts";
-import { LANES, LIVES, ROUND_S, makeTicket, pace, pickSpawn, points, topEaten } from "@/lib/game.ts";
+import { CREATURE_OF } from "@/lib/creatures.ts";
+import { LANES, LIVES, ROUND_S, makeTicket, pace, pickSpawn, points, stomachPersona, topEaten } from "@/lib/game.ts";
 import { PERSONAS } from "@/lib/personas.ts";
 import type { PersonaId } from "@/lib/quiz.ts";
 import { DishTag } from "./DishTag";
+import { TarotCard } from "./TarotCard";
 
 const BY_SLUG = new Map(DISHES.map((d) => [d.slug, d]));
 const BEST_KEY = "wti:stomach-best";
@@ -54,7 +57,7 @@ export function StomachChallenge({ wheelSlugs, personaId, onDish }: Props) {
   const g = useRef({ items: [] as Item[], lane: 1, t0: 0, last: 0, spawnIn: 0, next: 0, lives: LIVES, score: 0, eaten: [] as string[], stamped: [] as string[], raf: 0, reduce: false });
   const [, setFrame] = useState(0);
   const [pops, setPops] = useState<Pop[]>([]);
-  const [result, setResult] = useState({ score: 0, best: 0, top: [] as string[], stamped: [] as string[], record: false });
+  const [result, setResult] = useState({ score: 0, best: 0, top: [] as string[], stamped: [] as string[], record: false, card: null as PersonaId | null });
 
   const pop = (lane: number, text: string, bad = false) => {
     const id = g.current.next++;
@@ -67,7 +70,7 @@ export function StomachChallenge({ wheelSlugs, personaId, onDish }: Props) {
     cancelAnimationFrame(s.raf);
     const prev = readBest();
     writeBest(Math.max(prev, s.score));
-    setResult({ score: s.score, best: Math.max(prev, s.score), top: topEaten(s.eaten), stamped: [...s.stamped], record: s.score > prev && s.score > 0 });
+    setResult({ score: s.score, best: Math.max(prev, s.score), top: topEaten(s.eaten), stamped: [...s.stamped], record: s.score > prev && s.score > 0, card: stomachPersona(s.eaten) });
     setPhase("over");
   }, []);
 
@@ -185,7 +188,7 @@ export function StomachChallenge({ wheelSlugs, personaId, onDish }: Props) {
             </div>
             {s.items.map((it) => (
               <span key={it.id} className={it.kind === "chili" ? "game__item game__item--chili" : "game__item"} style={{ top: laneTop(it.lane), transform: `translate(${it.x - 30}px, -50%)` }} aria-hidden="true">
-                <Image src={`/icons/${it.kind === "chili" ? "chili" : BY_SLUG.get(it.slug!)!.icon}.svg`} alt="" width={40} height={40} />
+                <Image src={it.kind === "chili" ? "/icons/chili.svg" : CREATURE_OF.get(it.slug!) ?? `/icons/${BY_SLUG.get(it.slug!)!.icon}.svg`} alt="" width={44} height={44} />
               </span>
             ))}
             {pops.map((p) => <span key={p.id} className={p.bad ? "game__pop game__pop--bad" : "game__pop"} style={{ top: laneTop(p.lane) }} aria-hidden="true">{p.text}</span>)}
@@ -207,6 +210,12 @@ export function StomachChallenge({ wheelSlugs, personaId, onDish }: Props) {
 
         {phase === "over" && (
           <div className="game__screen" role="status">
+            {result.card && (
+              <div className="game__reveal">
+                <TarotCard id={result.card} size="sm" tilt={false} />
+                <span className="game__reveal-cap">შენმა კუჭმა გამოავლინა:<b>{PERSONAS[result.card].name}</b></span>
+              </div>
+            )}
             <strong className="game__big">{result.score}</strong>
             <span className="game__verdict">{result.record ? "ახალი რეკორდი! 🎉" : `ქულა · რეკორდი ${result.best}`}{result.stamped.length === ticket.length ? " · შეკვეთა სრულად შესრულდა" : ""}</span>
             {result.top.length > 0 && (

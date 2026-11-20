@@ -2,24 +2,25 @@
  * File:        components/PersonaGallery.tsx
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
- * Date:        2026-11-18
- * Version:     v1.0
- * Description: "12 პერსონა" — all personas in one dialog: icon, name, one-liner,
- *              Georgian/world habit tag, and real dishes from the catalogue that the
- *              persona boosts. The user's own persona (if the quiz was taken) is marked.
- *              Cards tilt on hover; CTA starts the quiz.
+ * Date:        2026-11-21
+ * Version:     v2.0 — tarot deck: 12 illustrated cards dealt in, tap flips a card
+ *              to its back (line, signature dishes → places, habit tag)
+ * Description: "12 პერსონა" in the shared Sheet. The user's persona is marked and
+ *              dealt first. SIGNATURE is exported — the game and teaser reuse it.
  */
 "use client";
 
-import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { motion, useReducedMotion } from "motion/react";
+import { useState } from "react";
 import { DISHES } from "@/lib/catalog.ts";
 import { PERSONA_IDS, type PersonaId } from "@/lib/quiz.ts";
 import { PERSONAS } from "@/lib/personas.ts";
 import { DishTag } from "./DishTag";
+import { Sheet } from "./Sheet";
+import { TarotCard } from "./TarotCard";
 
 /** Hand-picked signature dishes per persona (validated against the catalogue below). */
-const SIGNATURE: Record<PersonaId, string[]> = {
+export const SIGNATURE: Record<PersonaId, string[]> = {
   tamada: ["mtsvadi", "khachapuri", "satsivi"],
   khinkali: ["khinkali", "pelmeni", "dumplings-asian"],
   bakery: ["lobiani", "khachapuri", "mchadi"],
@@ -36,45 +37,52 @@ const SIGNATURE: Record<PersonaId, string[]> = {
 const NAME = new Map(DISHES.map((d) => [d.slug, d.name]));
 for (const [p, slugs] of Object.entries(SIGNATURE)) for (const s of slugs) if (!NAME.has(s)) throw new Error(`PersonaGallery: ${p} → unknown dish "${s}"`);
 
+/** Back of a gallery card: what this persona means for the wheel. */
+export function PersonaBack({ id, onDish }: { id: PersonaId; onDish: (slug: string) => void }) {
+  const p = PERSONAS[id];
+  return (
+    <div className="pback">
+      <strong className="pback__name">{p.name}</strong>
+      <span className="pback__line">{p.line}</span>
+      <span className="pback__dishes">{SIGNATURE[id].map((slug) => <DishTag key={slug} slug={slug} onOpen={onDish} />)}</span>
+      <span className={p.georgianHabit ? "pc__tag" : "pc__tag pc__tag--world"}>{p.georgianHabit ? "ქართული ჩვევა" : "ქალაქის რიტმი"}</span>
+    </div>
+  );
+}
+
 export function PersonaGallery({ current, onClose, onStart, onDish }: { current: PersonaId | null; onClose: () => void; onStart: () => void; onDish: (slug: string) => void }) {
-  const ref = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    const d = ref.current;
-    if (d && !d.open) d.showModal();
-  }, []);
+  const [open, setOpen] = useState<PersonaId | null>(null);
+  const reduce = useReducedMotion();
+  const order = current ? [current, ...PERSONA_IDS.filter((x) => x !== current)] : PERSONA_IDS;
 
   return (
-    <dialog
-      ref={ref}
-      className="modal gallery"
-      aria-labelledby="gallery-title"
-      onCancel={(e) => { e.preventDefault(); onClose(); }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div className="modal__card">
-        <button className="modal__close" onClick={onClose} aria-label="დახურვა">×</button>
-        <header>
-          <p className="caps">12 პერსონა</p>
-          <h2 id="gallery-title" className="gallery__title">ვინ ხარ სუფრასთან?</h2>
-          <p className="gallery__lead">8 ქართულ ჩვევაზეა დაფუძნებული, 4 — ქალაქის ახალ რიტმზე. ტესტი ერთს აგირჩევს და ბორბალს მის გემოზე მოარგებს.</p>
-        </header>
-        <ul className="gallery__grid">
-          {PERSONA_IDS.map((id, i) => {
-            const p = PERSONAS[id];
-            return (
-              <li key={id} className={id === current ? "pc pc--me" : "pc"} style={{ ["--i" as string]: i }}>
-                <span className="pc__ico"><Image src={`/icons/${p.icon}.svg`} alt="" width={44} height={44} /></span>
-                <strong className="pc__name">{p.name}</strong>
-                <span className="pc__line">{p.line}</span>
-                <span className="pc__dishes">{SIGNATURE[id].map((slug) => <DishTag key={slug} slug={slug} onOpen={onDish} />)}</span>
-                <span className={p.georgianHabit ? "pc__tag" : "pc__tag pc__tag--world"}>{p.georgianHabit ? "ქართული ჩვევა" : "ქალაქის რიტმი"}</span>
-                {id === current && <span className="pc__me">შენ ✓</span>}
-              </li>
-            );
-          })}
-        </ul>
-        <button className="pill pill--dark pill--block" onClick={onStart}>{current ? "ტესტი თავიდან" : "გაიარე ტესტი — 1 წუთი"}</button>
-      </div>
-    </dialog>
+    <Sheet className="gallery" labelledBy="gallery-title" onClose={onClose}>
+      <button className="modal__close" onClick={onClose} aria-label="დახურვა">×</button>
+      <header>
+        <p className="caps">12 პერსონა</p>
+        <h2 id="gallery-title" className="gallery__title">ვინ ხარ სუფრასთან?</h2>
+        <p className="gallery__lead">8 ქართულ ჩვევაზეა, 4 — ქალაქის რიტმზე. შეეხე ბარათს და გადააბრუნე.</p>
+      </header>
+      <ul className="gallery__deck">
+        {order.map((id, i) => (
+          <motion.li
+            key={id}
+            initial={reduce ? false : { y: 80, rotate: (i % 2 ? 1 : -1) * (6 + (i % 3) * 3), scale: 0.8 }}
+            animate={{ y: 0, rotate: 0, scale: 1 }}
+            transition={{ type: "spring", stiffness: 240, damping: 20, delay: 0.15 + i * 0.05 }}
+          >
+            <TarotCard
+              id={id}
+              size="md"
+              me={id === current}
+              flipped={open === id}
+              onFlip={() => setOpen((o) => (o === id ? null : id))}
+              back={<PersonaBack id={id} onDish={onDish} />}
+            />
+          </motion.li>
+        ))}
+      </ul>
+      <button className="pill pill--dark pill--block" onClick={onStart}>{current ? "ტესტი თავიდან" : "გაიარე ტესტი — 1 წუთი"}</button>
+    </Sheet>
   );
 }

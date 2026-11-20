@@ -3,19 +3,19 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-16
- * Version:     v2.1 — live Google map + on-tap Google Places nearby;
+ * Version:     v3.0 — shared Sheet: bottom sheet with drag-to-close on mobile, card-draw on desktop;
+ *              v2.1 — live Google map + on-tap Google Places nearby;
  *              v2.0 — 4–5 real versions of the dish (photo + credit, description,
  *              price, per-version Maps / delivery search); "სხვა ვერსიები" reshuffles
  * Description: Pops up the moment the wheel lands: the dish, where to taste it
  *              nearby, delivery apps, and the two next actions (spin again /
  *              not today). Closes with ×, Esc, or a click on the backdrop.
- *              Uses the native <dialog> so focus, Esc and the top layer come
- *              from the browser instead of hand-rolled code.
+ *              Shell = components/Sheet.tsx (native dialog underneath).
  */
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { priceBand, type Dish } from "@/lib/catalog.ts";
 import type { Variant } from "@/lib/variants.ts";
 import { typePhoto, variantPhoto, UNSPLASH_HOME, type Photo } from "@/lib/photos.ts";
@@ -23,6 +23,7 @@ import { deliveryLinks, mapsDirectionsUrl, mapsSearchUrl, type RadiusKm } from "
 import { MY_LOCATION, type Place } from "./FilterPanel";
 import { km, useNearbyVenues } from "./Paths";
 import { GoogleNearby } from "./GoogleNearby";
+import { Sheet } from "./Sheet";
 
 type Props = {
   dish: Dish;
@@ -69,26 +70,13 @@ function Credit({ p }: { p: Photo }) {
 export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday, onNever, onPickPlace, why, pickVersions }: Props) {
   const [versions, setVersions] = useState(() => pickVersions(VERSIONS));
   const hero = typePhoto(dish.slug);
-  const ref = useRef<HTMLDialogElement>(null);
   const venues = useNearbyVenues(dish, place, radius);
   const area = place && place.label !== MY_LOCATION ? place.label : "თბილისი";
   const nearArea = place && place.label !== MY_LOCATION ? place.label : null;
   const delivery = deliveryLinks(place?.wolt ?? null);
 
-  useEffect(() => {
-    const d = ref.current;
-    if (d && !d.open) d.showModal();
-  }, []);
-
   return (
-    <dialog
-      ref={ref}
-      className="modal"
-      aria-labelledby="modal-title"
-      onCancel={(e) => { e.preventDefault(); onClose(); }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
-    >
-      <div className="modal__card">
+    <Sheet labelledBy="modal-title" onClose={onClose}>
         <button className="modal__close" onClick={onClose} aria-label="დახურვა" autoFocus>×</button>
 
         <header className={hero ? "modal__hero modal__hero--photo" : "modal__hero"}>
@@ -197,7 +185,6 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
           <button className="pill pill--outline" onClick={onNotToday}>დღეს არა</button>
           <button className="link modal__never" onClick={onNever}>„{dish.name}“ არ მიყვარს — აღარ შემომთავაზო</button>
         </footer>
-      </div>
-    </dialog>
+    </Sheet>
   );
 }
