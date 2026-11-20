@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-16
- * Version:     v3.0 — shared Sheet: bottom sheet with drag-to-close on mobile, card-draw on desktop;
+ * Version:     v3.1 — actions pinned in the Sheet footer; 3 versions; hint lines removed;
+ *              v3.0 — shared Sheet: bottom sheet with drag-to-close on mobile, card-draw on desktop;
  *              v2.1 — live Google map + on-tap Google Places nearby;
  *              v2.0 — 4–5 real versions of the dish (photo + credit, description,
  *              price, per-version Maps / delivery search); "სხვა ვერსიები" reshuffles
@@ -38,7 +39,7 @@ type Props = {
   pickVersions: (n: number) => Variant[];
 };
 
-const VERSIONS = 5;
+const VERSIONS = 3; // fewer, so the popup reads at a glance (user testing)
 
 /**
  * Photo credit.
@@ -76,8 +77,17 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
   const delivery = deliveryLinks(place?.wolt ?? null);
 
   return (
-    <Sheet labelledBy="modal-title" onClose={onClose}>
-        <button className="modal__close" onClick={onClose} aria-label="დახურვა" autoFocus>×</button>
+    <Sheet
+      labelledBy="modal-title"
+      onClose={onClose}
+      footer={
+        <div className="modal__actions">
+          <button className="pill pill--dark" onClick={onAgain}>↻ ხელახლა</button>
+          <button className="pill pill--outline" onClick={onNotToday}>დღეს არა</button>
+          <button className="link modal__never" onClick={onNever}>„{dish.name}“ არ მიყვარს</button>
+        </div>
+      }
+    >
 
         <header className={hero ? "modal__hero modal__hero--photo" : "modal__hero"}>
           {hero ? (
@@ -110,7 +120,7 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
               <button className="link modal__reshuffle" onClick={() => setVersions(pickVersions(VERSIONS))}>სხვა ვერსიები ↻</button>
             )}
           </h3>
-          {versions.length === 0 && <p className="modal__hint">შენს ფილტრებს ამ კერძის არცერთი ვერსია არ ერგება — ადგილები და მიტანა მაინც ქვემოთაა.</p>}
+          {versions.length === 0 && <p className="modal__hint">შენს ფილტრებს ვერსია არ ერგება.</p>}
           <ul className="versions">
             {versions.map((v) => {
               const p = variantPhoto(v);
@@ -135,7 +145,6 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
               );
             })}
           </ul>
-          <p className="modal__hint">ფასი — ტიპური დიაპაზონი თბილისში, ერთ პორციაზე.</p>
         </section>
 
         <section className="modal__section">
@@ -177,14 +186,7 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
               </a>
             ))}
           </div>
-          <p className="modal__hint">აპში მოძებნე: „{versions[0]?.name ?? dish.search}“</p>
         </section>
-
-        <footer className="modal__actions">
-          <button className="pill pill--dark" onClick={onAgain}>↻ ხელახლა</button>
-          <button className="pill pill--outline" onClick={onNotToday}>დღეს არა</button>
-          <button className="link modal__never" onClick={onNever}>„{dish.name}“ არ მიყვარს — აღარ შემომთავაზო</button>
-        </footer>
     </Sheet>
   );
 }

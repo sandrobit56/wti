@@ -36,42 +36,52 @@ export function Quiz({ onClose, onApply, onDish }: Props) {
   const step = answers.length;                 // 0…7; 7 = result screen
   const done = step === QUESTIONS.length;
 
+  const back = () => setAnswers((a) => a.slice(0, -1));
   return (
-    <Sheet className="quiz" labelledBy="quiz-title" onClose={onClose}>
-        <button className="modal__close" onClick={onClose} aria-label="დახურვა">×</button>
+    <Sheet
+      className="quiz"
+      labelledBy="quiz-title"
+      onClose={onClose}
+      top={!done ? (
+        <div className="quiz__top">
+          {step > 0 && <button className="quiz__back" onClick={back} aria-label="წინა კითხვა">←</button>}
+          <span className="caps">{step + 1} / {QUESTIONS.length}</span>
+          <div className="quiz__bar" role="progressbar" aria-valuemin={0} aria-valuemax={QUESTIONS.length} aria-valuenow={step}>
+            <span style={{ width: `${((step + 1) / QUESTIONS.length) * 100}%` }} />
+          </div>
+        </div>
+      ) : undefined}
+      footer={done ? (
+        <div className="modal__actions">
+          <button className="pill pill--dark" onClick={() => onApply(answers)}>დაატრიალე ჩემი ბორბალი</button>
+          <button className="pill pill--outline" onClick={() => setAnswers([])}>თავიდან</button>
+        </div>
+      ) : undefined}
+    >
+      {!done && (
+        <>
+          <h2 id="quiz-title" className="quiz__q" key={QUESTIONS[step].id}>{QUESTIONS[step].text}</h2>
+          <div className="quiz__answers">
+            {QUESTIONS[step].answers.map((a, i) => (
+              <button key={a.id} className="quiz__a" onClick={() => setAnswers((prev) => [...prev, a.id])}>
+                <span className="quiz__letter">{"აბგდ"[i]}</span>
+                {a.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
 
-        {!done && (
-          <>
-            <div className="quiz__top">
-              <span className="caps">კითხვა {step + 1} / {QUESTIONS.length}</span>
-              {step > 0 && <button className="link quiz__back" onClick={() => setAnswers((a) => a.slice(0, -1))} aria-label="წინა კითხვა">← უკან</button>}
-            </div>
-            <div className="quiz__bar" role="progressbar" aria-valuemin={0} aria-valuemax={QUESTIONS.length} aria-valuenow={step}>
-              <span style={{ width: `${(step / QUESTIONS.length) * 100}%` }} />
-            </div>
-            <h2 id="quiz-title" className="quiz__q" key={QUESTIONS[step].id}>{QUESTIONS[step].text}</h2>
-            <div className="quiz__answers">
-              {QUESTIONS[step].answers.map((a, i) => (
-                <button key={a.id} className="quiz__a" onClick={() => setAnswers((prev) => [...prev, a.id])}>
-                  <span className="quiz__letter">{"აბგდ"[i]}</span>
-                  {a.label}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-
-        {done && <ResultView answers={answers} onApply={onApply} onDish={onDish} onRestart={() => setAnswers([])} />}
+      {done && <ResultView answers={answers} onDish={onDish} />}
     </Sheet>
   );
 }
 
 const BURST = ["khinkali", "pizza", "sushi", "khachapuri", "cake", "taco", "mtsvadi", "icecream", "burger", "churchkhela", "fish", "salad"];
 
-function ResultView({ answers, onApply, onDish, onRestart }: { answers: string[]; onApply: (a: string[]) => void; onDish: (slug: string) => void; onRestart: () => void }) {
+function ResultView({ answers, onDish }: { answers: string[]; onDish: (slug: string) => void }) {
   const r = scoreQuiz(answers);
   const p = PERSONAS[r.persona];
-  const half = PERSONAS[r.runnerUp];
   const applied = applyQuiz(r);
   // Reveal: the card arrives face down and turns over (reduced motion: CSS makes it instant).
   const [hidden, setHidden] = useState(true);
@@ -81,7 +91,7 @@ function ResultView({ answers, onApply, onDish, onRestart }: { answers: string[]
   const examples = DISHES
     .filter((d) => p.matches(d) && priceBand(d) <= applied.filters.priceMax && (!veg || d.vegetarian))
     .sort((a, b) => b.baseWeight - a.baseWeight)
-    .slice(0, 4);
+    .slice(0, 3);
   const changes = [
     BUDGET_LABEL[applied.filters.priceMax],
     ...applied.filters.tastes.map((t) => TASTE_LABEL[t]),
@@ -101,8 +111,7 @@ function ResultView({ answers, onApply, onDish, onRestart }: { answers: string[]
           ))}
         </span>
         <TarotCard id={r.persona} size="md" flipped={hidden} className="quiz__card" />
-        <p className="caps">შენი პერსონა</p>
-        <h2 id="quiz-title" className="modal__name" aria-label={p.name}>
+        <h2 id="quiz-title" className="modal__name sr-only" aria-label={p.name}>
           {/* letters drop one by one; grouped per word so a line never breaks mid-word */}
           {p.name.split(" ").map((word, w, words) => {
             const offset = words.slice(0, w).join(" ").length + (w ? 1 : 0);
@@ -117,26 +126,13 @@ function ResultView({ answers, onApply, onDish, onRestart }: { answers: string[]
           })}
         </h2>
         <p className="quiz__line">{p.line}</p>
-        <p className="modal__meta">ნახევრად — {half.name}</p>
       </header>
 
-      <section className="modal__section">
-        <h3><span className="dot dot--green" />ბორბალი უფრო ხშირად შემოგთავაზებს</h3>
-        {examples.length > 0
-          ? <div className="chips">{examples.map((d) => <DishTag key={d.slug} slug={d.slug} onOpen={onDish} />)}</div>
-          : <p className="modal__hint">შენს ფილტრებს ამ პერსონის კერძები ნაკლებად ერგება — ბორბალი მაინც მათ წინ წამოწევს.</p>}
-      </section>
-
-      <section className="modal__section">
-        <h3><span className="dot dot--orange" />ფილტრები, რომლებსაც დავაყენებ</h3>
+      <section className="modal__section quiz__wheel">
+        <h3>შენი ბორბალი</h3>
+        {examples.length > 0 && <div className="chips">{examples.map((d) => <DishTag key={d.slug} slug={d.slug} onOpen={onDish} />)}</div>}
         <ul className="quiz__changes">{changes.map((c) => <li key={c}>{c}</li>)}</ul>
-        <p className="modal__hint">ნებისმიერ დროს შეცვლი ფილტრების პანელში.</p>
       </section>
-
-      <footer className="modal__actions">
-        <button className="pill pill--dark" onClick={() => onApply(answers)} autoFocus>დაატრიალე ჩემი ბორბალი</button>
-        <button className="pill pill--outline" onClick={onRestart}>თავიდან</button>
-      </footer>
     </div>
   );
 }

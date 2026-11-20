@@ -56,12 +56,16 @@ export function PersonaGallery({ current, onClose, onStart, onDish }: { current:
   const order = current ? [current, ...PERSONA_IDS.filter((x) => x !== current)] : PERSONA_IDS;
 
   return (
-    <Sheet className="gallery" labelledBy="gallery-title" onClose={onClose}>
-      <button className="modal__close" onClick={onClose} aria-label="დახურვა">×</button>
+    <Sheet
+      className="gallery"
+      labelledBy="gallery-title"
+      onClose={onClose}
+      footer={<button className="pill pill--dark pill--block" onClick={onStart}>{current ? "ტესტი თავიდან" : "გაიარე ტესტი — 1 წუთი"}</button>}
+    >
       <header>
         <p className="caps">12 პერსონა</p>
         <h2 id="gallery-title" className="gallery__title">ვინ ხარ სუფრასთან?</h2>
-        <p className="gallery__lead">8 ქართულ ჩვევაზეა, 4 — ქალაქის რიტმზე. შეეხე ბარათს და გადააბრუნე.</p>
+        <p className="gallery__lead">შეეხე ბარათს და გადააბრუნე.</p>
       </header>
       <ul className="gallery__deck">
         {order.map((id, i) => (
@@ -82,7 +86,6 @@ export function PersonaGallery({ current, onClose, onStart, onDish }: { current:
           </motion.li>
         ))}
       </ul>
-      <button className="pill pill--dark pill--block" onClick={onStart}>{current ? "ტესტი თავიდან" : "გაიარე ტესტი — 1 წუთი"}</button>
     </Sheet>
   );
 }
