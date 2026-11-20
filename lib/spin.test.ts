@@ -12,7 +12,7 @@ import { DISHES, priceBand } from "./catalog.ts";
 import { VARIANTS } from "./variants.ts";
 import { PERSONAS } from "./personas.ts";
 import { applyQuiz, scoreQuiz, PERSONA_IDS } from "./quiz.ts";
-import { CATEGORY_CAP, CUISINE_CAP, DEFAULT_FILTERS, NO_PREFS, SpinError, countMatching, displayName, explain, pickVariants, mealTimeAt, seeded, spin, targetRotation, weightOf, type SpinContext } from "./spin.ts";
+import { CATEGORY_CAP, CUISINE_CAP, DEFAULT_FILTERS, normalizeFilters, NO_PREFS, SpinError, countMatching, displayName, explain, pickVariants, mealTimeAt, seeded, spin, targetRotation, weightOf, type SpinContext } from "./spin.ts";
 import { matchVenues, distanceKm, countByDish, mapsSearchUrl, type Venue } from "./places.ts";
 import { embedSearchUrl, parsePlaces, placesQuery, TBILISI } from "./google.ts";
 
@@ -30,7 +30,7 @@ test("wheel has 8 unique dishes and the winner is on it", () => {
 });
 
 test("hard filters: vegan + ₾ never shows meat or pricey dishes", () => {
-  const c = ctx({ filters: { priceMax: 1, tastes: [], diet: ["vegan"] } });
+  const c = ctx({ filters: { ...DEFAULT_FILTERS, priceMax: 1, diet: ["vegan"] } });
   for (let s = 0; s < 100; s++) {
     for (const d of spin(DISHES, c, seeded(s)).wheel) {
       const vs = pickVariants(d, c, seeded(s));
@@ -41,7 +41,7 @@ test("hard filters: vegan + ₾ never shows meat or pricey dishes", () => {
 });
 
 test("too strict filters fail fast instead of spinning a tiny wheel", () => {
-  const c = ctx({ filters: { priceMax: 1, tastes: [], diet: ["vegan"] }, available: new Set(["steak", "sushi", "khinkali"]) });
+  const c = ctx({ filters: { ...DEFAULT_FILTERS, priceMax: 1, diet: ["vegan"] }, available: new Set(["steak", "sushi", "khinkali"]) });
   assert.throws(() => spin(DISHES, c, seeded(1)), SpinError);
 });
 
@@ -176,7 +176,7 @@ test("every persona matches at least 3 dishes (its wheel can show its taste)", (
 
 test("applyQuiz: vegetarian + ₾ + spicy pre-fill the panel; spice-avoid stays a soft pref", () => {
   const veg = applyQuiz(scoreQuiz(["q1a", "q2b", "q3c", "q4a", "q5b", "q6a", "q7d"]));
-  assert.deepEqual(veg.filters, { priceMax: 1, tastes: ["spicy"], diet: ["vegetarian"] });
+  assert.deepEqual(veg.filters, { ...DEFAULT_FILTERS, priceMax: 1, tastes: ["spicy"], diet: ["vegetarian"] });
   assert.notEqual(veg.prefs.persona, "mtsvadi");
   const mild = applyQuiz(scoreQuiz(["q1b", "q2d", "q3b", "q4d", "q5d", "q6c", "q7b"]));
   assert.equal(mild.prefs.spiceAvoid, true);
@@ -196,7 +196,7 @@ test("diversity: ≤3 per cuisine and ≤2 per category on every full wheel", ()
 });
 
 test("diversity yields when the pool is small (vegan ₾ still fills the wheel)", () => {
-  const r = spin(DISHES, ctx({ filters: { priceMax: 1, tastes: [], diet: ["vegan"] } }), seeded(3));
+  const r = spin(DISHES, ctx({ filters: { ...DEFAULT_FILTERS, priceMax: 1, diet: ["vegan"] } }), seeded(3));
   assert.equal(r.wheel.length, Math.min(8, r.matching));
 });
 
@@ -299,4 +299,21 @@ test("Google: embed URL pinned to Tbilisi; parsePlaces drops non-Tbilisi and inc
 test("Google query: meal dishes get the cuisine, pastry/street food stay as typed", () => {
   assert.equal(placesQuery("ოჯახური", "კერძი", "ქართული"), "ოჯახური ქართული სამზარეულო");
   assert.equal(placesQuery("ლობიანი", "ცომეული", "ქართული"), "ლობიანი");
+});
+
+test("მეტი ფილტრი: cuisine / category / meal are hard filters (OR within a group)", () => {
+  const c = ctx({ filters: { ...DEFAULT_FILTERS, cuisines: ["იტალიური", "აზიური"] } });
+  for (let s = 1; s <= 30; s++) {
+    for (const d of spin(DISHES, c, seeded(s)).wheel) assert.ok(["იტალიური", "აზიური"].includes(d.cuisine), d.slug);
+  }
+  const soup = ctx({ filters: { ...DEFAULT_FILTERS, categories: ["წვნიანი"] } });
+  for (let s = 1; s <= 10; s++) for (const d of spin(DISHES, soup, seeded(s)).wheel) assert.equal(d.category, "წვნიანი");
+  const bf = ctx({ filters: { ...DEFAULT_FILTERS, meals: ["საუზმე"] } });
+  for (let s = 1; s <= 10; s++) for (const d of spin(DISHES, bf, seeded(s)).wheel) assert.ok(d.meals.includes("საუზმე"), d.slug);
+});
+
+test("normalizeFilters fills groups missing from older saved filters", () => {
+  const f = normalizeFilters({ priceMax: 2, tastes: ["spicy"], diet: [] });
+  assert.deepEqual([f.cuisines, f.categories, f.meals], [[], [], []]);
+  assert.equal(f.priceMax, 2);
 });

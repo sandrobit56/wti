@@ -3,7 +3,9 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-18
- * Version:     v1.1 — one consistent link style (was: measured sliding pill)
+ * Version:     v1.2 — "თამაში" link; scroll-spy sections in page order (fixes "ადგილები"
+ *              staying lit further down the page)
+ *              v1.1 — one consistent link style (was: measured sliding pill)
  * Description: Header (desktop) + tab bar (mobile), made "alive":
  *   - scroll-spy: the section on screen is highlighted
  *   - every link (left and right) shares one hover/active style: a pill grows in
@@ -16,14 +18,16 @@
 import Image from "next/image";
 import { useEffect, useState, type ReactNode } from "react";
 
-type SectionId = "wheel" | "persona" | "trust" | "paths";
+type SectionId = "wheel" | "paths" | "game" | "persona" | "trust";
 const LEFT: { id: SectionId; label: string }[] = [
   { id: "wheel", label: "ბორბალი" },
-  { id: "persona", label: "ტესტი" },
   { id: "paths", label: "ადგილები" },
+  { id: "game", label: "თამაში" },
+  { id: "persona", label: "ტესტი" },
 ];
 
-const SECTIONS: SectionId[] = ["wheel", "persona", "trust", "paths"];
+/** Page order — the last section whose top passed the line wins. */
+const SECTIONS: SectionId[] = ["wheel", "paths", "game", "persona", "trust"];
 
 /**
  * Which section is under the 45% line of the screen. Scroll-based on purpose: the
@@ -102,8 +106,9 @@ export function SiteTabbar() {
   return (
     <nav className="tabbar only-mobile" aria-label="ნავიგაცია">
       {tab("wheel", "ბორბალი", <HomeIcon />)}
-      {tab("persona", "ტესტი", <SparkIcon />)}
       {tab("paths", "ადგილები", <PinIcon />)}
+      {tab("game", "თამაში", <GameIcon />)}
+      {tab("persona", "ტესტი", <SparkIcon />)}
       <span aria-disabled="true"><span className="tabbar__ico"><UserIcon /></span>პროფილი</span>
     </nav>
   );
@@ -112,4 +117,5 @@ export function SiteTabbar() {
 const HomeIcon = () => <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11 12 3l9 8v10h-6v-6H9v6H3z" fill="currentColor" /></svg>;
 const PinIcon = () => <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s7-7 7-12a7 7 0 1 0-14 0c0 5 7 12 7 12zm0-9a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" fill="currentColor" /></svg>;
 const SparkIcon = () => <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4z" fill="currentColor" /></svg>;
+const GameIcon = () => <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12 21.5 6.5A11 11 0 1 0 21.5 17.5z" fill="currentColor" /></svg>;
 const UserIcon = () => <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4.5" fill="currentColor" /><path d="M3 21c0-4.4 4-7 9-7s9 2.6 9 7z" fill="currentColor" /></svg>;

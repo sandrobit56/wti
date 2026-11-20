@@ -17,7 +17,7 @@ import { DISHES, type Dish } from "@/lib/catalog.ts";
 import type { RadiusKm } from "@/lib/places.ts";
 import { PERSONAS } from "@/lib/personas.ts";
 import { applyQuiz, scoreQuiz } from "@/lib/quiz.ts";
-import { DEFAULT_FILTERS, NO_PREFS, SpinError, displayName, explain, pickVariants, seeded, spin, targetRotation, type Filters, type Mood, type Prefs, type SpinContext, type Win } from "@/lib/spin.ts";
+import { NO_PREFS, normalizeFilters, SpinError, displayName, explain, pickVariants, seeded, spin, targetRotation, type Filters, type Mood, type Prefs, type SpinContext, type Win } from "@/lib/spin.ts";
 import { FilterPanel, MY_LOCATION, type Place } from "./FilterPanel";
 import { coarse } from "@/lib/security.ts";
 import { Paths, PersonaTeaser } from "./Paths";
@@ -25,6 +25,7 @@ import { TrustCard } from "./TrustCard";
 import { Quiz } from "./Quiz";
 import { FoodRibbon } from "./FoodRibbon";
 import { PersonaGallery } from "./PersonaGallery";
+import { StomachChallenge } from "./StomachChallenge";
 import { ResultModal } from "./ResultModal";
 import { Wheel } from "./Wheel";
 
@@ -58,7 +59,7 @@ function initial(): Stored & { now: Date; seed: number } {
   const s = load();
   const now = Date.now();
   const notToday = Object.fromEntries(Object.entries(s?.notToday ?? {}).filter(([, until]) => until > now));
-  return { filters: s?.filters ?? DEFAULT_FILTERS, place: s?.place ?? null, radius: s?.radius ?? 2, notToday, quizAnswers: s?.quizAnswers ?? null, never: s?.never ?? [], history: s?.history ?? [], now: new Date(), seed: Math.floor(Math.random() * 1e9) };
+  return { filters: normalizeFilters(s?.filters), place: s?.place ?? null, radius: s?.radius ?? 2, notToday, quizAnswers: s?.quizAnswers ?? null, never: s?.never ?? [], history: s?.history ?? [], now: new Date(), seed: Math.floor(Math.random() * 1e9) };
 }
 /** Stored answers → soft prefs. Answers from an older quiz version are dropped (fail safe, not silent: user just sees no persona). */
 function prefsFrom(answers: string[] | null | undefined): Prefs {
@@ -214,7 +215,7 @@ export function Randomizer() {
 
   function applyPersona(answers: string[]) {
     const a = applyQuiz(scoreQuiz(answers));
-    setFilters({ ...a.filters, diet: [...a.filters.diet] });
+    setFilters(normalizeFilters({ ...a.filters, diet: [...a.filters.diet] }));
     setQuizAnswers(answers);
     changed();
     setQuizOpen(false);
@@ -248,7 +249,7 @@ export function Randomizer() {
   const dish = spun?.landed ? wheel[spun.winner] : null;
   const spinning = Boolean(spun && !spun.landed);
   const matching = preview.result?.matching ?? preview.error ?? 0;
-  const activeCount = (filters.priceMax < 3 ? 1 : 0) + filters.tastes.length + filters.diet.length + (place ? 1 : 0);
+  const activeCount = (filters.priceMax < 3 ? 1 : 0) + filters.tastes.length + filters.diet.length + filters.cuisines.length + filters.categories.length + filters.meals.length + (place ? 1 : 0);
 
   const status = (() => {
     if (current && "error" in current) return `ადგილები ვერ ჩაიტვირთა (${current.error}) — ბორბალი მთელ თბილისს იყენებს.`;
@@ -345,7 +346,8 @@ export function Randomizer() {
         )}
       </div>
 
-      <FoodRibbon onPick={openDish} />
+      <FoodRibbon />
+      <StomachChallenge wheelSlugs={(spun?.wheel ?? preview.result?.wheel ?? []).map((d) => d.slug)} personaId={prefs.persona} onDish={openDish} />
       <PersonaTeaser persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />
       {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} onDish={(slug) => { setGalleryOpen(false); openDish(slug); }} />}
       <TrustCard />

@@ -176,7 +176,7 @@ a.row-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
 .footer { background: var(--surface); margin-top: 80px; padding: 28px 0 32px; }
 .footer__row { display: flex; align-items: center; justify-content: space-between; gap: 16px; font-size: 14px; }
 .footer__legal { font-size: 12px; color: var(--muted); margin-top: 14px; }
-.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: var(--surface); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(4, 1fr); padding: 8px 0 calc(8px + env(safe-area-inset-bottom)); }
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; background: var(--surface); border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(5, 1fr); padding: 8px 0 calc(8px + env(safe-area-inset-bottom)); }
 .tabbar a, .tabbar span { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; font-weight: 700; color: #8a8a8a; text-decoration: none; }
 .tabbar .on { color: var(--text); }
 .tabbar [aria-disabled] { opacity: 0.5; }
@@ -676,22 +676,9 @@ a.row-card:hover { transform: translateX(4px); box-shadow: 0 3px 0 rgba(18,18,18
 
 /* ── Ribbon game mode ──────────────────────────────────────────── */
 .ribbon { min-height: 122px; }
-.ribbon--game, .ribbon--over { cursor: pointer; user-select: none; touch-action: manipulation; }
 .ribbon__play { position: absolute; right: 24px; bottom: 10px; z-index: 3; border: 0; border-radius: 999px; padding: 6px 16px; font: inherit; font-weight: 800; font-size: 14px; color: #fff; background: var(--brand); box-shadow: 0 3px 0 #c92c45; cursor: pointer; transition: transform .15s ease, box-shadow .15s; }
 .ribbon__play:hover { transform: translateY(-2px); box-shadow: 0 5px 0 #c92c45; }
 .ribbon__play:active { transform: translateY(3px); box-shadow: none; }
-.ribbon__lane { position: absolute; inset: 0 0 34px 0; }
-.ribbon__runner { position: absolute; left: 0; top: 50%; margin-top: -32px; width: 64px; height: 64px; border-radius: 50%; background: #fff; display: grid; place-items: center; box-shadow: 0 3px 0 rgba(18,18,18,.1); will-change: transform; }
-.ribbon__mouth { position: absolute; top: 50%; width: 64px; height: 64px; margin-top: -32px; border-radius: 50%; border: 3px dashed rgba(241,67,94,.45); }
-.ribbon__lives { color: var(--brand); letter-spacing: 2px; font-size: 15px; }
-.ribbon__lives i { color: rgba(18,18,18,.18); font-style: normal; }
-.ribbon--hit0, .ribbon--hit1 { animation: hit .3s ease; }
-@keyframes hit { 25% { transform: rotate(-2deg) translateX(-6px); } 75% { transform: rotate(-2deg) translateX(6px); } }
-.ribbon__over { position: absolute; inset: 0 0 0 120px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; padding: 10px 20px; cursor: default; animation: fade-up .35s var(--spring); }
-.ribbon__big { font-size: 52px; font-weight: 900; font-stretch: 62.5%; line-height: 1; color: var(--brand); }
-.ribbon__actions { display: inline-flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.ribbon__actions .pill { min-height: 40px; padding: 0 16px; }
-.ribbon--over .ribbon__score { display: none; }
 @media (max-width: 1023px) {
   .ribbon__play { right: 14px; }
   .ribbon__over { inset: 0 0 0 90px; gap: 8px; padding: 8px 12px; font-size: 13px; }
@@ -795,3 +782,57 @@ html, body { overflow-x: clip; max-width: 100%; }
 .dtag:active { transform: translateY(2px); box-shadow: none; }
 .dtag:focus-visible { outline: 3px solid var(--lavender); outline-offset: 2px; }
 .pc__dishes { display: flex; flex-wrap: wrap; gap: 6px; color: inherit; font-weight: inherit; }
+
+/* "მეტი ფილტრი" — collapsed by default; compact text chips keep 21 options calm (FilterPanel v3.1) */
+.more { border: 1.5px dashed var(--edge, var(--line)); border-radius: var(--r-md); margin-top: 10px; }
+.more[open] { border-style: solid; }
+.more__sum { list-style: none; display: flex; align-items: center; gap: 8px; padding: 12px 14px; cursor: pointer; font-weight: 800; font-size: 14px; }
+.more__sum::-webkit-details-marker { display: none; }
+.more__badge { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: var(--brand-ink); color: #fff; font-size: 12px; display: inline-grid; place-items: center; }
+.more__chev { margin-left: auto; transition: transform .25s var(--spring); }
+.more[open] .more__chev { transform: rotate(180deg); }
+.more__body { padding: 0 14px 14px; }
+.more__h { font-size: 12px; font-weight: 800; color: var(--muted, #6b6b6b); margin: 8px 0 6px; }
+.chips--mini { gap: 6px; }
+.chip--mini { min-height: 32px; padding: 0 12px; font-size: 13px; font-weight: 700; transition: transform .15s var(--spring), background .15s; }
+.chip--mini:hover { transform: translateY(-1px); }
+.chip--mini:active { transform: translateY(1px); }
+@media (prefers-reduced-motion: reduce) { .more__chev, .chip--mini { transition: none; } }
+
+/* „კუჭის ჩელენჯი" — own section (StomachChallenge v1.0) */
+.game { padding-top: 56px; padding-bottom: 24px; scroll-margin-top: 80px; }
+.game__head { text-align: center; margin-bottom: 18px; }
+.game__title { font-size: clamp(32px, 6vw, 56px); font-weight: 900; font-stretch: 62.5%; line-height: 1; margin: 0; }
+.game__sub { color: var(--muted); font-weight: 600; margin: 8px 0 0; }
+.game__ticket { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; justify-content: center; margin-bottom: 14px; }
+.game__ticket-h { display: inline-flex; flex-direction: column; font-weight: 900; font-size: 15px; line-height: 1.1; margin-right: 4px; }
+.game__ticket-h small { font-weight: 700; font-size: 11px; color: var(--muted); }
+.game__order { position: relative; display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px 4px 6px; border-radius: 999px; background: #fff; border: 1.5px dashed var(--line); font-weight: 700; font-size: 14px; transition: background .2s, border-color .2s; }
+.game__order.done { background: var(--mint); border: 1.5px solid var(--green-ink); }
+.game__stamp { position: absolute; top: -8px; right: -6px; width: 20px; height: 20px; border-radius: 50%; background: var(--green-ink); color: #fff; font-size: 12px; display: grid; place-items: center; animation: gulp .3s var(--spring); }
+.game__persona { font-size: 13px; font-weight: 800; color: var(--brand-ink); background: var(--pink-soft); border-radius: 999px; padding: 6px 12px; }
+.game__arena { position: relative; overflow: hidden; height: clamp(320px, 52vh, 460px); border-radius: 28px; background: var(--yellow); box-shadow: 0 6px 0 #e6b800; outline: none; user-select: none; touch-action: manipulation; }
+.game__arena--play { cursor: pointer; }
+.game__line { position: absolute; left: 0; right: 0; height: 0; border-top: 3px dashed rgba(18,18,18,.12); }
+.game__item { position: absolute; left: 0; width: 60px; height: 60px; border-radius: 50%; background: #fff; display: grid; place-items: center; box-shadow: 0 3px 0 rgba(18,18,18,.1); will-change: transform; }
+.game__item--chili { background: #ffe1e1; box-shadow: 0 0 0 3px var(--brand), 0 3px 0 rgba(18,18,18,.1); }
+.game__mascot { position: absolute; left: 32px; translate: 0 -50%; transition: top .12s ease-out; animation: chomp .5s steps(2) infinite; filter: drop-shadow(2.5px 0 0 #fff) drop-shadow(-2.5px 0 0 #fff) drop-shadow(0 2.5px 0 #fff) drop-shadow(0 -2.5px 0 #fff); z-index: 2; }
+.game__hud { position: absolute; top: 12px; right: 16px; z-index: 3; display: flex; gap: 14px; align-items: center; font-weight: 800; background: #fff; border-radius: 999px; padding: 6px 14px; box-shadow: var(--soft-shadow); }
+.game__hud b { font-size: 20px; color: var(--brand-ink); }
+.game__lives { color: var(--brand); letter-spacing: 2px; }
+.game__lives i { color: rgba(18,18,18,.18); font-style: normal; }
+.game__time { font-variant-numeric: tabular-nums; }
+.game__pop { position: absolute; left: 90px; translate: 0 -120%; font-weight: 900; color: var(--green-ink); animation: plus .7s ease-out forwards; pointer-events: none; z-index: 3; white-space: nowrap; }
+.game__pop--bad { color: var(--brand-ink); }
+.game__screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: 20px; text-align: center; animation: fade-up .35s var(--spring); }
+.game__hero-mascot { animation: chomp .5s steps(2) infinite; }
+.game__rules { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.game__rules li { display: inline-flex; align-items: center; gap: 6px; background: #fff; border-radius: 999px; padding: 6px 12px; font-weight: 700; font-size: 14px; }
+.game__start { min-height: 48px; padding: 0 28px; font-size: 16px; }
+.game__big { font-size: 72px; font-weight: 900; font-stretch: 62.5%; line-height: 1; color: var(--brand-ink); }
+.game__verdict { font-weight: 800; }
+.game__top { display: flex; flex-direction: column; gap: 8px; align-items: center; font-weight: 700; }
+.game__top .dtags { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.ribbon__play { text-decoration: none; }
+@media (prefers-reduced-motion: reduce) { .game__mascot, .game__hero-mascot { animation: none; } }
+.game__arena:not(.game__arena--play) .game__line { display: none; }

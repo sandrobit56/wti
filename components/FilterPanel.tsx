@@ -3,7 +3,9 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-17
- * Version:     v3.0 — stylized: sticker chips with food icons, hover lift,
+ * Version:     v3.1 — "მეტი ფილტრი": collapsed <details> with cuisine / dish type / meal
+ *              time (compact text chips, count badge, opens itself when something is set)
+ *              v3.0 — stylized: sticker chips with food icons, hover lift,
  *              press-down click, sliding segmented thumb, icon pop on select
  *              (layout still Figma "v3/Filter panel"; motion off for reduced-motion)
  * Description: Controlled component, owns no state. Every change is applied to the
@@ -13,9 +15,10 @@
 "use client";
 
 import Image from "next/image";
-import type { CSSProperties, ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
+import type { Category, Cuisine, MealTime } from "@/lib/catalog.ts";
 import { NEIGHBORHOODS, RADII_KM, type LatLng, type RadiusKm } from "@/lib/places.ts";
-import type { Diet, Filters, Taste } from "@/lib/spin.ts";
+import { DEFAULT_FILTERS, type Diet, type Filters, type Taste } from "@/lib/spin.ts";
 
 export type Place = { label: string; center: LatLng; wolt: string | null };
 
@@ -31,6 +34,10 @@ const DIETS: { id: Diet; label: string; icon: string }[] = [
   { id: "vegetarian", label: "ვეგეტარიანული", icon: "leaf" },
   { id: "vegan", label: "ვეგანური", icon: "sprout" },
 ];
+const CUISINES: Cuisine[] = ["ქართული", "ევროპული", "იტალიური", "აზიური", "ახლოაღმოსავლური", "ამერიკული", "ლათინური", "ინდური"];
+const CATEGORIES: Category[] = ["ხორცი", "ცომეული", "წვნიანი", "კერძი", "სალათი", "ზღვის", "სტრიტფუდი", "საუზმე", "დესერტი"];
+const CATEGORY_LABEL: Partial<Record<Category, string>> = { "ზღვის": "ზღვის პროდუქტი", "კერძი": "ცხელი კერძი" };
+const MEALS: MealTime[] = ["საუზმე", "სადილი", "ვახშამი", "ღამე"];
 const GEO = "__geo";
 export const MY_LOCATION = "ჩემი ლოკაცია";
 
@@ -64,6 +71,11 @@ function Chip({ on, icon, label, onClick }: { on: boolean; icon: string; label: 
   );
 }
 
+/** Compact text chip for the "მეტი ფილტრი" groups — no icons, so 21 options stay calm. */
+function Mini({ on, label, onClick }: { on: boolean; label: string; onClick: () => void }) {
+  return <button aria-pressed={on} className={on ? "chip chip--mini on" : "chip chip--mini"} onClick={onClick}>{label}</button>;
+}
+
 /** Section title with a small icon. */
 const Title = ({ icon, children }: { icon: string; children: ReactNode }) => (
   <h3 className="panel__title"><Image src={`/icons/${icon}.svg`} alt="" width={18} height={18} />{children}</h3>
@@ -72,11 +84,14 @@ const Title = ({ icon, children }: { icon: string; children: ReactNode }) => (
 export function FilterPanel(p: Props) {
   const { filters: f } = p;
   const value = p.locating ? GEO : p.place?.label ?? "";
+  const moreCount = f.cuisines.length + f.categories.length + f.meals.length;
+  // Opens itself when the quiz or a saved session already set something inside.
+  const [moreOpen, setMoreOpen] = useState(moreCount > 0);
   return (
     <section className="panel" aria-label="ფილტრები">
       <div className="panel__head">
         <h2>ფილტრები</h2>
-        <button className="link" onClick={() => p.onFilters({ priceMax: 3, tastes: [], diet: [] })}>გასუფთავება</button>
+        <button className="link" onClick={() => p.onFilters(DEFAULT_FILTERS)}>გასუფთავება</button>
         {p.onClose && <button className="panel__close" onClick={p.onClose} aria-label="დახურვა">×</button>}
       </div>
 
@@ -135,6 +150,28 @@ export function FilterPanel(p: Props) {
           <Chip key={d.id} on={f.diet.includes(d.id)} icon={d.icon} label={d.label} onClick={() => p.onFilters({ ...f, diet: toggle(f.diet, d.id) })} />
         ))}
       </div>
+
+      <details className="more" open={moreOpen} onToggle={(e) => setMoreOpen(e.currentTarget.open)}>
+        <summary className="more__sum">
+          <span>მეტი ფილტრი</span>
+          {moreCount > 0 && <span className="more__badge">{moreCount}</span>}
+          <svg className="more__chev" width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </summary>
+        <div className="more__body">
+          <h4 className="more__h">სამზარეულო</h4>
+          <div className="chips chips--mini">
+            {CUISINES.map((c) => <Mini key={c} on={f.cuisines.includes(c)} label={c} onClick={() => p.onFilters({ ...f, cuisines: toggle(f.cuisines, c) })} />)}
+          </div>
+          <h4 className="more__h">კერძის ტიპი</h4>
+          <div className="chips chips--mini">
+            {CATEGORIES.map((c) => <Mini key={c} on={f.categories.includes(c)} label={CATEGORY_LABEL[c] ?? c} onClick={() => p.onFilters({ ...f, categories: toggle(f.categories, c) })} />)}
+          </div>
+          <h4 className="more__h">რისთვის</h4>
+          <div className="chips chips--mini">
+            {MEALS.map((m) => <Mini key={m} on={f.meals.includes(m)} label={m === "ღამე" ? "ღამით" : m} onClick={() => p.onFilters({ ...f, meals: toggle(f.meals, m) })} />)}
+          </div>
+        </div>
+      </details>
 
       <button className="panel__hint" onClick={p.onQuiz}>
         <Image src="/icons/spark.svg" alt="" width={16} height={16} />

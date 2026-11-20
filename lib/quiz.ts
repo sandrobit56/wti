@@ -142,7 +142,7 @@ export function applyQuiz(r: QuizResult) {
   if (s.light) tastes.push("light");
   if (s.fast) tastes.push("fast");
   return {
-    filters: { priceMax: s.priceMax ?? 3, tastes, diet: s.vegetarian ? (["vegetarian"] as const).slice() : [] },
+    filters: { priceMax: s.priceMax ?? 3, tastes, diet: s.vegetarian ? (["vegetarian"] as const).slice() : [], cuisines: [], categories: [], meals: [] },
     prefs: { persona: r.persona, spiceAvoid: s.spice === 0, lenten: Boolean(s.lenten), novelty: Boolean(s.novelty) },
   };
 }

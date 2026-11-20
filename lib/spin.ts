@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-16
- * Version:     v5.0 — taste chips are hard filters (OR); displayName() for honest labels;
+ * Version:     v5.1 — "მეტი ფილტრი": cuisine / category / meal time are hard type filters (OR within a group)
+ *              v5.0 — taste chips are hard filters (OR); displayName() for honest labels;
  *              v4.0 — variant-aware: a type passes hard filters if one of its
  *              real variants does; pickVariants() chooses 4–5 for the popup
  * Description: Pure spin logic. The winner is decided HERE, before any animation;
@@ -16,7 +17,7 @@
  *   diversity: one wheel holds ≤3 dishes of a cuisine and ≤2 of a category,
  *              relaxed only when the pool is too small to fill 8 slices.
  */
-import { DISHES, priceBand, type Dish, type MealTime } from "./catalog.ts";
+import { DISHES, priceBand, type Category, type Cuisine, type Dish, type MealTime } from "./catalog.ts";
 import { PERSONA_BOOST, PERSONAS } from "./personas.ts";
 import { variantsOf, type Variant } from "./variants.ts";
 import type { PersonaId } from "./quiz.ts";
@@ -32,9 +33,26 @@ export type Filters = {
   priceMax: 1 | 2 | 3;
   tastes: Taste[];
   diet: Diet[];
+  /** "მეტი ფილტრი" (collapsed by default). Empty = no restriction; several = OR. */
+  cuisines: Cuisine[];
+  categories: Category[];
+  meals: MealTime[];
 };
 
-export const DEFAULT_FILTERS: Filters = { priceMax: 3, tastes: [], diet: [] };
+export const DEFAULT_FILTERS: Filters = { priceMax: 3, tastes: [], diet: [], cuisines: [], categories: [], meals: [] };
+
+/** Older saved filters (before v5.1) lack the new groups — fill them so nothing reads undefined. */
+export function normalizeFilters(f: Partial<Filters> | null | undefined): Filters {
+  return { ...DEFAULT_FILTERS, ...f };
+}
+
+/** Type-level hard filters from "მეტი ფილტრი". */
+export function typeAllowed(d: Dish, f: Filters): boolean {
+  if (f.cuisines.length && !f.cuisines.includes(d.cuisine)) return false;
+  if (f.categories.length && !f.categories.includes(d.category)) return false;
+  if (f.meals.length && !f.meals.some((m) => d.meals.includes(m))) return false;
+  return true;
+}
 
 /** Soft preferences that come from the quiz (not visible as filter controls). */
 export type Prefs = {
@@ -150,6 +168,7 @@ export function isAllowed(d: Dish, ctx: SpinContext): boolean {
   if (ctx.excluded.includes(d.slug)) return false;
   if (ctx.available && !ctx.available.has(d.slug)) return false;
   if (ctx.random) return true;
+  if (!typeAllowed(d, ctx.filters)) return false;
   return variantsOf(d.slug).some((v) => variantAllowed(v, ctx.filters, d));
 }
 
