@@ -836,3 +836,10 @@ html, body { overflow-x: clip; max-width: 100%; }
 .ribbon__play { text-decoration: none; }
 @media (prefers-reduced-motion: reduce) { .game__mascot, .game__hero-mascot { animation: none; } }
 .game__arena:not(.game__arena--play) .game__line { display: none; }
+
+/* Unsplash credit — always visible (API guideline), as small as legibility allows */
+.credit-chip { display: inline-block; font-size: 10px; line-height: 1.4; font-weight: 600; color: #fff; background: rgba(0,0,0,.55); padding: 2px 8px; border-radius: 999px; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.credit-chip a { color: inherit; text-decoration: none; }
+.credit-chip a:hover { text-decoration: underline; }
+.version__credit { font-size: 10px; color: var(--muted); }
+.version__credit .credit-chip { background: none; color: var(--muted); padding: 0; font-size: 10px; }

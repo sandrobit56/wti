@@ -16,9 +16,9 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import photos from "@/data/photos.json";
 import { priceBand, type Dish } from "@/lib/catalog.ts";
-import { TYPE_WIKI, type Variant } from "@/lib/variants.ts";
+import type { Variant } from "@/lib/variants.ts";
+import { typePhoto, variantPhoto, UNSPLASH_HOME, type Photo } from "@/lib/photos.ts";
 import { deliveryLinks, mapsDirectionsUrl, mapsSearchUrl, type RadiusKm } from "@/lib/places.ts";
 import { MY_LOCATION, type Place } from "./FilterPanel";
 import { km, useNearbyVenues } from "./Paths";
@@ -37,16 +37,23 @@ type Props = {
   pickVersions: (n: number) => Variant[];
 };
 
-type Photo = { src: string; author: string; license: string; licenseUrl: string | null; source: string };
-const PHOTOS = photos as Record<string, Photo>;
 const VERSIONS = 5;
 
 /**
- * Photo credit. CC BY / BY-SA require attribution, so it must stay reachable —
- * but as a small ⓘ next to the photo, opened on tap, not as a line of text.
+ * Photo credit.
+ * - Wikimedia (CC BY / BY-SA): attribution must stay reachable → small ⓘ, opened on tap.
+ * - Unsplash: the API guidelines require the photographer + Unsplash to be credited
+ *   with links wherever the photo is shown → always-visible, tiny chip.
  */
 function Credit({ p }: { p: Photo }) {
   const [open, setOpen] = useState(false);
+  if (p.kind === "unsplash") {
+    return (
+      <span className="credit-chip">
+        <a href={p.authorUrl} target="_blank" rel="noreferrer">{p.author}</a> / <a href={UNSPLASH_HOME} target="_blank" rel="noreferrer">Unsplash</a>
+      </span>
+    );
+  }
   return (
     <span className="credit-wrap">
       <button type="button" className="credit-btn" aria-expanded={open} aria-label="ფოტოს ავტორი და ლიცენზია" onClick={() => setOpen((o) => !o)}>i</button>
@@ -61,7 +68,7 @@ function Credit({ p }: { p: Photo }) {
 
 export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday, onNever, onPickPlace, why, pickVersions }: Props) {
   const [versions, setVersions] = useState(() => pickVersions(VERSIONS));
-  const hero = PHOTOS[TYPE_WIKI[dish.slug]];
+  const hero = typePhoto(dish.slug);
   const ref = useRef<HTMLDialogElement>(null);
   const venues = useNearbyVenues(dish, place, radius);
   const area = place && place.label !== MY_LOCATION ? place.label : "თბილისი";
@@ -87,7 +94,7 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
         <header className={hero ? "modal__hero modal__hero--photo" : "modal__hero"}>
           {hero ? (
             <figure className="modal__photo">
-              {/* plain <img>: local, already 640px; next/image would re-encode for no gain */}
+              {/* plain <img>: Commons files are local 640px; Unsplash must be hotlinked (API guideline) */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={hero.src} alt={dish.name} loading="eager" />
               <figcaption><Credit p={hero} /></figcaption>
@@ -118,12 +125,12 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
           {versions.length === 0 && <p className="modal__hint">შენს ფილტრებს ამ კერძის არცერთი ვერსია არ ერგება — ადგილები და მიტანა მაინც ქვემოთაა.</p>}
           <ul className="versions">
             {versions.map((v) => {
-              const p = v.wiki ? PHOTOS[v.wiki] : undefined;
+              const p = variantPhoto(v);
               return (
                 <li key={v.slug} className="version">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   {p ? <img className="version__img" src={p.src} alt="" loading="lazy" /> : <span className="version__icon"><Image src={`/icons/${dish.icon}.svg`} alt="" width={40} height={40} /></span>}
-                  {p && <Credit p={p} />}
+                  {p?.kind === "commons" && <Credit p={p} />}
                   <div className="version__body">
                     <strong>{v.name}</strong>
                     <span className="version__desc">{v.desc}</span>
@@ -133,6 +140,7 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
                       {v.vegan ? " · ვეგანური" : v.vegetarian ? " · ვეგეტარიანული" : ""}
                       {v.healthy ? " · ჯანსაღი" : ""}
                     </span>
+                    {p?.kind === "unsplash" && <span className="version__credit">ფოტო: <Credit p={p} /></span>}
                   </div>
                   <a className="version__go" href={mapsSearchUrl(v.name, nearArea)} target="_blank" rel="noreferrer" aria-label={`${v.name} Google Maps-ზე`}>↗</a>
                 </li>

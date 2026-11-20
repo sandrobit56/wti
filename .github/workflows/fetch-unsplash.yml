@@ -1,0 +1,43 @@
+# File:        .github/workflows/fetch-unsplash.yml
+# Application: რა ვჭამოთ? (WTI)
+# Author:      Sandro Germanishvili
+# Date:        2026-11-20
+# Version:     v1.0
+# Description: Fills dish-photo gaps from Unsplash (scripts/fetch-unsplash.ts).
+#              Hourly, because a demo Unsplash app may make 50 requests/hour; each
+#              run does ≤45 and resumes where the last one stopped. Once every key
+#              is done a run makes 0 requests. Needs the UNSPLASH_ACCESS_KEY secret.
+name: fetch-unsplash
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fetch-unsplash
+  cancel-in-progress: false
+
+jobs:
+  photos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Fetch Unsplash photos
+        env:
+          UNSPLASH_ACCESS_KEY: ${{ secrets.UNSPLASH_ACCESS_KEY }}
+        run: node scripts/fetch-unsplash.ts
+      - name: Commit if changed
+        run: |
+          git config user.name "wti-bot"
+          git config user.email "wti-bot@users.noreply.github.com"
+          git add data/unsplash.json
+          git diff --cached --quiet || git commit -m "data: dish photos from Unsplash"
+          git pull --rebase origin main
+          git push

@@ -1,0 +1,148 @@
+/**
+ * File:        scripts/unsplash-queries.ts
+ * Application: რა ვჭამოთ? (WTI)
+ * Author:      Sandro Germanishvili
+ * Date:        2026-11-20
+ * Version:     v1.0
+ * Description: Data for scripts/fetch-unsplash.ts.
+ *   QUERY   — English Unsplash search term per version ("type/slug") and for the
+ *             4 types that have no Wikimedia photo ("type:<slug>").
+ *   TYPE_KW — relevance gate: a candidate photo is kept only if its Unsplash
+ *             caption (alt_description / description) contains one of these words.
+ *             This is what stops "ხინკალი" from getting a random pasta photo.
+ *             Words are matched as substrings, lowercase ("dumpling" ⊂ "dumplings").
+ */
+
+export const TYPE_KW: Record<string, string[]> = {
+  khinkali: ["dumpling", "khinkali"], khachapuri: ["bread", "cheese", "khachapuri", "pastry", "pie"], lobiani: ["bread", "bean", "pastry", "pie"],
+  kubdari: ["pie", "bread", "pastry", "meat"], mtsvadi: ["skewer", "kebab", "barbecue", "grill", "meat", "shashlik"], kupati: ["sausage"],
+  shkmeruli: ["chicken", "garlic"], chakapuli: ["stew", "meat", "lamb", "herb"], chakhokhbili: ["stew", "chicken", "tomato"], chashushuli: ["stew", "meat", "tomato", "mushroom"],
+  ojakhuri: ["potato", "meat", "pork", "fried"], ostri: ["stew", "meat", "tomato", "beef"], kharcho: ["soup", "stew"], chikhirtma: ["soup"], khashi: ["soup", "broth"],
+  lobio: ["bean"], pkhali: ["spinach", "beet", "vegetable", "walnut", "pkhali", "salad"], badrijani: ["eggplant", "aubergine"], elarji: ["corn", "cheese", "porridge", "polenta"],
+  mchadi: ["corn", "bread", "cornbread", "polenta"], tolma: ["dolma", "stuffed", "cabbage", "grape"], satsivi: ["walnut", "chicken", "turkey", "sauce"],
+  "georgian-salad": ["salad", "tomato", "cucumber"], "georgian-breakfast": ["egg", "yogurt", "breakfast"], "georgian-sweets": ["churchkhela", "nut", "walnut", "sweet", "dessert", "pastry"],
+  shawarma: ["shawarma", "wrap", "kebab", "pita"], doner: ["doner", "kebab", "wrap", "pita"], lahmacun: ["pide", "lahmacun", "flatbread", "pizza", "bread"],
+  falafel: ["falafel"], hummus: ["hummus", "dip", "eggplant", "meze"], burger: ["burger", "hamburger", "cheeseburger"], "fried-chicken": ["chicken", "wing", "nugget", "fried"],
+  "hot-dog": ["hot dog", "hotdog", "sausage", "corn dog"], sandwich: ["sandwich", "wrap", "toast", "panini", "bagel", "croissant"], pizza: ["pizza", "calzone"],
+  sushi: ["sushi", "roll", "sashimi", "nigiri", "maki"], ramen: ["ramen", "noodle"], wok: ["noodle", "wok", "stir", "fried rice", "rice"],
+  "dumplings-asian": ["dumpling", "bun", "wonton", "gyoza", "dim sum"], "pad-thai": ["noodle", "curry", "thai", "soup", "rice", "mango"],
+  pho: ["pho", "noodle", "soup", "sandwich", "spring roll", "roll"], bibimbap: ["bibimbap", "rice", "korean", "beef", "kimchi", "noodle", "rice cake"],
+  "korean-chicken": ["chicken", "fried"], chinese: ["chicken", "duck", "tofu", "noodle", "beef", "broccoli"], "japanese-hot": ["chicken", "pork", "cutlet", "curry", "tempura", "skewer", "rice", "bowl"],
+  poke: ["poke", "bowl"], curry: ["curry", "chicken", "rice", "biryani", "dal", "lentil", "samosa", "naan", "bread", "paneer", "spinach"],
+  tacos: ["taco"], burrito: ["burrito", "quesadilla", "nacho", "enchilada", "tortilla"], pasta: ["pasta", "spaghetti", "lasagna", "gnocchi", "ravioli", "noodle", "fettuccine", "penne"],
+  risotto: ["risotto", "rice"], steak: ["steak", "beef", "meat"], seafood: ["fish", "salmon", "trout", "shrimp", "prawn", "mussel", "squid", "calamari", "seafood"],
+  soup: ["soup", "borscht", "broth"], pelmeni: ["dumpling", "pelmeni", "vareniki", "pierogi", "manti"], "salad-bowl": ["salad"],
+  "grilled-chicken-salad": ["chicken", "salmon", "turkey", "salad", "vegetable", "quinoa", "bowl"], "smoothie-bowl": ["bowl", "acai", "smoothie", "berr", "chia", "granola", "yogurt"],
+  brunch: ["egg", "toast", "breakfast", "shakshuka", "omelet", "avocado"], syrniki: ["pancake", "waffle", "crepe", "blini", "syrniki"],
+  cake: ["cake", "cheesecake", "tiramisu", "brownie", "eclair", "macaron", "croissant", "baklava", "dessert", "pastry"],
+  "ice-cream": ["ice cream", "gelato", "sorbet", "milkshake", "yogurt", "sundae", "cone"], donut: ["donut", "doughnut"],
+};
+
+export const QUERY: Record<string, string> = {
+  // types with no Wikimedia photo
+  "type:ostri": "spicy beef stew tomato", "type:badrijani": "eggplant rolls walnut", "type:georgian-salad": "tomato cucumber salad", "type:lahmacun": "turkish pide",
+  // ქართული
+  "khinkali/kalakuri": "khinkali", "khinkali/mtiuluri": "georgian dumplings khinkali", "khinkali/lamb": "lamb dumplings", "khinkali/fried": "fried dumplings",
+  "khinkali/mushroom": "mushroom dumplings", "khinkali/cheese": "cheese dumplings", "khinkali/potato": "potato dumplings", "khinkali/pumpkin": "pumpkin dumplings",
+  "khachapuri/imeruli": "khachapuri cheese bread", "khachapuri/megruli": "megrelian khachapuri", "khachapuri/adjaruli": "adjarian khachapuri egg", "khachapuri/penovani": "puff pastry cheese",
+  "khachapuri/guruli": "georgian cheese pie", "khachapuri/osuri": "potato cheese pie", "khachapuri/shampuri": "cheese bread skewer", "khachapuri/achma": "achma cheese pastry",
+  "lobiani/classic": "lobiani bean bread", "lobiani/rachuli": "bean bread ham", "lobiani/penovani": "bean puff pastry", "lobiani/kada-lobiani": "georgian bean bread",
+  "kubdari/beef": "kubdari meat pie", "kubdari/pork": "meat pie bread",
+  "mtsvadi/pork": "pork skewers", "mtsvadi/veal": "beef skewers grill", "mtsvadi/lamb": "lamb skewers", "mtsvadi/chicken": "chicken skewers", "mtsvadi/lula": "lula kebab",
+  "mtsvadi/kebab-lavash": "kebab lavash", "mtsvadi/liver": "liver skewers", "mtsvadi/mushroom": "mushroom skewers", "mtsvadi/salmon": "salmon skewers",
+  "kupati/pork": "pork sausage grilled", "kupati/megruli": "spicy sausage", "kupati/chicken": "chicken sausage",
+  "shkmeruli/classic": "chicken garlic sauce",
+  "chakapuli/veal": "veal stew herbs", "chakapuli/lamb": "lamb stew herbs",
+  "chakhokhbili/chicken": "chicken tomato stew", "chakhokhbili/turkey": "turkey stew tomato",
+  "chashushuli/beef": "beef stew tomato", "chashushuli/pork": "pork stew", "chashushuli/mushroom": "mushroom stew",
+  "ojakhuri/pork": "pork fried potatoes", "ojakhuri/chicken": "chicken fried potatoes", "ojakhuri/mushroom": "mushroom potatoes pan",
+  "ostri/beef": "spicy beef stew", "ostri/pork": "spicy pork stew",
+  "kharcho/beef": "kharcho soup", "kharcho/megruli": "walnut beef stew",
+  "chikhirtma/chicken": "chicken egg soup",
+  "khashi/classic": "beef tripe soup",
+  "lobio/kotani": "bean stew clay pot", "lobio/rachuli": "red beans ham", "lobio/nigvzit": "bean walnut salad", "lobio/mtsvane": "green beans eggs",
+  "pkhali/spinach": "spinach walnut balls", "pkhali/beet": "beet walnut", "pkhali/beet-leaf": "beet greens walnut", "pkhali/leek": "leek walnut",
+  "pkhali/jonjoli": "pickled jonjoli", "pkhali/assorti": "pkhali",
+  "badrijani/nigvzit": "eggplant rolls walnut", "badrijani/khizilala": "eggplant caviar",
+  "elarji/classic": "elarji cornmeal cheese", "elarji/ghomi": "polenta cheese", "elarji/gebzhalia": "cheese rolls mint",
+  "mchadi/cheese": "cornbread cheese", "mchadi/chvishtari": "cheese cornbread", "mchadi/lobio": "cornbread beans",
+  "tolma/vine": "dolma grape leaves", "tolma/cabbage": "stuffed cabbage rolls", "tolma/veg": "stuffed peppers",
+  "satsivi/turkey": "turkey walnut sauce", "satsivi/chicken": "chicken walnut sauce",
+  "georgian-salad/nigvzit": "tomato cucumber salad walnut", "georgian-salad/kakhuri": "tomato cucumber salad herbs", "georgian-salad/tomato-onion": "tomato onion salad",
+  "georgian-breakfast/erbokvertskhi": "fried eggs pan", "georgian-breakfast/chirbuli": "eggs tomato walnut", "georgian-breakfast/matsoni": "yogurt honey",
+  "georgian-sweets/churchkhela": "churchkhela", "georgian-sweets/gozinaki": "walnut honey candy", "georgian-sweets/pelamushi": "grape pudding",
+  "georgian-sweets/nazuki": "sweet bread", "georgian-sweets/kada": "sweet pastry",
+  // ახლო აღმოსავლეთი
+  "shawarma/chicken": "chicken shawarma", "shawarma/beef": "beef shawarma", "shawarma/mixed": "shawarma wrap", "shawarma/xl": "big shawarma",
+  "shawarma/plate": "shawarma plate", "shawarma/cheese": "shawarma cheese", "shawarma/veg": "vegetable wrap pita",
+  "doner/chicken": "chicken doner kebab", "doner/veal": "doner kebab", "doner/durum": "durum wrap", "doner/iskender": "iskender kebab", "doner/plate": "doner plate",
+  "lahmacun/lahmacun": "lahmacun", "lahmacun/pide-cheese": "cheese pide", "lahmacun/pide-meat": "meat pide", "lahmacun/pide-egg": "pide egg",
+  "falafel/wrap": "falafel wrap", "falafel/plate": "falafel plate", "falafel/bowl": "falafel bowl",
+  "hummus/classic": "hummus", "hummus/meat": "hummus meat", "hummus/mushroom": "hummus mushrooms", "hummus/baba-ganoush": "baba ganoush", "hummus/meze": "meze platter",
+  // ამერიკული / სტრიტფუდი
+  "burger/classic": "hamburger", "burger/cheese": "cheeseburger", "burger/double": "double cheeseburger", "burger/bacon": "bacon burger", "burger/smash": "smash burger",
+  "burger/chicken": "chicken burger", "burger/bbq": "bbq burger", "burger/blue-cheese": "blue cheese burger", "burger/mushroom-swiss": "mushroom swiss burger",
+  "burger/jalapeno": "jalapeno burger", "burger/veggie": "veggie burger", "burger/plant": "plant based burger", "burger/fish": "fish burger",
+  "fried-chicken/buffalo": "buffalo wings", "fried-chicken/bbq-wings": "bbq chicken wings", "fried-chicken/nuggets": "chicken nuggets", "fried-chicken/tenders": "chicken tenders",
+  "fried-chicken/bucket": "fried chicken bucket", "fried-chicken/sandwich": "fried chicken sandwich",
+  "hot-dog/classic": "hot dog", "hot-dog/chili": "chili dog", "hot-dog/bavarian": "bratwurst hot dog", "hot-dog/corn": "corn dog", "hot-dog/danish": "danish hot dog",
+  "sandwich/club": "club sandwich", "sandwich/blt": "blt sandwich", "sandwich/tuna": "tuna sandwich", "sandwich/chicken-caesar-wrap": "chicken caesar wrap",
+  "sandwich/ham-cheese": "ham cheese panini", "sandwich/caprese": "caprese sandwich", "sandwich/grilled-cheese": "grilled cheese sandwich", "sandwich/cheesesteak": "philly cheesesteak",
+  "sandwich/reuben": "reuben sandwich", "sandwich/bagel-salmon": "salmon bagel", "sandwich/croissant": "croissant sandwich", "sandwich/veg-wrap": "vegetable wrap",
+  // იტალიური
+  "pizza/margherita": "margherita pizza", "pizza/pepperoni": "pepperoni pizza", "pizza/quattro-formaggi": "four cheese pizza", "pizza/diavola": "spicy salami pizza",
+  "pizza/hawaiian": "hawaiian pizza", "pizza/bbq-chicken": "bbq chicken pizza", "pizza/vegetarian": "vegetable pizza", "pizza/capricciosa": "capricciosa pizza",
+  "pizza/prosciutto-rucola": "prosciutto arugula pizza", "pizza/marinara": "marinara pizza", "pizza/funghi": "mushroom pizza", "pizza/truffle": "truffle pizza",
+  "pizza/sulguni": "cheese pizza", "pizza/meat-lovers": "meat pizza", "pizza/calzone": "calzone", "pizza/burrata": "burrata pizza", "pizza/tuna": "tuna pizza", "pizza/seafood": "seafood pizza",
+  "pasta/carbonara": "spaghetti carbonara", "pasta/bolognese": "spaghetti bolognese", "pasta/alfredo": "fettuccine alfredo", "pasta/pesto": "pesto pasta", "pasta/arrabbiata": "penne arrabbiata",
+  "pasta/aglio-olio": "spaghetti aglio olio", "pasta/lasagna": "lasagna", "pasta/frutti-di-mare": "seafood pasta", "pasta/quattro-formaggi": "cheese pasta", "pasta/amatriciana": "amatriciana pasta",
+  "pasta/gnocchi": "gnocchi", "pasta/ravioli": "ravioli", "pasta/truffle": "truffle pasta", "pasta/salmon": "salmon pasta",
+  "risotto/mushroom": "mushroom risotto", "risotto/seafood": "seafood risotto", "risotto/chicken": "chicken risotto", "risotto/milanese": "saffron risotto", "risotto/veg": "vegetable risotto", "risotto/truffle": "truffle risotto",
+  // აზიური
+  "sushi/philadelphia": "salmon cream cheese roll", "sushi/california": "california roll", "sushi/tempura": "tempura sushi roll", "sushi/baked": "baked sushi roll",
+  "sushi/salmon-nigiri": "salmon nigiri", "sushi/tuna-nigiri": "tuna nigiri", "sushi/ikura-gunkan": "ikura sushi", "sushi/salmon-sashimi": "salmon sashimi", "sushi/set": "sushi set",
+  "sushi/kappa-maki": "cucumber maki", "sushi/avocado-maki": "avocado sushi roll", "sushi/unagi": "unagi sushi", "sushi/dragon": "dragon roll sushi", "sushi/spicy-tuna": "spicy tuna roll",
+  "sushi/futomaki": "futomaki", "sushi/temaki": "temaki hand roll", "sushi/shrimp-tempura": "shrimp tempura roll", "sushi/veg-set": "vegetable sushi",
+  "ramen/tonkotsu": "tonkotsu ramen", "ramen/shoyu": "shoyu ramen", "ramen/miso": "miso ramen", "ramen/spicy": "spicy ramen", "ramen/chicken": "chicken ramen", "ramen/veg": "vegetable ramen",
+  "wok/chicken-udon": "chicken udon stir fry", "wok/beef": "beef stir fry noodles", "wok/seafood": "seafood noodles", "wok/veg": "vegetable stir fry noodles", "wok/teriyaki": "teriyaki noodles",
+  "wok/yakisoba": "yakisoba", "wok/fried-rice": "fried rice", "wok/chow-mein": "chow mein",
+  "dumplings-asian/gyoza": "gyoza", "dumplings-asian/har-gow": "har gow dim sum", "dumplings-asian/baozi": "steamed buns baozi", "dumplings-asian/xiaolongbao": "xiaolongbao",
+  "dumplings-asian/wonton-soup": "wonton soup", "dumplings-asian/veg-dumplings": "vegetable dumplings",
+  "pad-thai/pad-thai-chicken": "pad thai chicken", "pad-thai/pad-thai-shrimp": "pad thai shrimp", "pad-thai/pad-thai-tofu": "pad thai tofu", "pad-thai/tom-yum": "tom yum soup",
+  "pad-thai/tom-kha": "tom kha soup", "pad-thai/green-curry": "thai green curry", "pad-thai/red-curry": "thai red curry", "pad-thai/massaman": "massaman curry", "pad-thai/mango-rice": "mango sticky rice",
+  "pho/pho-bo": "beef pho", "pho/pho-ga": "chicken pho", "pho/bun-bo-hue": "bun bo hue", "pho/banh-mi": "banh mi", "pho/spring-rolls": "vietnamese spring rolls",
+  "bibimbap/bibimbap": "bibimbap", "bibimbap/dolsot": "dolsot bibimbap", "bibimbap/bulgogi": "bulgogi beef", "bibimbap/kimchi-jjigae": "kimchi stew", "bibimbap/tteokbokki": "tteokbokki rice cake",
+  "bibimbap/kimbap": "kimbap", "bibimbap/japchae": "japchae noodles",
+  "korean-chicken/original": "korean fried chicken", "korean-chicken/yangnyeom": "yangnyeom chicken", "korean-chicken/soy-garlic": "soy garlic chicken", "korean-chicken/boneless": "boneless fried chicken",
+  "chinese/kung-pao": "kung pao chicken", "chinese/sweet-sour": "sweet and sour chicken", "chinese/peking-duck": "peking duck", "chinese/mapo-tofu": "mapo tofu",
+  "chinese/beef-broccoli": "beef broccoli", "chinese/dan-dan": "dan dan noodles",
+  "japanese-hot/teriyaki-chicken": "teriyaki chicken", "japanese-hot/tonkatsu": "tonkatsu pork cutlet", "japanese-hot/katsu-curry": "katsu curry", "japanese-hot/tempura": "tempura",
+  "japanese-hot/yakitori": "yakitori", "japanese-hot/donburi": "donburi rice bowl",
+  "poke/salmon": "salmon poke bowl", "poke/tuna": "tuna poke bowl", "poke/chicken": "chicken poke bowl", "poke/tofu": "tofu poke bowl", "poke/shrimp": "shrimp poke bowl",
+  // ინდური / ლათინური
+  "curry/butter-chicken": "butter chicken", "curry/tikka-masala": "chicken tikka masala", "curry/palak-paneer": "palak paneer", "curry/dal": "dal lentil curry", "curry/biryani": "biryani",
+  "curry/vindaloo": "vindaloo curry", "curry/korma": "korma curry", "curry/samosa": "samosa", "curry/naan": "garlic naan",
+  "tacos/al-pastor": "tacos al pastor", "tacos/carne-asada": "carne asada tacos", "tacos/chicken": "chicken tacos", "tacos/fish": "fish tacos", "tacos/barbacoa": "barbacoa tacos", "tacos/veg": "vegetarian tacos",
+  "burrito/beef": "beef burrito", "burrito/chicken": "chicken burrito", "burrito/bean": "bean burrito", "burrito/quesadilla": "cheese quesadilla", "burrito/chicken-quesadilla": "chicken quesadilla",
+  "burrito/nachos": "nachos", "burrito/enchiladas": "enchiladas",
+  // ევროპული
+  "steak/ribeye": "ribeye steak", "steak/filet": "filet mignon", "steak/striploin": "striploin steak", "steak/t-bone": "t-bone steak", "steak/picanha": "picanha", "steak/flank": "flank steak",
+  "seafood/salmon": "grilled salmon", "seafood/kalmakhi": "grilled trout", "seafood/dorado": "grilled sea bream", "seafood/seabass": "grilled sea bass", "seafood/shrimp-garlic": "garlic shrimp",
+  "seafood/mussels": "mussels", "seafood/calamari": "fried calamari", "seafood/fish-chips": "fish and chips",
+  "soup/borscht": "borscht", "soup/solyanka": "solyanka soup", "soup/chicken-broth": "chicken soup", "soup/mushroom-cream": "mushroom cream soup", "soup/pumpkin-cream": "pumpkin soup",
+  "soup/tomato": "tomato soup", "soup/lentil": "lentil soup",
+  "pelmeni/siberian": "pelmeni", "pelmeni/vareniki-potato": "potato vareniki", "pelmeni/vareniki-cottage": "pierogi cottage cheese", "pelmeni/manti": "manti dumplings",
+  "salad-bowl/caesar": "caesar salad", "salad-bowl/greek": "greek salad", "salad-bowl/caprese": "caprese salad", "salad-bowl/nicoise": "nicoise salad", "salad-bowl/quinoa": "quinoa salad",
+  "salad-bowl/burrata": "burrata salad", "salad-bowl/salmon": "salmon salad", "salad-bowl/olivier": "olivier salad", "salad-bowl/waldorf": "waldorf salad",
+  "salad-bowl/warm-veal": "warm beef salad", "salad-bowl/shrimp-avocado": "shrimp avocado salad",
+  "grilled-chicken-salad/chicken-veg": "grilled chicken vegetables", "grilled-chicken-salad/chicken-quinoa": "chicken quinoa bowl", "grilled-chicken-salad/salmon-sweet-potato": "salmon sweet potato",
+  "grilled-chicken-salad/turkey-bulgur": "turkey bulgur bowl",
+  "smoothie-bowl/acai": "acai bowl", "smoothie-bowl/berry": "berry smoothie bowl", "smoothie-bowl/green": "green smoothie bowl", "smoothie-bowl/chia": "chia pudding", "smoothie-bowl/granola": "granola yogurt",
+  "brunch/benedict": "eggs benedict", "brunch/shakshuka": "shakshuka", "brunch/avocado-toast": "avocado toast", "brunch/omelette": "omelette", "brunch/english": "english breakfast",
+  "brunch/french-toast": "french toast", "brunch/salmon-eggs": "salmon scrambled eggs",
+  "syrniki/syrniki": "syrniki", "syrniki/blini": "blini", "syrniki/pancakes": "pancakes", "syrniki/waffles": "waffles", "syrniki/crepe": "chocolate crepe",
+  "cake/cheesecake": "cheesecake", "cake/napoleon": "napoleon cake", "cake/medovik": "honey cake", "cake/tiramisu": "tiramisu", "cake/fondant": "chocolate lava cake",
+  "cake/brownie": "brownie", "cake/eclair": "eclair", "cake/macarons": "macarons", "cake/croissant": "croissant", "cake/carrot-cake": "carrot cake", "cake/pakhlava": "baklava",
+  "ice-cream/gelato": "gelato", "ice-cream/sorbet": "sorbet", "ice-cream/cone": "ice cream cone", "ice-cream/milkshake": "milkshake", "ice-cream/froyo": "frozen yogurt", "ice-cream/sundae": "ice cream sundae",
+  "donut/glazed": "glazed donut", "donut/chocolate": "chocolate donut", "donut/jam": "jelly donut", "donut/cream": "cream donut",
+};
