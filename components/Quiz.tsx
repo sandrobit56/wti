@@ -14,6 +14,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { DishTag } from "./DishTag";
 import { DISHES, priceBand } from "@/lib/catalog.ts";
 import { PERSONAS } from "@/lib/personas.ts";
 import { QUESTIONS, applyQuiz, scoreQuiz } from "@/lib/quiz.ts";
@@ -21,12 +22,13 @@ import { QUESTIONS, applyQuiz, scoreQuiz } from "@/lib/quiz.ts";
 type Props = {
   onClose: () => void;
   onApply: (answers: string[]) => void;
+  onDish: (slug: string) => void;
 };
 
 const TASTE_LABEL = { spicy: "ცხარე", light: "მსუბუქი", fast: "სწრაფი" } as const;
 const BUDGET_LABEL = { 1: "ბიუჯეტი: 15 ₾-მდე", 2: "ბიუჯეტი: 35 ₾-მდე", 3: "ბიუჯეტი: ნებისმიერი" } as const;
 
-export function Quiz({ onClose, onApply }: Props) {
+export function Quiz({ onClose, onApply, onDish }: Props) {
   const ref = useRef<HTMLDialogElement>(null);
   const [answers, setAnswers] = useState<string[]>([]);
   const step = answers.length;                 // 0…7; 7 = result screen
@@ -69,7 +71,7 @@ export function Quiz({ onClose, onApply }: Props) {
           </>
         )}
 
-        {done && <ResultView answers={answers} onApply={onApply} onRestart={() => setAnswers([])} />}
+        {done && <ResultView answers={answers} onApply={onApply} onDish={onDish} onRestart={() => setAnswers([])} />}
       </div>
     </dialog>
   );
@@ -77,7 +79,7 @@ export function Quiz({ onClose, onApply }: Props) {
 
 const BURST = ["khinkali", "pizza", "sushi", "khachapuri", "cake", "taco", "mtsvadi", "icecream", "burger", "churchkhela", "fish", "salad"];
 
-function ResultView({ answers, onApply, onRestart }: { answers: string[]; onApply: (a: string[]) => void; onRestart: () => void }) {
+function ResultView({ answers, onApply, onDish, onRestart }: { answers: string[]; onApply: (a: string[]) => void; onDish: (slug: string) => void; onRestart: () => void }) {
   const r = scoreQuiz(answers);
   const p = PERSONAS[r.persona];
   const half = PERSONAS[r.runnerUp];
@@ -118,7 +120,7 @@ function ResultView({ answers, onApply, onRestart }: { answers: string[]; onAppl
       <section className="modal__section">
         <h3><span className="dot dot--green" />ბორბალი უფრო ხშირად შემოგთავაზებს</h3>
         {examples.length > 0
-          ? <div className="chips">{examples.map((d) => <span key={d.slug} className="chip chip--static">{d.name}</span>)}</div>
+          ? <div className="chips">{examples.map((d) => <DishTag key={d.slug} slug={d.slug} onOpen={onDish} />)}</div>
           : <p className="modal__hint">შენს ფილტრებს ამ პერსონის კერძები ნაკლებად ერგება — ბორბალი მაინც მათ წინ წამოწევს.</p>}
       </section>
 

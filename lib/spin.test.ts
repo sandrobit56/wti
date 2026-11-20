@@ -12,7 +12,7 @@ import { DISHES, priceBand } from "./catalog.ts";
 import { VARIANTS } from "./variants.ts";
 import { PERSONAS } from "./personas.ts";
 import { applyQuiz, scoreQuiz, PERSONA_IDS } from "./quiz.ts";
-import { CATEGORY_CAP, CUISINE_CAP, DEFAULT_FILTERS, NO_PREFS, SpinError, countMatching, explain, pickVariants, mealTimeAt, seeded, spin, targetRotation, weightOf, type SpinContext } from "./spin.ts";
+import { CATEGORY_CAP, CUISINE_CAP, DEFAULT_FILTERS, NO_PREFS, SpinError, countMatching, displayName, explain, pickVariants, mealTimeAt, seeded, spin, targetRotation, weightOf, type SpinContext } from "./spin.ts";
 import { matchVenues, distanceKm, countByDish, mapsSearchUrl, type Venue } from "./places.ts";
 import { embedSearchUrl, parsePlaces, placesQuery, TBILISI } from "./google.ts";
 
@@ -60,11 +60,29 @@ test("time of day: khashi is boosted at 8:00 and damped at 20:00", () => {
   assert.equal(mealTimeAt(new Date("2026-11-15T23:30:00")), "ღამე");
 });
 
-test("taste chip boosts matching dishes ×1.5", () => {
-  const ostri = DISHES.find((d) => d.slug === "ostri")!;
-  const plain = weightOf(ostri, ctx());
-  const spicy = weightOf(ostri, ctx({ filters: { ...DEFAULT_FILTERS, tastes: ["spicy"] } }));
-  assert.equal(spicy, plain * 1.5);
+test("taste chips are HARD filters: every wheel dish + every popup version fits a chosen taste", () => {
+  for (const tastes of [["spicy"], ["healthy"], ["light"], ["spicy", "sweet"]] as const) {
+    const c = ctx({ filters: { ...DEFAULT_FILTERS, tastes: [...tastes] } });
+    for (let s = 0; s < 40; s++) {
+      for (const d of spin(DISHES, c, seeded(s)).wheel) {
+        const vs = pickVariants(d, c, seeded(s));
+        assert.ok(vs.length > 0, `${tastes} ${d.slug}`);
+        for (const v of vs) {
+          const ok = tastes.some((t) => t === "spicy" ? v.spicy >= 1 : t === "healthy" ? v.healthy : t === "light" ? v.heaviness === "მსუბუქი" : d.category === "დესერტი" || d.tags.includes("brunch"));
+          assert.ok(ok, `${tastes}: ${v.slug} does not fit`);
+        }
+      }
+    }
+  }
+});
+
+test("displayName is honest: vegetarian sees the version name, not the meat type", () => {
+  const mtsvadi = DISHES.find((d) => d.slug === "mtsvadi")!;
+  const veg = ctx({ filters: { ...DEFAULT_FILTERS, diet: ["vegetarian"] } });
+  assert.equal(displayName(mtsvadi, veg), "სოკოს მწვადი");
+  assert.equal(displayName(mtsvadi, ctx()), "მწვადი");
+  const pkhali = DISHES.find((d) => d.slug === "pkhali")!;
+  assert.equal(displayName(pkhali, veg), pkhali.name);
 });
 
 test("rotation lands the chosen slice under the pointer", () => {
@@ -207,15 +225,15 @@ test("the same dish rarely wins twice in a row once memory is on", () => {
   assert.ok(repeats < 8, `repeats: ${repeats}/400`);
 });
 
-test("mood + healthy chip shift weights the right way", () => {
+test("mood shifts weights the right way", () => {
   const salad = DISHES.find((d) => d.slug === "salad-bowl")!;
   const ojakhuri = DISHES.find((d) => d.slug === "ojakhuri")!;
   assert.ok(weightOf(ojakhuri, ctx({ mood: "hungry" })) > weightOf(ojakhuri, ctx()));
   assert.ok(weightOf(salad, ctx({ mood: "hungry" })) < weightOf(salad, ctx()));
   assert.ok(weightOf(salad, ctx({ mood: "light" })) > weightOf(salad, ctx()));
   const healthy = ctx({ filters: { ...DEFAULT_FILTERS, tastes: ["healthy"] } });
-  assert.equal(weightOf(salad, healthy), Math.min(5, weightOf(salad, ctx()) * 1.5));
-  assert.equal(weightOf(ojakhuri, healthy), weightOf(ojakhuri, ctx()));
+  assert.equal(countMatching([ojakhuri], healthy), 0, "ojakhuri has no healthy version → off the wheel");
+  assert.equal(countMatching([salad], healthy), 1);
   assert.ok(DISHES.filter((d) => d.tags.includes("healthy")).length >= 10);
 });
 

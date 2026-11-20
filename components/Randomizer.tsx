@@ -17,7 +17,7 @@ import { DISHES, type Dish } from "@/lib/catalog.ts";
 import type { RadiusKm } from "@/lib/places.ts";
 import { PERSONAS } from "@/lib/personas.ts";
 import { applyQuiz, scoreQuiz } from "@/lib/quiz.ts";
-import { DEFAULT_FILTERS, NO_PREFS, SpinError, explain, pickVariants, seeded, spin, targetRotation, type Filters, type Mood, type Prefs, type SpinContext, type Win } from "@/lib/spin.ts";
+import { DEFAULT_FILTERS, NO_PREFS, SpinError, displayName, explain, pickVariants, seeded, spin, targetRotation, type Filters, type Mood, type Prefs, type SpinContext, type Win } from "@/lib/spin.ts";
 import { FilterPanel, MY_LOCATION, type Place } from "./FilterPanel";
 import { coarse } from "@/lib/security.ts";
 import { Paths, PersonaTeaser } from "./Paths";
@@ -136,7 +136,7 @@ export function Randomizer() {
   function openDish(slug: string) {
     const d = DISHES.find((x) => x.slug === slug);
     if (!d) throw new Error(`openDish: unknown dish ${slug}`);
-    setSpun({ wheel: [d], winner: 0, landed: true, why: ["პეკმენმა აირჩია — თამაშში ბოლოს ეს შეჭამა"], ctx: ctx(false) });
+    setSpun({ wheel: [d], winner: 0, landed: true, why: [], ctx: ctx(false) });
     setModalOpen(true);
   }
 
@@ -238,9 +238,14 @@ export function Randomizer() {
     );
   }
 
-  const wheel = spun?.wheel ?? preview.result?.wheel ?? [];
+  // Honest labels: under a diet/taste filter a slice shows the fitting version's name.
+  const labelCtx: SpinContext = spun?.ctx ?? { filters, now: init.now, excluded, random: false, available, prefs, mood, history };
+  const wheel = (spun?.wheel ?? preview.result?.wheel ?? []).map((d) => {
+    const name = displayName(d, labelCtx);
+    return name === d.name ? d : { ...d, name, search: name }; // search Google/Maps/Wolt for the version, too
+  });
   const winner = spun?.landed ? spun.winner : null;
-  const dish = spun?.landed ? spun.wheel[spun.winner] : null;
+  const dish = spun?.landed ? wheel[spun.winner] : null;
   const spinning = Boolean(spun && !spun.landed);
   const matching = preview.result?.matching ?? preview.error ?? 0;
   const activeCount = (filters.priceMax < 3 ? 1 : 0) + filters.tastes.length + filters.diet.length + (place ? 1 : 0);
@@ -325,7 +330,7 @@ export function Randomizer() {
         />
       )}
 
-      {quizOpen && <Quiz onClose={() => setQuizOpen(false)} onApply={applyPersona} />}
+      {quizOpen && <Quiz onClose={() => setQuizOpen(false)} onApply={applyPersona} onDish={(slug) => { setQuizOpen(false); openDish(slug); }} />}
 
       <div ref={pathsRef} className="paths-anchor">
         <Paths
@@ -342,7 +347,7 @@ export function Randomizer() {
 
       <FoodRibbon onPick={openDish} />
       <PersonaTeaser persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />
-      {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} />}
+      {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} onDish={(slug) => { setGalleryOpen(false); openDish(slug); }} />}
       <TrustCard />
     </>
   );

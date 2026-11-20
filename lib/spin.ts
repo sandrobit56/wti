@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-16
- * Version:     v4.0 — variant-aware: a type passes hard filters if one of its
+ * Version:     v5.0 — taste chips are hard filters (OR); displayName() for honest labels;
+ *              v4.0 — variant-aware: a type passes hard filters if one of its
  *              real variants does; pickVariants() chooses 4–5 for the popup
  * Description: Pure spin logic. The winner is decided HERE, before any animation;
  *              the wheel only travels to it. Randomness is injected (rng) so tests
@@ -15,7 +16,7 @@
  *   diversity: one wheel holds ≤3 dishes of a cuisine and ≤2 of a category,
  *              relaxed only when the pool is too small to fill 8 slices.
  */
-import { priceBand, type Dish, type MealTime } from "./catalog.ts";
+import { DISHES, priceBand, type Dish, type MealTime } from "./catalog.ts";
 import { PERSONA_BOOST, PERSONAS } from "./personas.ts";
 import { variantsOf, type Variant } from "./variants.ts";
 import type { PersonaId } from "./quiz.ts";
@@ -100,11 +101,48 @@ function memoryWeight(d: Dish, ctx: SpinContext): number {
 }
 
 /** Hard filters on one real variant (budget + diet). */
-export function variantAllowed(v: Variant, f: Filters): boolean {
+/**
+ * Taste chips are HARD filters (user testing: "the wheel ignores my filters").
+ * Several chips = OR: a version passes if it matches at least one chosen taste.
+ * spicy / light / healthy are judged on the version itself; georgian / sweet / fast on its type.
+ */
+const DISH_BY_SLUG = new Map(DISHES.map((d) => [d.slug, d]));
+
+const VARIANT_TASTE: Record<Taste, (v: Variant, d: Dish) => boolean> = {
+  spicy: (v) => v.spicy >= 1,
+  light: (v) => v.heaviness === "მსუბუქი",
+  healthy: (v) => v.healthy,
+  georgian: (_v, d) => TASTE_MATCH.georgian(d),
+  sweet: (_v, d) => TASTE_MATCH.sweet(d),
+  fast: (_v, d) => TASTE_MATCH.fast(d),
+};
+
+export function variantAllowed(v: Variant, f: Filters, d: Dish = DISH_BY_SLUG.get(v.type)!): boolean {
   if (priceBand(v) > f.priceMax) return false;
   if (f.diet.includes("vegan") && !v.vegan) return false;
   if (f.diet.includes("vegetarian") && !v.vegetarian) return false;
+  if (f.tastes.length && !f.tastes.some((t) => VARIANT_TASTE[t](v, d))) return false;
   return true;
+}
+
+/** The versions of a dish type that pass the current hard filters. */
+export function allowedVariants(d: Dish, ctx: SpinContext): Variant[] {
+  return variantsOf(d.slug).filter((v) => ctx.random || variantAllowed(v, ctx.filters, d));
+}
+
+/**
+ * Honest name for the slice/popup: the type name when the type itself fits the
+ * filters, otherwise the first fitting version ("სოკოს მწვადი", not "მწვადი", for a
+ * vegetarian) — so nobody is offered a dish that, as named, breaks their filter.
+ */
+export function displayName(d: Dish, ctx: SpinContext): string {
+  if (ctx.random) return d.name;
+  const f = ctx.filters;
+  const typeFits = (!f.diet.includes("vegan") || d.vegan) && (!f.diet.includes("vegetarian") || d.vegetarian)
+    && (!f.tastes.length || f.tastes.some((t) => TASTE_MATCH[t](d)));
+  if (typeFits) return d.name;
+  const v = allowedVariants(d, ctx)[0];
+  return v ? v.name : d.name;
 }
 
 /** Hard filters: a dish TYPE may appear if at least one of its variants passes. */
@@ -112,7 +150,7 @@ export function isAllowed(d: Dish, ctx: SpinContext): boolean {
   if (ctx.excluded.includes(d.slug)) return false;
   if (ctx.available && !ctx.available.has(d.slug)) return false;
   if (ctx.random) return true;
-  return variantsOf(d.slug).some((v) => variantAllowed(v, ctx.filters));
+  return variantsOf(d.slug).some((v) => variantAllowed(v, ctx.filters, d));
 }
 
 /**
@@ -120,7 +158,7 @@ export function isAllowed(d: Dish, ctx: SpinContext): boolean {
  * pass the hard filters, weighted by taste chips, mood and quiz prefs, no repeats.
  */
 export function pickVariants(d: Dish, ctx: SpinContext, rng: Rng, n = 5): Variant[] {
-  const pool = variantsOf(d.slug).filter((v) => ctx.random || variantAllowed(v, ctx.filters));
+  const pool = allowedVariants(d, ctx);
   const w = pool.map((v) => {
     if (ctx.random) return 1;
     let x = 1;
@@ -157,7 +195,6 @@ export function weightOf(d: Dish, ctx: SpinContext): number {
   if (p.novelty && d.cuisine !== "ქართული") w *= 1.3;
   if (!d.meals.includes(slot)) w *= 0.3;
   else if (slot === "საუზმე" || slot === "ღამე") w *= 2;
-  for (const t of ctx.filters.tastes) if (TASTE_MATCH[t](d)) w *= 1.5;
   if (ctx.mood) w *= MOOD_WEIGHT[ctx.mood](d, ctx);
   w *= memoryWeight(d, ctx);
   return Math.min(5, Math.max(0.1, w));

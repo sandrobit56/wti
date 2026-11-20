@@ -16,6 +16,7 @@ import { useEffect, useRef } from "react";
 import { DISHES } from "@/lib/catalog.ts";
 import { PERSONA_IDS, type PersonaId } from "@/lib/quiz.ts";
 import { PERSONAS } from "@/lib/personas.ts";
+import { DishTag } from "./DishTag";
 
 /** Hand-picked signature dishes per persona (validated against the catalogue below). */
 const SIGNATURE: Record<PersonaId, string[]> = {
@@ -35,7 +36,7 @@ const SIGNATURE: Record<PersonaId, string[]> = {
 const NAME = new Map(DISHES.map((d) => [d.slug, d.name]));
 for (const [p, slugs] of Object.entries(SIGNATURE)) for (const s of slugs) if (!NAME.has(s)) throw new Error(`PersonaGallery: ${p} → unknown dish "${s}"`);
 
-export function PersonaGallery({ current, onClose, onStart }: { current: PersonaId | null; onClose: () => void; onStart: () => void }) {
+export function PersonaGallery({ current, onClose, onStart, onDish }: { current: PersonaId | null; onClose: () => void; onStart: () => void; onDish: (slug: string) => void }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
     const d = ref.current;
@@ -60,13 +61,12 @@ export function PersonaGallery({ current, onClose, onStart }: { current: Persona
         <ul className="gallery__grid">
           {PERSONA_IDS.map((id, i) => {
             const p = PERSONAS[id];
-            const dishes = SIGNATURE[id].map((s) => NAME.get(s));
             return (
               <li key={id} className={id === current ? "pc pc--me" : "pc"} style={{ ["--i" as string]: i }}>
                 <span className="pc__ico"><Image src={`/icons/${p.icon}.svg`} alt="" width={44} height={44} /></span>
                 <strong className="pc__name">{p.name}</strong>
                 <span className="pc__line">{p.line}</span>
-                <span className="pc__dishes">{dishes.join(" · ")}</span>
+                <span className="pc__dishes">{SIGNATURE[id].map((slug) => <DishTag key={slug} slug={slug} onOpen={onDish} />)}</span>
                 <span className={p.georgianHabit ? "pc__tag" : "pc__tag pc__tag--world"}>{p.georgianHabit ? "ქართული ჩვევა" : "ქალაქის რიტმი"}</span>
                 {id === current && <span className="pc__me">შენ ✓</span>}
               </li>

@@ -115,6 +115,7 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
               <button className="link modal__reshuffle" onClick={() => setVersions(pickVersions(VERSIONS))}>სხვა ვერსიები ↻</button>
             )}
           </h3>
+          {versions.length === 0 && <p className="modal__hint">შენს ფილტრებს ამ კერძის არცერთი ვერსია არ ერგება — ადგილები და მიტანა მაინც ქვემოთაა.</p>}
           <ul className="versions">
             {versions.map((v) => {
               const p = v.wiki ? PHOTOS[v.wiki] : undefined;

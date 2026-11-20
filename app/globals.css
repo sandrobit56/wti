@@ -784,3 +784,14 @@ a.row-card:hover { transform: translateX(4px); box-shadow: 0 3px 0 rgba(18,18,18
 html, body { overflow-x: clip; max-width: 100%; }
 .hero, #persona, .paths, section[aria-label="პეკმენის თამაში"] { overflow-x: clip; }
 @media (max-width: 1023px) { #wheel-title-arc-d { display: none; } }
+
+/* ── Dish tags: every dish name is a door to places + delivery ──── */
+.dtag { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 4px 10px 4px 6px; border-radius: 999px; border: 1.5px solid var(--edge); background: #fff; font: inherit; font-size: 13px; font-weight: 700; color: var(--text); cursor: pointer; box-shadow: var(--soft-shadow); transition: transform .15s ease, border-color .2s, box-shadow .15s; }
+.dtag img { width: 22px; height: 22px; padding: 2px; border-radius: 50%; background: var(--bg); transition: transform .3s var(--spring); }
+.dtag__go { font-size: 11px; color: var(--brand-ink); transition: transform .2s ease; }
+.dtag:hover { transform: translateY(-2px); border-color: var(--brand); box-shadow: 0 4px 0 rgba(18,18,18,.08); }
+.dtag:hover img { transform: rotate(-12deg) scale(1.08); }
+.dtag:hover .dtag__go { transform: translate(2px, -2px); }
+.dtag:active { transform: translateY(2px); box-shadow: none; }
+.dtag:focus-visible { outline: 3px solid var(--lavender); outline-offset: 2px; }
+.pc__dishes { display: flex; flex-wrap: wrap; gap: 6px; color: inherit; font-weight: inherit; }
