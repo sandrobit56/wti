@@ -1219,3 +1219,30 @@ body { background: var(--cream); }
   @keyframes chapter-roll { from { border-radius: 50% 50% 0 0 / 110px 110px 0 0; transform: translateY(40px); } to { border-radius: 50% 50% 0 0 / 40px 40px 0 0; transform: none; } }
   .section-title, .game__title, .persona__copy h2 { font-size: clamp(44px, 13vw, 64px); }
 }
+
+/* ── Hero v4 (2026-11-21): title + wheel + filters all inside the first screen.
+   Mobile: stacked. Desktop: title & filters left, wheel right, wheel sized by the
+   viewport height so it never pushes the filters below the fold. ─────────── */
+.hero { padding: var(--s2) 0 var(--s6); }
+.hero__inner { display: grid; grid-template-areas: "title" "wheel" "controls"; justify-items: center; align-content: center; gap: var(--s2); min-height: calc(100svh - 64px - 72px); }
+.hero__title { grid-area: title; margin: 0; font-size: clamp(36px, 11vw, 52px); font-weight: 900; font-stretch: 62.5%; line-height: .95; color: #fff; text-align: center; text-shadow: 0 3px 0 rgba(150, 40, 60, .16); }
+.hero__title .hl { text-shadow: none; }
+.hero__stage { grid-area: wheel; width: min(86vw, 46svh); padding-top: 0; margin: 0; }
+.hero__controls { grid-area: controls; display: flex; flex-direction: column; align-items: center; gap: var(--s1); width: 100%; }
+.wheel { aspect-ratio: 400 / 416; }
+.wheel--skeleton, .wheel--empty { aspect-ratio: 1; }
+.wheel__hub { top: 51.9%; width: 27%; box-shadow: 0 0 0 5px #fff, 0 8px 18px rgba(214, 51, 78, .35); animation: hub-breathe 2.4s ease-in-out infinite; }
+.wheel__hub:disabled { animation: none; }
+.wheel__label { font-size: 15px; font-weight: 900; }
+.wheel__label--won { fill: #121212; text-decoration: underline; }
+.wheel__fork { filter: drop-shadow(0 3px 0 rgba(18,18,18,.15)); }
+@keyframes hub-breathe { 50% { transform: translate(-50%, -50%) scale(1.05); } }
+@media (min-width: 1024px) {
+  .hero { padding: var(--s3) 0 var(--s6); }
+  .hero__inner { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title wheel" "controls wheel"; justify-items: start; align-items: center; column-gap: var(--s8); row-gap: var(--s3); min-height: calc(100svh - 72px - var(--s8)); }
+  .hero__title { align-self: end; text-align: left; font-size: clamp(64px, 7.4vw, 120px); }
+  .hero__controls { align-self: start; align-items: flex-start; }
+  .hero__controls .tokens { justify-content: flex-start; flex-wrap: wrap; max-width: 560px; }
+  .hero__stage { width: min(44vw, calc(100svh - 72px - 120px), 620px); }
+}
+@media (prefers-reduced-motion: reduce) { .wheel__hub { animation: none; } }

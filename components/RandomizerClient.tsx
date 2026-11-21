@@ -12,12 +12,16 @@
 
 import dynamic from "next/dynamic";
 import { WheelShell } from "./Wheel";
+import { HeroTitle } from "./HeroTitle";
 
 export const RandomizerClient = dynamic(() => import("./Randomizer").then((m) => m.Randomizer), {
   ssr: false,
   loading: () => (
     <section className="hero">
-      <div className="hero__stage"><WheelShell /></div>
+      <div className="hero__inner container">
+        <HeroTitle />
+        <div className="hero__stage"><WheelShell /></div>
+      </div>
     </section>
   ),
 });

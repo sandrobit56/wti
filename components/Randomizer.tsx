@@ -29,6 +29,7 @@ import { StomachChallenge } from "./StomachChallenge";
 import { FilterTokens } from "./FilterTokens";
 import { Sheet } from "./Sheet";
 import { Trail } from "./Trail";
+import { HeroTitle } from "./HeroTitle";
 import { SectionBridge } from "./SectionBridge";
 import { ResultModal } from "./ResultModal";
 import { Wheel } from "./Wheel";
@@ -274,11 +275,13 @@ export function Randomizer() {
     <>
       <section className="hero" id="wheel" ref={heroRef}>
         <div className="hero__inner container">
+          <HeroTitle />
           <div className="hero__stage">
-            <h1 className="sr-only">რა ვჭამოთ დღეს?</h1>
             {wheel.length > 0
               ? <Wheel dishes={wheel} rotation={rotation} spinning={spinning} winnerIndex={winner} onSpin={() => doSpin(false)} onLanded={onLanded} />
               : <div className="wheel wheel--empty"><p>ფილტრებს მხოლოდ {matching} კერძი ერგება.<br />შეარბილე ბიუჯეტი, დიეტა ან გაზარდე რადიუსი.</p></div>}
+          </div>
+          <div className="hero__controls">
             <FilterTokens filters={filters} place={place?.label ?? null} radius={radius} onOpen={() => setSheetOpen(true)} />
             <p className="hero__status" aria-live="polite">{status}</p>
             {(Object.keys(notToday).length > 0 || never.length > 0) && (
