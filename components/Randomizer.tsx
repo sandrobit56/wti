@@ -347,13 +347,13 @@ export function Randomizer() {
         )}
       </div>
 
-      <SectionBridge creature="khinkali" fact="ხინკლის „კუდს“ ტრადიციულად არ ჭამენ — მისით იჭერენ და თეფშზე ტოვებენ, რომ დათვალონ." />
+      <SectionBridge creature="khinkali" fact="„მხოლოდ ხუთს შევჭამ“ — ყველაზე ხშირი ტყუილი თბილისში." />
       <FoodRibbon />
       <StomachChallenge wheelSlugs={(spun?.wheel ?? preview.result?.wheel ?? []).map((d) => d.slug)} personaId={prefs.persona} onDish={openDish} />
-      <SectionBridge creature="churchkhela" side="right" fact="ჩურჩხელისთვის ნიგოზს ძაფზე აცვამენ და ყურძნის ბადაგით მოხარშულ თათარაში რამდენჯერმე ავლებენ." />
+      <SectionBridge creature="cupcake" side="right" fact="ბებიასთან „უკვე ვჭამე“ არ მუშაობს. აქაც ვერ გაგვექცევი." />
       <PersonaTeaser persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />
       {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} onDish={(slug) => { setGalleryOpen(false); openDish(slug); }} />}
-      <SectionBridge creature="chili" fact="აჯიკა მეგრული ცხარე პასტაა: წიწაკა, ნიორი, ქინძი და უცხო სუნელი — სულ ცოტა საკმარისია." />
+      <SectionBridge creature="chili" fact="„ცოტა ცხარეა“ — თქვა მან და ცრემლები მოიწმინდა." />
       <TrustCard />
     </>
   );
