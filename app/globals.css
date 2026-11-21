@@ -1049,19 +1049,18 @@ section[id] { scroll-margin-top: 104px; }
 }
 .game__ticket-orders { display: flex; gap: var(--s1); justify-content: center; }
 
-/* ── Intro curtain (components/Intro.tsx) ─────────────────────────────── */
-.intro { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; background: var(--cream); cursor: pointer; transition: transform .7s cubic-bezier(.7, 0, .2, 1), border-radius .7s; }
+/* ── Intro curtain v2 (components/Intro.tsx): ~1.5 s ─────────────────────── */
+.intro { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s3); background: var(--cream); cursor: pointer; transition: transform .6s cubic-bezier(.7, 0, .2, 1), border-radius .6s; }
 html[data-intro="seen"] .intro { display: none; }
 .intro--lift { transform: translateY(-100%); border-radius: 0 0 50% 50% / 0 0 12% 12%; }
-.intro__stage { display: flex; flex-direction: column; align-items: center; gap: var(--s4); padding: var(--s3); max-width: 560px; }
-.intro__mascot { animation: intro-drop .7s var(--spring) both, chomp .5s steps(2) .7s infinite; }
-.intro__lines { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s2); text-align: center; min-height: 9em; }
-.intro__lines li { font-size: clamp(20px, 3.2vw, 28px); font-weight: 800; line-height: 1.25; }
-.intro__lines li:nth-child(3) { font-size: clamp(26px, 4.4vw, 40px); font-weight: 900; font-stretch: 62.5%; color: var(--brand-ink); }
-.intro__lines li.is-typing::after { content: ""; display: inline-block; width: .08em; height: 1em; margin-left: 2px; vertical-align: -.12em; background: currentColor; animation: caret .8s steps(1) infinite; }
-.intro__num { display: block; font-size: 11px; font-weight: 800; letter-spacing: .12em; color: var(--muted); margin-bottom: 4px; }
+.intro__track { position: relative; width: min(320px, 80vw); height: 74px; }
+.intro__mascot { position: absolute; left: 0; top: 0; animation: intro-run .9s cubic-bezier(.3, .7, .3, 1) both, chomp .25s steps(2) infinite; }
+.intro__dot { position: absolute; top: 33px; left: calc(25% + var(--i) * 14%); width: 10px; height: 10px; border-radius: 50%; background: var(--brand); animation: intro-eat 0s linear both; animation-delay: calc(.18s + var(--i) * .13s); }
+.intro__word { margin: 0; font-size: clamp(36px, 7vw, 56px); font-weight: 900; font-stretch: 62.5%; color: var(--text); }
+.intro__word span { display: inline-block; animation: intro-pop .4s var(--spring) both; animation-delay: calc(.75s + var(--i) * .04s); }
 .intro__skip { position: absolute; bottom: var(--s4); left: 50%; translate: -50% 0; border: 0; background: none; font: inherit; font-size: 13px; font-weight: 800; letter-spacing: .08em; color: var(--muted); cursor: pointer; padding: var(--s1) var(--s2); }
 .intro__skip:hover { color: var(--text); }
-@keyframes intro-drop { from { transform: translateY(-60px) scale(.6) rotate(-20deg); } to { transform: none; } }
-@keyframes caret { 50% { visibility: hidden; } }
+@keyframes intro-run { from { left: -40%; } to { left: calc(100% - 72px); } }
+@keyframes intro-eat { to { transform: scale(0); } }
+@keyframes intro-pop { from { transform: translateY(24px) scale(.3); } to { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .intro { display: none; } }
