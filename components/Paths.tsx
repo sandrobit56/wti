@@ -65,7 +65,7 @@ export function Paths({ dish, place, radius, onPickPlace }: Props) {
   const delivery = deliveryLinks(place?.wolt ?? null);
 
   return (
-    <section className="paths" id="paths" aria-labelledby="paths-title">
+    <section className="paths sect" id="paths" aria-labelledby="paths-title">
       <div className="container">
         <h2 id="paths-title" className="section-title"><Words parts={["ნახე, ", ["მიდი", "hl hl--green"], " ან ", ["გამოიძახე", "hl hl--orange"]]} /></h2>
         {dish ? (
@@ -182,15 +182,15 @@ function fanOf(persona: Persona | null): PersonaId[] {
 export function PersonaTeaser({ persona, onStart, onGallery }: { persona: Persona | null; onStart: () => void; onGallery: () => void }) {
   const fan = fanOf(persona);
   return (
-    <section className="container" id="persona">
+    <section className="container sect" id="persona">
       <div className="persona reveal-pop">
         <div className="persona__copy">
           {persona ? (
             <>
               <p className="caps">შენი პერსონა</p>
               <h2>{persona.name}</h2>
-              <p>{persona.line} ბორბალი შენს გემოზეა აწყობილი — მისი კერძები უფრო ხშირად ამოდის.</p>
-              <div className="row">
+              <p>{persona.line}</p>
+              <div className="row persona__actions">
                 <button className="pill pill--dark" onClick={onStart}>ტესტი თავიდან</button>
                 <button className="pill pill--white" onClick={onGallery}>12 პერსონა</button>
               </div>
@@ -198,8 +198,8 @@ export function PersonaTeaser({ persona, onStart, onGallery }: { persona: Person
           ) : (
             <>
               <h2><Words parts={["გაიგე შენი პერსონა"]} /></h2>
-              <p><Words parts={["7 კითხვა, ერთი წუთი. პასუხების მიხედვით ბორბალი თავად დააყენებს ფილტრებს — ბიუჯეტს, გემოს, დიეტას. რეგისტრაცია არ სჭირდება."]} /></p>
-              <div className="row">
+              <p><Words parts={["7 კითხვა, ერთი წუთი — ბორბალი შენს გემოზე მოირგება."]} /></p>
+              <div className="row persona__actions">
                 <button className="pill pill--dark" onClick={onStart}>ტესტის დაწყება</button>
                 <button className="pill pill--white" onClick={onGallery}>12 პერსონა</button>
               </div>

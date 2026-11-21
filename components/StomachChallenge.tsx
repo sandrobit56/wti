@@ -147,24 +147,26 @@ export function StomachChallenge({ wheelSlugs, personaId, onDish }: Props) {
   const laneTop = (lane: number) => `${((lane + 0.5) / LANES) * 100}%`;
 
   return (
-    <section id="game" className="game container" aria-labelledby="game-title">
+    <section id="game" className="game container sect" aria-labelledby="game-title">
       <div className="game__head">
         <h2 id="game-title" className="game__title">კუჭის ჩელენჯი</h2>
-        <p className="game__sub">60 წამი, 3 სიცოცხლე. შეჭამე კერძები, აარიდე წიწაკას, შეავსე შეკვეთა.</p>
+        <p className="game__sub">60 წამი. შეჭამე, აარიდე წიწაკას.</p>
       </div>
 
       <div className="game__ticket" aria-label="დღის შეკვეთა">
-        <span className="game__ticket-h">შეკვეთა<small>შენი ბორბლიდან · +3</small></span>
-        {ticket.map((slug) => {
-          const d = BY_SLUG.get(slug)!;
-          const done = (phase === "over" ? result.stamped : s.stamped).includes(slug);
-          return (
-            <span key={slug} className={done ? "game__order done" : "game__order"}>
-              <Image src={`/icons/${d.icon}.svg`} alt="" width={26} height={26} />{d.name}
-              {done && <span className="game__stamp" aria-label="შესრულდა">✓</span>}
-            </span>
-          );
-        })}
+        <span className="game__ticket-h" title="3 კერძი შენი ბორბლიდან — თითო +3 ქულა">შეკვეთა +3</span>
+        <span className="game__ticket-orders">
+          {ticket.map((slug) => {
+            const d = BY_SLUG.get(slug)!;
+            const done = (phase === "over" ? result.stamped : s.stamped).includes(slug);
+            return (
+              <span key={slug} className={done ? "game__order done" : "game__order"}>
+                <Image src={`/icons/${d.icon}.svg`} alt="" width={26} height={26} />{d.name}
+                {done && <span className="game__stamp" aria-label="შესრულდა">✓</span>}
+              </span>
+            );
+          })}
+        </span>
         {persona && <span className="game__persona">{persona.name}: ×2</span>}
       </div>
 
@@ -198,18 +200,21 @@ export function StomachChallenge({ wheelSlugs, personaId, onDish }: Props) {
 
         {phase === "idle" && (
           <div className="game__screen">
-            <Image className="game__hero-mascot" src="/icons/mascot.svg" alt="" width={96} height={99} />
-            <ul className="game__rules">
-              <li><b>შეეხე ზოლს</b> ან ↑ ↓ — გადაადგილება</li>
-              <li><Image src="/icons/khinkali.svg" alt="" width={20} height={20} /> კერძი +1</li>
-              <li><Image src="/icons/chili.svg" alt="" width={20} height={20} /> წიწაკა −♥</li>
-            </ul>
-            <button type="button" className="pill pill--dark game__start" onClick={start}>▶ დაწყება</button>
+            <div className="game__card">
+              <Image className="game__hero-mascot" src="/icons/mascot.svg" alt="" width={88} height={91} />
+              <ul className="game__rules" aria-label="წესები">
+                <li><span className="game__key" aria-hidden="true">↑↓</span><span className="game__rule-txt">მოძრაობა</span></li>
+                <li><Image src="/illustrations/creatures/khinkali.webp" alt="" width={28} height={28} />+1</li>
+                <li><Image src="/icons/chili.svg" alt="" width={24} height={24} />−♥</li>
+              </ul>
+              <button type="button" className="pill pill--dark game__start" onClick={start}>▶ დაწყება</button>
+            </div>
           </div>
         )}
 
         {phase === "over" && (
           <div className="game__screen" role="status">
+            <div className="game__card game__card--over">
             {result.card && (
               <div className="game__reveal">
                 <TarotCard id={result.card} size="sm" tilt={false} />
@@ -225,6 +230,7 @@ export function StomachChallenge({ wheelSlugs, personaId, onDish }: Props) {
               </div>
             )}
             <button type="button" className="pill pill--dark game__start" onClick={start}>ისევ</button>
+            </div>
           </div>
         )}
       </div>

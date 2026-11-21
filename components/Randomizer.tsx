@@ -26,6 +26,7 @@ import { Quiz } from "./Quiz";
 import { FoodRibbon } from "./FoodRibbon";
 import { PersonaGallery } from "./PersonaGallery";
 import { StomachChallenge } from "./StomachChallenge";
+import { SectionBridge } from "./SectionBridge";
 import { ResultModal } from "./ResultModal";
 import { Wheel } from "./Wheel";
 
@@ -346,10 +347,13 @@ export function Randomizer() {
         )}
       </div>
 
+      <SectionBridge creature="khinkali" fact="ხინკლის „კუდს“ ტრადიციულად არ ჭამენ — მისით იჭერენ და თეფშზე ტოვებენ, რომ დათვალონ." />
       <FoodRibbon />
       <StomachChallenge wheelSlugs={(spun?.wheel ?? preview.result?.wheel ?? []).map((d) => d.slug)} personaId={prefs.persona} onDish={openDish} />
+      <SectionBridge creature="churchkhela" side="right" fact="ჩურჩხელისთვის ნიგოზს ძაფზე აცვამენ და ყურძნის ბადაგით მოხარშულ თათარაში რამდენჯერმე ავლებენ." />
       <PersonaTeaser persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />
       {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} onDish={(slug) => { setGalleryOpen(false); openDish(slug); }} />}
+      <SectionBridge creature="chili" fact="აჯიკა მეგრული ცხარე პასტაა: წიწაკა, ნიორი, ქინძი და უცხო სუნელი — სულ ცოტა საკმარისია." />
       <TrustCard />
     </>
   );

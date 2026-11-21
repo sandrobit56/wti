@@ -52,7 +52,7 @@ export function TrustCard() {
   const shown = LEVELS[(level || 3) - 1];
 
   return (
-    <section className="container" id="trust">
+    <section className="container sect" id="trust">
       <div className="trust2 reveal" ref={boxRef}>
         <div className="trust2__top">
           <div>
