@@ -67,7 +67,12 @@ export function Paths({ dish, place, radius, onPickPlace }: Props) {
   return (
     <section className="paths sect" id="paths" aria-labelledby="paths-title">
       <div className="container">
-        <h2 id="paths-title" className="section-title"><Words parts={["ნახე, ", ["მიდი", "hl hl--green"], " ან ", ["გამოიძახე", "hl hl--orange"]]} /></h2>
+        <h2 id="paths-title" className="section-title paths__title">
+          <Image className="paths__peek paths__peek--a" src="/illustrations/creatures/khinkali.webp" alt="" width={72} height={72} aria-hidden="true" />
+          <Words parts={["სად ", ["შეჭამ?", "hl hl--green"]]} />
+          <Image className="paths__peek paths__peek--b" src="/illustrations/creatures/sushi.webp" alt="" width={64} height={64} aria-hidden="true" />
+          <Image className="paths__peek paths__peek--c" src="/illustrations/creatures/pizza.webp" alt="" width={56} height={56} aria-hidden="true" />
+        </h2>
         {dish ? (
           <div className="pick">
             <Image src={`/icons/${dish.icon}.svg`} alt="" width={56} height={56} />

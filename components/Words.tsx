@@ -19,6 +19,8 @@ export function Words({ parts }: { parts: Part[] }) {
       <span className="sr-only">{plain}</span>
       {parts.flatMap((p, pi) => {
         const [text, cls] = typeof p === "string" ? [p, ""] : p;
+        // a styled part (sticker) stays one piece, so "ვერ იყიდი" is one sticker, not two
+        if (cls) return [<span key={`${pi}`} className={`w ${cls}`} style={{ ["--w" as string]: i++ }} aria-hidden="true">{text}</span>];
         return text.split(/(\s+)/).filter(Boolean).map((w, wi) =>
           /^\s+$/.test(w) ? w : (
             <span key={`${pi}-${wi}`} className={cls ? `w ${cls}` : "w"} style={{ ["--w" as string]: i++ }} aria-hidden="true">{w}</span>

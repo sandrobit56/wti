@@ -1064,3 +1064,38 @@ html[data-intro="seen"] .intro { display: none; }
 @keyframes intro-eat { to { transform: scale(0); } }
 @keyframes intro-pop { from { transform: translateY(24px) scale(.3); } to { transform: none; } }
 @media (prefers-reduced-motion: reduce) { .intro { display: none; } }
+
+/* ── Stickers instead of marker lines (2026-11-21: "the lines over the text look bad").
+   A highlighted word is a slightly tilted sticker with a white die-cut edge that
+   slaps on as it scrolls in. ─────────────────────────────────────────── */
+.hl { display: inline-block; position: relative; padding: .02em .28em .08em; border-radius: .22em; color: #fff; rotate: -2.5deg; box-shadow: 0 0 0 .09em #fff, 0 .12em 0 .09em rgba(18,18,18,.10); white-space: nowrap; }
+.hl::after { content: none; }
+.hl--green { background: #3f9a57; }
+.hl--orange { background: #e0812f; }
+.hl--pink { background: var(--brand-ink); }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .words .hl, .reveal .hl { animation: sticker-slap linear both; animation-timeline: view(); animation-range: entry 35% cover 40%; }
+  }
+}
+@keyframes sticker-slap { from { transform: scale(1.6) rotate(-14deg); } 70% { transform: scale(.94) rotate(1deg); } to { transform: none; } }
+
+/* Paths title: short, with creatures peeking around it */
+.paths__title { position: relative; display: inline-block; padding: 0 var(--s4); }
+.paths__peek { position: absolute; height: auto; pointer-events: none; animation: wiggle 2s ease-in-out infinite; }
+.paths__peek--a { left: -56px; bottom: -6px; width: 72px; rotate: -12deg; }
+.paths__peek--b { right: -40px; top: -28px; width: 60px; rotate: 14deg; animation-delay: -.6s; }
+.paths__peek--c { right: -84px; bottom: -10px; width: 52px; rotate: -8deg; animation-delay: -1.2s; }
+@media (max-width: 640px) {
+  .paths__title { padding: 0 var(--s2); }
+  .paths__peek--a { left: -24px; width: 52px; }
+  .paths__peek--b { right: -4px; top: -32px; width: 44px; }
+  .paths__peek--c { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .paths__peek { animation: none; } }
+.paths__title { padding-left: 80px; }
+.paths__peek--a { left: 0; }
+@media (max-width: 640px) {
+  .paths__title { padding-left: 56px; }
+  .paths__peek--a { left: 0; width: 48px; }
+}
