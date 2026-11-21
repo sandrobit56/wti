@@ -23,7 +23,6 @@ import { coarse } from "@/lib/security.ts";
 import { Paths, PersonaTeaser } from "./Paths";
 import { TrustCard } from "./TrustCard";
 import { Quiz } from "./Quiz";
-import { FoodRibbon } from "./FoodRibbon";
 import { PersonaGallery } from "./PersonaGallery";
 import { StomachChallenge } from "./StomachChallenge";
 import { FilterTokens } from "./FilterTokens";
@@ -31,6 +30,7 @@ import { Sheet } from "./Sheet";
 import { Trail } from "./Trail";
 import { HeroTitle } from "./HeroTitle";
 import { SectionBridge } from "./SectionBridge";
+import { WaveBand } from "./WaveBand";
 import { ResultModal } from "./ResultModal";
 import { Wheel } from "./Wheel";
 
@@ -346,6 +346,7 @@ export function Randomizer() {
       {quizOpen && <Quiz onClose={() => setQuizOpen(false)} onApply={applyPersona} onDish={(slug) => { setQuizOpen(false); openDish(slug); }} />}
 
       <div className="chapter chapter--cream">
+      <WaveBand tone="wine" text="ბედმა აირჩია — ახლა შენი ჯერია" />
       <div ref={pathsRef} className="paths-anchor">
         <Trail icon={dish?.icon ?? null} label={dish ? dish.name : null} />
         <Paths
@@ -362,17 +363,19 @@ export function Randomizer() {
 
       <SectionBridge creature="khinkali" fact="„მხოლოდ ხუთს შევჭამ“ — ყველაზე ხშირი ტყუილი თბილისში." />
       </div>
-      <FoodRibbon />
-      <div className="chapter chapter--green">
+      <div className="chapter chapter--wine">
+        <WaveBand tone="mustard" tilt={2.5} text="მშიერი კაცი ბორბალს არ ეკამათება" />
         <StomachChallenge wheelSlugs={(spun?.wheel ?? preview.result?.wheel ?? []).map((d) => d.slug)} personaId={prefs.persona} onDish={openDish} />
         <SectionBridge creature="cupcake" side="right" fact="ბებიასთან „უკვე ვჭამე“ არ მუშაობს. აქაც ვერ გაგვექცევი." />
       </div>
-      <div className="chapter chapter--lavender">
+      <div className="chapter chapter--mustard">
+        <WaveBand tone="brand" text="სუფრასთან ყველა ვიღაცაა" />
         <PersonaTeaser persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />
       {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} onDish={(slug) => { setGalleryOpen(false); openDish(slug); }} />}
         <SectionBridge creature="chili" fact="„ცოტა ცხარეა“ — თქვა მან და ცრემლები მოიწმინდა." />
       </div>
       <div className="chapter chapter--cream">
+        <WaveBand tone="wine" tilt={2} text="გემოზე არ დავობთ — ვაფასებთ" />
         <TrustCard />
       </div>
     </>

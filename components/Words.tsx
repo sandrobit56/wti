@@ -3,15 +3,19 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-18
- * Version:     v1.0
+ * Version:     v2.0 — caps: display titles set plain words in Mtavruli
  * Description: Splits text into words so CSS can scrub them in one by one with the
- *              scroll (pale pink → ink, slight rise + tilt). Pure markup; the motion
- *              lives in globals.css under `.words`. Screen readers get the plain text.
- *              parts: plain strings, or [text, className] for highlighted words.
+ *              scroll. Pure markup; the motion lives in globals.css under `.words`.
+ *              Screen readers get the plain (Mkhedruli) text.
+ *              parts: plain strings, or [text, className] — e.g. "accent" for the
+ *              serif voice word. `caps` turns plain parts into Mtavruli capitals;
+ *              classed parts keep their own lettering.
  */
+import { toMtavruli } from "@/lib/mtavruli.ts";
+
 type Part = string | [string, string];
 
-export function Words({ parts }: { parts: Part[] }) {
+export function Words({ parts, caps = false }: { parts: Part[]; caps?: boolean }) {
   let i = 0;
   const plain = parts.map((p) => (typeof p === "string" ? p : p[0])).join("");
   return (
@@ -19,9 +23,9 @@ export function Words({ parts }: { parts: Part[] }) {
       <span className="sr-only">{plain}</span>
       {parts.flatMap((p, pi) => {
         const [text, cls] = typeof p === "string" ? [p, ""] : p;
-        // a styled part (sticker) stays one piece, so "ვერ იყიდი" is one sticker, not two
+        // a styled part stays one piece, so "ვერ იყიდი" moves as one phrase
         if (cls) return [<span key={`${pi}`} className={`w ${cls}`} style={{ ["--w" as string]: i++ }} aria-hidden="true">{text}</span>];
-        return text.split(/(\s+)/).filter(Boolean).map((w, wi) =>
+        return (caps ? toMtavruli(text) : text).split(/(\s+)/).filter(Boolean).map((w, wi) =>
           /^\s+$/.test(w) ? w : (
             <span key={`${pi}-${wi}`} className={cls ? `w ${cls}` : "w"} style={{ ["--w" as string]: i++ }} aria-hidden="true">{w}</span>
           ),

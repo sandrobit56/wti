@@ -51,7 +51,7 @@ export function TrustCard() {
         <div className="trust2__top">
           <div>
             <p className="caps">როგორ ვაფასებთ</p>
-            <h2><Words parts={["„ჩანგალი“ — შეფასება, რომელსაც ", ["ვერ იყიდი", "hl hl--pink"]]} /></h2>
+            <h2 className="display"><Words caps parts={["„ჩანგალი“ — შეფასება, რომელსაც ", ["ვერ იყიდი", "accent"]]} /></h2>
           </div>
           <Image className="trust2__seal" src="/icons/rosette.svg" alt="" width={64} height={64} />
         </div>

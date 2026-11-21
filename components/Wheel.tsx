@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-16
- * Version:     v4.0 — "ბედის თეფში": cream plate, saturated slices, icons on white
+ * Version:     v5.0 — 4-colour system palette (wine/mustard/blush/cream) on a cream plate; was v4.0 — "ბედის თეფში": cream plate, saturated slices, icons on white
  *              sticker discs, fork pointer; title moved out of the SVG into the hero (HTML)
  *              v2.3 — desktop title matches Figma (big off-centre arc, gradient);
  *              v2.2 — long names → bigger icon only (name lives in the popup and
@@ -17,10 +17,13 @@
 
 import type { Dish } from "@/lib/catalog.ts";
 
-// "ბედის თეფში" palette (v4): saturated brand colours, clockwise from 12 o'clock,
-// ordered so neighbours never repeat. INK picks a readable label colour per slice.
-const SLICE_COLORS = ["#F1435E", "#FFD233", "#B4A7F5", "#86C994", "#F5A04C", "#8EB4F2", "#F5A3B1", "#FFE68A"];
-const INK = ["#ffffff", "#121212", "#121212", "#121212", "#121212", "#121212", "#121212", "#121212"];
+// v5 palette = the site's own four colours (globals.css "Design system v5"), so the
+// wheel reads as part of the page, not a rainbow sticker on top of it.
+// INK is the readable label colour for each slice.
+const SLICE_COLORS = ["#3B0D18", "#FFC93C", "#F8B4C0", "#FFF8EC"];
+const INK = ["#FFF1DC", "#3B0D18", "#3B0D18", "#3B0D18"];
+/** Cycle the palette; when n leaves one slice over, recolour it so it never matches slice 0. */
+const colorOf = (i: number, n: number) => (i === n - 1 && n % SLICE_COLORS.length === 1 ? 2 : i % SLICE_COLORS.length);
 const R = 170;        // slice radius
 const PLATE = 196;    // cream plate radius
 const isBottom = (deg: number) => { const a = ((deg % 360) + 360) % 360; return a > 90 && a < 270; };
@@ -60,10 +63,10 @@ export function Wheel({ dishes, rotation, spinning, winnerIndex, onSpin, onLande
           {dishes.map((d, i) => {
             const mid = i * a + a / 2;
             const won = !spinning && winnerIndex === i;
-            const ci = i % SLICE_COLORS.length;
+            const ci = colorOf(i, n);
             return (
               <g key={d.slug}>
-                <path d={slicePath(i, n)} fill={SLICE_COLORS[ci]} stroke="#FFF4DE" strokeWidth={5} strokeLinejoin="round" />
+                <path d={slicePath(i, n)} fill={SLICE_COLORS[ci]} stroke="#FFF1DC" strokeWidth={4} strokeLinejoin="round" />
                 <g transform={`rotate(${mid})`}>
                   <g transform={isBottom(mid + rotation) ? `rotate(180 0 ${-R + 56})` : undefined}>
                     {/* icon on a white sticker disc, so it reads on any slice colour */}
@@ -91,11 +94,11 @@ export function Wheel({ dishes, rotation, spinning, winnerIndex, onSpin, onLande
 function Plate() {
   return (
     <>
-      <circle r={PLATE} fill="#FFF4DE" />
+      <circle r={PLATE} fill="#FFF1DC" />
       <circle r={PLATE - 4} fill="none" stroke="#fff" strokeWidth={3} opacity={0.8} />
       {Array.from({ length: 24 }, (_, i) => {
         const t = (i / 24) * 2 * Math.PI;
-        return <circle key={i} cx={(R + 13) * Math.cos(t)} cy={(R + 13) * Math.sin(t)} r={3.5} fill={i % 2 ? "#F1435E" : "#FFD233"} />;
+        return <circle key={i} cx={(R + 13) * Math.cos(t)} cy={(R + 13) * Math.sin(t)} r={3.5} fill={i % 2 ? "#3B0D18" : "#F1435E"} />;
       })}
     </>
   );
@@ -105,7 +108,7 @@ function Plate() {
 // One silhouette (handle → shoulders → three tines) so the white outline is one clean line.
 const FORK_D = "M-5 -212 A5 5 0 0 1 5 -212 L5 -191 C5 -188 15 -190 15 -184 L15 -153 A2.5 2.5 0 0 1 10 -153 L10 -171 L2.5 -171 L2.5 -150 A2.5 2.5 0 0 1 -2.5 -150 L-2.5 -171 L-10 -171 L-10 -153 A2.5 2.5 0 0 1 -15 -153 L-15 -184 C-15 -190 -5 -188 -5 -191 Z";
 function Fork() {
-  return <path className="wheel__fork" d={FORK_D} fill="#d6334e" stroke="#fff" strokeWidth={4} paintOrder="stroke" strokeLinejoin="round" />;
+  return <path className="wheel__fork" d={FORK_D} fill="#3B0D18" stroke="#FFF1DC" strokeWidth={4} paintOrder="stroke" strokeLinejoin="round" />;
 }
 
 /** Static shell shown while the interactive wheel loads: same box and plate. */

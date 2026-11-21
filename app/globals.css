@@ -1246,3 +1246,120 @@ body { background: var(--cream); }
   .hero__stage { width: min(44vw, calc(100svh - 72px - 120px), 620px); }
 }
 @media (prefers-reduced-motion: reduce) { .wheel__hub { animation: none; } }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   Design system v5 (2026-11-22) — one type system, one 5-colour palette.
+   Lessons taken from sweet-tape.com (technique only): a condensed all-caps poster
+   face, a second "voice" face for one word, few colours used in big flat fields,
+   dark/bright alternation between chapters, and ribbons that cross the seams.
+   ─ Display:  Noto Sans Georgian, width 62.5 %, weight 900, in Mtavruli capitals
+   ─ Voice:    Noto Serif Georgian, one word per title (.accent) — replaces stickers
+   ─ Body/UI:  Google Sans
+   ─ Colour:   wine (ink) · coral (brand) · cream (paper) · mustard · blush
+   This block intentionally comes last and overrides older layers above it.
+   ════════════════════════════════════════════════════════════════════════════ */
+:root {
+  --wine: #3b0d18; --wine-2: #561424; --brand: #f1435e; --brand-ink: #d92f4c;
+  --cream: #fff1dc; --mustard: #ffc93c; --blush: #f8b4c0;
+  /* legacy names now point into the palette, so older rules follow automatically */
+  --text: var(--wine); --muted: #7a5560; --bg: var(--cream); --line: #ecd9c4; --surface: #fffaf2;
+  --pink: var(--brand); --pink-soft: #fde3e8; --yellow: var(--mustard); --lavender: var(--blush);
+  --green: var(--blush); --orange: var(--brand); --coral: var(--brand); --blue: var(--blush);
+  --mint: var(--cream); --green-ink: var(--wine);
+  --font: "Google Sans Variable", "Noto Sans Georgian Variable", system-ui, sans-serif;
+  --display: "Noto Sans Georgian Variable", system-ui, sans-serif;
+  --serif: "Noto Serif Georgian Variable", Georgia, serif;
+  /* crumpled paper: fractal noise lit from the top-left, multiplied over the fill */
+  --paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='600'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.0065' numOctaves='5' seed='11' stitchTiles='stitch'/%3E%3CfeDiffuseLighting lighting-color='%23fff' surfaceScale='2.6'%3E%3CfeDistantLight azimuth='225' elevation='58'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23c)'/%3E%3C/svg%3E");
+}
+html { background: var(--cream); }
+body { font-family: var(--font); color: var(--wine); background: var(--cream); overflow-x: clip; }
+
+/* ── Type ──────────────────────────────────────────────────────────────────── */
+.display, .section-title, .game__title, .persona__copy h2, .trust h2 {
+  font-family: var(--display); font-weight: 900; font-stretch: 62.5%; letter-spacing: -.005em; line-height: .86;
+}
+.accent {
+  font-family: var(--serif); font-weight: 420; font-stretch: 100%; letter-spacing: -.025em;
+  color: var(--accent, var(--brand)); padding: 0; background: none; box-shadow: none; rotate: none; border-radius: 0;
+}
+.hl { padding: 0; background: none; box-shadow: none; rotate: none; color: inherit; } /* stickers retired in titles */
+@keyframes word-in { from { translate: 0 .5em; rotate: 4deg; } to { translate: 0 0; rotate: 0deg; } }
+.caps { font-family: var(--font); letter-spacing: .08em; text-transform: uppercase; font-weight: 700; }
+
+/* ── Header + tab bar sit on the same coral as the hero ───────────────────── */
+.header { background: var(--brand); color: var(--cream); }
+.header__nav a { color: var(--cream); }
+.nav-live a::before, .nav-live__pill { background: var(--wine) !important; }
+.nav-live a.on, .nav-live a:hover { color: var(--cream); }
+.nav-live__soon, .nav-live__soon sup { color: var(--cream); }
+.header__user img { filter: brightness(0) invert(.95) sepia(.2); } /* icon is a dark SVG file; tint it cream */
+.header__user:hover { background: var(--wine); }
+.header--scrolled { background: rgba(241, 67, 94, .94); box-shadow: 0 6px 24px rgba(59, 13, 24, .18); }
+.tabbar { background: var(--wine); border-top: 0; }
+.tabbar a, .tabbar span { color: rgba(255, 241, 220, .55); }
+.tabbar a.on, .tabbar .on { color: var(--mustard); }
+
+/* ── Hero: coral field, cream capitals, the wine serif voice ──────────────── */
+.hero { background: var(--brand); --accent: var(--wine); }
+.hero__title { color: var(--cream); text-shadow: none; font-size: clamp(54px, 15vw, 76px); line-height: .84; }
+.hero__title .accent { display: block; font-size: 1.04em; line-height: 1; margin-top: .04em; }
+.hero__status { background: rgba(59, 13, 24, .14); color: var(--cream); }
+.token { background: var(--cream); color: var(--wine); box-shadow: 0 3px 0 rgba(59, 13, 24, .22); font-weight: 600; }
+.token.on { background: var(--wine); color: var(--cream); }
+.wheel__hub { background: var(--brand) !important; color: var(--cream); font-family: var(--display); font-stretch: 62.5%; font-weight: 900; letter-spacing: .02em; box-shadow: 0 0 0 5px var(--cream), 0 8px 18px rgba(59, 13, 24, .3); }
+.wheel__label { font-family: var(--display); font-stretch: 62.5%; font-weight: 900; font-size: 16px; letter-spacing: .01em; }
+@media (min-width: 1024px) {
+  .hero__title { font-size: clamp(88px, 9vw, 150px); }
+}
+
+/* ── Buttons: wine is the one "do it" colour ──────────────────────────────── */
+.pill { font-weight: 700; }
+.pill--dark { background-color: var(--wine) !important; color: var(--cream); box-shadow: 0 3px 0 #1c050a !important; }
+.pill--white { background: var(--cream); color: var(--wine); }
+
+/* ── Chapters: big flat fields, alternating light / dark ──────────────────── */
+.chapter::before, .hero::before { background: var(--paper); background-size: 600px; mix-blend-mode: multiply; opacity: .22; }
+.chapter--cream   { background: var(--cream);   color: var(--wine); --accent: var(--brand); }
+.chapter--wine    { background: var(--wine);    color: var(--cream); --accent: var(--mustard); }
+.chapter--mustard { background: var(--mustard); color: var(--wine);  --accent: var(--brand-ink); }
+.chapter--wine::before { mix-blend-mode: soft-light; opacity: .5; }
+.chapter--wine .game__title, .chapter--wine .game__sub { color: var(--cream); }
+.chapter--mustard .persona__copy h2, .chapter--mustard .persona__copy p { color: var(--wine); }
+.footer { background: var(--wine); color: var(--cream); }
+
+/* Paths cards: palette only */
+.card--yellow { background: var(--mustard); }
+.card--green  { background: var(--blush); }
+.card--orange { background: var(--brand); }
+
+/* Game on wine: the arena becomes the bright card */
+.game__card { background: var(--cream); color: var(--wine); }
+.game__arena { background: var(--mustard); }
+.game__ticket-h { background: var(--mustard); color: var(--wine); }
+.game__order { color: var(--wine); }
+
+/* Speech bubbles: cream paper with wine ink everywhere */
+.bridge__bubble { background: var(--surface); color: var(--wine); }
+.bridge__bubble b { color: var(--brand-ink); }
+
+/* Trust */
+.trust { background: var(--surface); }
+.trust h2 { font-size: clamp(32px, 4.4vw, 52px); }
+
+/* ── WaveBand: the ribbon that crosses each chapter seam ──────────────────── */
+.wave { position: absolute; z-index: 3; left: -6vw; right: -6vw; top: -120px; height: 220px; rotate: var(--tilt); pointer-events: none; }
+.wave svg { width: 100%; height: 100%; overflow: visible; display: block; }
+.wave__band { fill: none; stroke-width: 76; stroke-linecap: butt; }
+.wave__text { font-family: var(--display); font-stretch: 62.5%; font-weight: 900; font-size: 46px; letter-spacing: .01em; }
+.wave--wine    .wave__band { stroke: var(--wine); }    .wave--wine    .wave__text { fill: var(--mustard); }
+.wave--mustard .wave__band { stroke: var(--mustard); } .wave--mustard .wave__text { fill: var(--wine); }
+.wave--brand   .wave__band { stroke: var(--brand); }   .wave--brand   .wave__text { fill: var(--cream); }
+.wave--cream   .wave__band { stroke: var(--cream); }   .wave--cream   .wave__text { fill: var(--wine); }
+.chapter { padding-top: calc(var(--s8) * 2); }
+.chapter > .bridge:last-child { margin-bottom: calc(var(--s8) * 2); } /* leave the next ribbon room so it never covers a bubble */
+@media (max-width: 640px) {
+  .wave { top: -80px; height: 150px; left: -40vw; right: -40vw; }
+  .chapter { padding-top: calc(var(--s8) + var(--s6)); }
+  .chapter > .bridge:last-child { margin-bottom: calc(var(--s8) + var(--s4)); }
+}

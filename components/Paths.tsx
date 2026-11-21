@@ -67,9 +67,9 @@ export function Paths({ dish, place, radius, onPickPlace }: Props) {
   return (
     <section className="paths sect" id="paths" aria-labelledby="paths-title">
       <div className="container">
-        <h2 id="paths-title" className="section-title paths__title">
+        <h2 id="paths-title" className="section-title paths__title display">
           <Image className="paths__peek paths__peek--a" src="/illustrations/creatures/khinkali.webp" alt="" width={72} height={72} aria-hidden="true" />
-          <Words parts={["სად ", ["შეჭამ?", "hl hl--green"]]} />
+          <Words caps parts={["სად ", ["შეჭამ?", "accent"]]} />
           <Image className="paths__peek paths__peek--b" src="/illustrations/creatures/sushi.webp" alt="" width={64} height={64} aria-hidden="true" />
           <Image className="paths__peek paths__peek--c" src="/illustrations/creatures/pizza.webp" alt="" width={56} height={56} aria-hidden="true" />
         </h2>
@@ -202,7 +202,7 @@ export function PersonaTeaser({ persona, onStart, onGallery }: { persona: Person
             </>
           ) : (
             <>
-              <h2><Words parts={["გაიგე შენი პერსონა"]} /></h2>
+              <h2 className="display"><Words caps parts={["გაიგე შენი ", ["პერსონა", "accent"]]} /></h2>
               <p><Words parts={["7 კითხვა, ერთი წუთი — ბორბალი შენს გემოზე მოირგება."]} /></p>
               <div className="row persona__actions">
                 <button className="pill pill--dark" onClick={onStart}>ტესტის დაწყება</button>

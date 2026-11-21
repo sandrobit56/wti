@@ -17,6 +17,7 @@
  */
 "use client";
 
+import { Words } from "./Words";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DISHES } from "@/lib/catalog.ts";
@@ -149,7 +150,7 @@ export function StomachChallenge({ wheelSlugs, personaId, onDish }: Props) {
   return (
     <section id="game" className="game container sect" aria-labelledby="game-title">
       <div className="game__head">
-        <h2 id="game-title" className="game__title">კუჭის ჩელენჯი</h2>
+        <h2 id="game-title" className="game__title display"><Words caps parts={["კუჭის ", ["ჩელენჯი", "accent"]]} /></h2>
         <p className="game__sub">60 წამი. შეჭამე, აარიდე წიწაკას.</p>
       </div>
 
