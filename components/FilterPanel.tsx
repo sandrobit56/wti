@@ -53,6 +53,8 @@ type Props = {
   onLocate: () => void;
   onApply: () => void;
   onRandom: () => void;
+  /** Inside the shared Sheet: no own × (Sheet has one), actions go to the Sheet footer. */
+  inSheet?: boolean;
   onClose?: () => void;
   personaName: string | null;
   onQuiz: () => void;
@@ -90,7 +92,7 @@ export function FilterPanel(p: Props) {
   return (
     <section className="panel" aria-label="ფილტრები">
       <div className="panel__head">
-        <h2>ფილტრები</h2>
+        <h2 id="filters-title">ფილტრები</h2>
         <button className="link" onClick={() => p.onFilters(DEFAULT_FILTERS)}>გასუფთავება</button>
         {p.onClose && <button className="panel__close" onClick={p.onClose} aria-label="დახურვა">×</button>}
       </div>
@@ -179,10 +181,10 @@ export function FilterPanel(p: Props) {
         <span aria-hidden="true" className="panel__hint-arrow">→</span>
       </button>
 
-      <div className="panel__actions">
+      {!p.inSheet && <div className="panel__actions">
         <button className="pill pill--dark" onClick={p.onApply}>გაფილტრე</button>
         <button className="pill pill--outline" onClick={p.onRandom}>შემთხვევით</button>
-      </div>
+      </div>}
     </section>
   );
 }

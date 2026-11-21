@@ -3,12 +3,12 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-18
- * Version:     v2.0 — interactive
+ * Version:     v3.0 — one job only: explain the fork scale (steps, seal toggle and note
+ *              removed — "too many elements, unclear what it is for")
+ *              v2.0 — interactive
  * Description: "ჩანგალი" rating explainer.
  *   - Fork meter: hover/tap 1–3 forks → what that level means. When the block first
  *     scrolls into view it plays 1→2→3 once, then waits for the user.
- *   - How we rate: 3 steps; the connecting line fills as you scroll (CSS view timeline).
- *   - Rosette: tap → "შემოწმებულია" stamp.
  *   Level texts are DRAFT copy until the rating methodology is final.
  */
 "use client";
@@ -22,15 +22,9 @@ const LEVELS = [
   { title: "ორი ჩანგალი", text: "გამორჩეული — ღირს გზის გაგრძელება და სხვა უბნიდან მოსვლა." },
   { title: "სამი ჩანგალი", text: "განსაკუთრებული — ღირს სპეციალურად წასვლა. ასეთი ცოტა იქნება." },
 ];
-const STEPS = [
-  { icon: "user", title: "ანონიმური ვიზიტი" },
-  { icon: "coin", title: "ვიხდით ჩვენ" },
-  { icon: "rosette", title: "2+ ინსპექტორი, ყოველ 6 თვეში" },
-];
 
 export function TrustCard() {
   const [level, setLevel] = useState(0); // 0 = none chosen yet
-  const [stamped, setStamped] = useState(false);
   const touched = useRef(false);
   const boxRef = useRef<HTMLDivElement>(null);
 
@@ -59,10 +53,7 @@ export function TrustCard() {
             <p className="caps">როგორ ვაფასებთ</p>
             <h2><Words parts={["„ჩანგალი“ — შეფასება, რომელსაც ", ["ვერ იყიდი", "hl hl--pink"]]} /></h2>
           </div>
-          <button type="button" className={stamped ? "trust2__seal stamped" : "trust2__seal"} onClick={() => setStamped((s) => !s)} aria-pressed={stamped} aria-label="შემოწმების ბეჭედი">
-            <Image src="/icons/rosette.svg" alt="" width={72} height={72} />
-            <span className="trust2__stamp" aria-hidden="true">შემოწმებულია</span>
-          </button>
+          <Image className="trust2__seal" src="/icons/rosette.svg" alt="" width={64} height={64} />
         </div>
 
         <div className="forks" role="radiogroup" aria-label="ჩანგლების დონე">
@@ -89,15 +80,6 @@ export function TrustCard() {
           </p>
         </div>
 
-        <ol className="steps">
-          {STEPS.map((s, i) => (
-            <li key={s.title} className="step" style={{ ["--i" as string]: i }}>
-              <span className="step__ico"><Image src={`/icons/${s.icon}.svg`} alt="" width={26} height={26} /></span>
-              <strong>{s.title}</strong>
-            </li>
-          ))}
-        </ol>
-        <p className="trust2__note">პირველი შეფასებები მალე.</p>
       </div>
     </section>
   );

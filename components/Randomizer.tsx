@@ -26,6 +26,9 @@ import { Quiz } from "./Quiz";
 import { FoodRibbon } from "./FoodRibbon";
 import { PersonaGallery } from "./PersonaGallery";
 import { StomachChallenge } from "./StomachChallenge";
+import { FilterTokens } from "./FilterTokens";
+import { Sheet } from "./Sheet";
+import { Trail } from "./Trail";
 import { SectionBridge } from "./SectionBridge";
 import { ResultModal } from "./ResultModal";
 import { Wheel } from "./Wheel";
@@ -250,7 +253,6 @@ export function Randomizer() {
   const dish = spun?.landed ? wheel[spun.winner] : null;
   const spinning = Boolean(spun && !spun.landed);
   const matching = preview.result?.matching ?? preview.error ?? 0;
-  const activeCount = (filters.priceMax < 3 ? 1 : 0) + filters.tastes.length + filters.diet.length + filters.cuisines.length + filters.categories.length + filters.meals.length + (place ? 1 : 0);
 
   const status = (() => {
     if (current && "error" in current) return `ადგილები ვერ ჩაიტვირთა (${current.error}) — ბორბალი მთელ თბილისს იყენებს.`;
@@ -259,11 +261,11 @@ export function Randomizer() {
     return `${matching} კერძი ერგება · ${where}${persona ? ` · ${persona.name}` : ""}`;
   })();
 
-  const panel = (onClose?: () => void) => (
+  const panel = () => (
     <FilterPanel
       filters={filters} place={place} radius={radius} locating={locating} locateError={locateError}
       onFilters={onFilters} onPlace={onPlace} onRadius={onRadius} onLocate={locate}
-      onApply={() => doSpin(false)} onRandom={() => doSpin(true)} onClose={onClose}
+      onApply={() => doSpin(false)} onRandom={() => doSpin(true)} inSheet
       personaName={persona?.name ?? null} onQuiz={() => { setSheetOpen(false); setQuizOpen(true); }}
     />
   );
@@ -277,11 +279,7 @@ export function Randomizer() {
             {wheel.length > 0
               ? <Wheel dishes={wheel} rotation={rotation} spinning={spinning} winnerIndex={winner} onSpin={() => doSpin(false)} onLanded={onLanded} />
               : <div className="wheel wheel--empty"><p>ფილტრებს მხოლოდ {matching} კერძი ერგება.<br />შეარბილე ბიუჯეტი, დიეტა ან გაზარდე რადიუსი.</p></div>}
-            <div className="moods" role="group" aria-label="განწყობა">
-              {MOODS.map((m) => (
-                <button key={m.id} className={mood === m.id ? "mood on" : "mood"} aria-pressed={mood === m.id} onClick={() => pickMood(m.id)}>{m.label}</button>
-              ))}
-            </div>
+            <FilterTokens filters={filters} place={place?.label ?? null} radius={radius} onOpen={() => setSheetOpen(true)} />
             <p className="hero__status" aria-live="polite">{status}</p>
             {(Object.keys(notToday).length > 0 || never.length > 0) && (
               <div className="hidden-today">
@@ -305,22 +303,32 @@ export function Randomizer() {
                 ბორბალმა აირჩია: <strong>{dish.name}</strong> <span className="hero__winner-go">ნახე →</span>
               </button>
             )}
-            <div className="hero__actions only-mobile">
-              <button className="pill pill--dark" onClick={() => setSheetOpen(true)}>ფილტრები{activeCount ? ` · ${activeCount}` : ""}</button>
-              <button className="pill pill--outline" onClick={() => doSpin(true)} disabled={spinning}>შემთხვევით</button>
-            </div>
           </div>
-          <aside className="hero__panel only-desktop">{panel()}</aside>
         </div>
       </section>
 
       {sheetOpen && (
-        <div className="sheet" role="dialog" aria-modal="true" aria-label="ფილტრები" onClick={() => setSheetOpen(false)}>
-          <div className="sheet__body" onClick={(e) => e.stopPropagation()}>
-            <div className="sheet__handle" />
-            {panel(() => setSheetOpen(false))}
+        <Sheet
+          className="filters-sheet"
+          labelledBy="filters-title"
+          onClose={() => setSheetOpen(false)}
+          footer={
+            <div className="modal__actions">
+              <button className="pill pill--dark" onClick={() => doSpin(false)}>დაატრიალე</button>
+              <button className="pill pill--outline" onClick={() => doSpin(true)}>შემთხვევით</button>
+            </div>
+          }
+        >
+          {panel()}
+          <div className="moods-block">
+            <h3 className="panel__title">განწყობა</h3>
+            <div className="moods" role="group" aria-label="განწყობა">
+              {MOODS.map((m) => (
+                <button key={m.id} className={mood === m.id ? "mood on" : "mood"} aria-pressed={mood === m.id} onClick={() => pickMood(m.id)}>{m.label}</button>
+              ))}
+            </div>
           </div>
-        </div>
+        </Sheet>
       )}
 
       {modalOpen && dish && (
@@ -335,6 +343,7 @@ export function Randomizer() {
       {quizOpen && <Quiz onClose={() => setQuizOpen(false)} onApply={applyPersona} onDish={(slug) => { setQuizOpen(false); openDish(slug); }} />}
 
       <div ref={pathsRef} className="paths-anchor">
+        <Trail icon={dish?.icon ?? null} label={dish ? dish.name : null} />
         <Paths
           dish={dish} place={place} radius={radius}
           onPickPlace={pickPlace}

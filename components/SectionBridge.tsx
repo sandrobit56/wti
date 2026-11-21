@@ -3,25 +3,58 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-21
- * Version:     v1.1 — shared-experience jokes instead of food facts (Georgians know
- *              what churchkhela is; they laugh at the "only five khinkali" lie)
- * Description: The pause between two sections: a food creature walks in with one
- *   short line, so moving down the page feels like turning to a new
- *   chapter instead of a mechanical stack of blocks. Motion is scroll-driven CSS
- *   (animation-timeline: view(), see globals.css "bridge"), so it follows the
- *   finger/wheel instead of playing once. Reduced motion / old browsers: static.
+ * Version:     v2.0 — the creature hops in, then "talks": typing dots, then the line
+ *              types out in its bubble (was: everything appeared at once — "rough")
+ *              v1.1 — shared-experience jokes instead of food facts
+ * Description: The pause between two sections. Hop-in is scroll-driven CSS
+ *   (globals.css "bridge"); speech starts when the bridge is mostly on screen
+ *   (IntersectionObserver), once. The full line is always in the DOM for screen
+ *   readers; the typed copy is visual only. Reduced motion: shown at once.
  *   Voice: the cheeky fortune-teller — a moment every Georgian recognises, ≤ 1 line.
  */
+"use client";
+
 import Image from "next/image";
-import { CREATURES } from "@/lib/creatures.ts";
+import { useEffect, useRef, useState } from "react";
+import type { CREATURES } from "@/lib/creatures.ts";
 
 type CreatureName = (typeof CREATURES)[number]["name"];
+const DOTS_MS = 650, CHAR_MS = 26;
 
 export function SectionBridge({ creature, fact, side = "left" }: { creature: CreatureName; fact: string; side?: "left" | "right" }) {
+  const ref = useRef<HTMLElement>(null);
+  const total = [...fact].length;
+  const [shown, setShown] = useState(-1);   // -1 = not started, 0 = typing dots, n = chars typed
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { const t = setTimeout(() => setShown(total), 0); return () => clearTimeout(t); }
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      setShown(0);
+    }, { threshold: 0.7 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [total]);
+
+  useEffect(() => {
+    if (shown < 0 || shown >= total) return;
+    const t = setTimeout(() => setShown((n) => n + 1), shown === 0 ? DOTS_MS : CHAR_MS);
+    return () => clearTimeout(t);
+  }, [shown, total]);
+
   return (
-    <aside className={`bridge bridge--${side}`}>
+    <aside ref={ref} className={`bridge bridge--${side}${shown >= 0 ? " is-on" : ""}`}>
       <Image className="bridge__creature" src={`/illustrations/creatures/${creature}.webp`} alt="" width={96} height={96} />
-      <p className="bridge__bubble">{fact}</p>
+      <p className="bridge__bubble">
+        <span className="sr-only">{fact}</span>
+        <span className="bridge__ghost" aria-hidden="true">{fact}</span>
+        <span className="bridge__typed" aria-hidden="true">
+          {shown === 0 ? <span className="bridge__dots"><i /><i /><i /></span> : [...fact].slice(0, Math.max(0, shown)).join("")}
+        </span>
+      </p>
     </aside>
   );
 }
