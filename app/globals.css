@@ -1179,3 +1179,43 @@ html[data-intro="seen"] .intro { display: none; }
 @keyframes ride { from { offset-distance: 0%; } to { offset-distance: 100%; } }
 @media (max-width: 640px) { .trail { transform: scale(.8); margin-block: calc(-1 * var(--s6)) calc(-1 * var(--s4)); } }
 @media (min-width: 641px) { .tokens { max-width: none; flex-wrap: nowrap; } }
+
+/* ── Chapters v1 (2026-11-21, ref. sweet-tape.com technique, our palette/assets) ──
+   Every block is a full-bleed colour field whose curved top rolls over the one
+   before it; a faint crumpled-paper grain sits on every field; titles go giant. */
+:root {
+  --paper: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.02' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+body { background: var(--cream); }
+.chapter { position: relative; isolation: isolate; margin-top: calc(-1 * var(--s8)); padding: calc(var(--s8) + var(--s6)) 0 var(--s8); border-radius: 50% 50% 0 0 / 96px 96px 0 0; }
+.chapter::before, .hero::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: var(--paper); background-size: 240px; mix-blend-mode: multiply; opacity: .07; pointer-events: none; }
+.hero { position: relative; isolation: isolate; z-index: 0; }
+.chapter--cream { background: var(--cream); }
+.chapter--green { background: var(--green); }
+.chapter--lavender { background: var(--lavender); }
+.chapter .sect { animation: none; }
+.chapter > .bridge:last-child { margin-bottom: var(--s4); }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .chapter { animation: chapter-roll linear both; animation-timeline: view(); animation-range: entry 0% entry 60%; }
+  }
+}
+@keyframes chapter-roll { from { border-radius: 50% 50% 0 0 / 220px 220px 0 0; transform: translateY(64px); } to { border-radius: 50% 50% 0 0 / 96px 96px 0 0; transform: none; } }
+
+/* Giant titles */
+.section-title, .game__title, .persona__copy h2 { font-size: clamp(56px, 10vw, 136px); line-height: .92; letter-spacing: -.01em; }
+.paths { margin-top: 0; }
+.paths__title { margin-bottom: var(--s6); }
+.game { padding-top: 0; }
+.game__title { color: #1f3d2a; }
+.game__sub { color: #2c5a3c; font-size: 18px; }
+.persona { background: none; box-shadow: none; padding: 0; }
+.persona__copy h2 { color: #3a2d7a; }
+.persona__copy p { font-size: 18px; }
+.ribbon { z-index: 2; }
+.footer { margin-top: 0; background: var(--cream); }
+@media (max-width: 640px) {
+  .chapter { border-radius: 50% 50% 0 0 / 40px 40px 0 0; padding-top: calc(var(--s6) + var(--s4)); margin-top: calc(-1 * var(--s6)); }
+  @keyframes chapter-roll { from { border-radius: 50% 50% 0 0 / 110px 110px 0 0; transform: translateY(40px); } to { border-radius: 50% 50% 0 0 / 40px 40px 0 0; transform: none; } }
+  .section-title, .game__title, .persona__copy h2 { font-size: clamp(44px, 13vw, 64px); }
+}

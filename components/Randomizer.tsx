@@ -342,6 +342,7 @@ export function Randomizer() {
 
       {quizOpen && <Quiz onClose={() => setQuizOpen(false)} onApply={applyPersona} onDish={(slug) => { setQuizOpen(false); openDish(slug); }} />}
 
+      <div className="chapter chapter--cream">
       <div ref={pathsRef} className="paths-anchor">
         <Trail icon={dish?.icon ?? null} label={dish ? dish.name : null} />
         <Paths
@@ -357,13 +358,20 @@ export function Randomizer() {
       </div>
 
       <SectionBridge creature="khinkali" fact="„მხოლოდ ხუთს შევჭამ“ — ყველაზე ხშირი ტყუილი თბილისში." />
+      </div>
       <FoodRibbon />
-      <StomachChallenge wheelSlugs={(spun?.wheel ?? preview.result?.wheel ?? []).map((d) => d.slug)} personaId={prefs.persona} onDish={openDish} />
-      <SectionBridge creature="cupcake" side="right" fact="ბებიასთან „უკვე ვჭამე“ არ მუშაობს. აქაც ვერ გაგვექცევი." />
-      <PersonaTeaser persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />
+      <div className="chapter chapter--green">
+        <StomachChallenge wheelSlugs={(spun?.wheel ?? preview.result?.wheel ?? []).map((d) => d.slug)} personaId={prefs.persona} onDish={openDish} />
+        <SectionBridge creature="cupcake" side="right" fact="ბებიასთან „უკვე ვჭამე“ არ მუშაობს. აქაც ვერ გაგვექცევი." />
+      </div>
+      <div className="chapter chapter--lavender">
+        <PersonaTeaser persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />
       {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} onDish={(slug) => { setGalleryOpen(false); openDish(slug); }} />}
-      <SectionBridge creature="chili" fact="„ცოტა ცხარეა“ — თქვა მან და ცრემლები მოიწმინდა." />
-      <TrustCard />
+        <SectionBridge creature="chili" fact="„ცოტა ცხარეა“ — თქვა მან და ცრემლები მოიწმინდა." />
+      </div>
+      <div className="chapter chapter--cream">
+        <TrustCard />
+      </div>
     </>
   );
 }
