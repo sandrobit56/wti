@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-22
- * Version:     v0.1 — prototype (lives on /wheel-3d until approved for the hero)
+ * Version:     v1.0 — the hero's wheel scene (driven by components/Wheel.tsx); v0.1 prototype
  * Description: The wheel as a real 3D scene (three.js via React Three Fiber) instead of a
  *              pre-rendered plate tilted with CSS. Because the plate is geometry, it spins in
  *              true perspective: slices, labels, bulbs and the rim all turn together, and
@@ -17,12 +17,13 @@
 "use client";
 
 import { Billboard, ContactShadows, Text, useTexture } from "@react-three/drei";
-import { Canvas, useFrame, type ThreeEvent } from "@react-three/fiber";
-import { useMemo, useRef, useState } from "react";
+import { Canvas, useFrame } from "@react-three/fiber";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { configureTextBuilder } from "troika-three-text";
 import { toMtavruli } from "@/lib/mtavruli.ts";
 import { stickerSrc } from "@/lib/stickers.ts";
+import { cameraPosition, cameraTarget, GEO, spinEase, VIEW, type View } from "@/lib/view3d.ts";
 
 // Lay text out on the main thread: troika's worker is built from blob: scripts, which our CSP
 // (script-src 'self') rightly refuses. A handful of short labels costs nothing on the main thread.
@@ -34,13 +35,11 @@ const C = { teal: "#163C3A", coral: "#F1435E", ink: "#D92F4C", cream: "#FFF1DC",
 const SLICE = [C.teal, C.mustard, C.blush, C.paper];
 const LABEL = [C.cream, C.teal, C.teal, C.teal];
 const FONT = "/fonts/wti-display-cond-black.ttf";
-const PLATE_R = 1;          // slices
-const RIM_R = 1.16;         // outer edge of the cream rim
-const SPIN_MS = 5200;
-const TURNS = 6;
+const PLATE_R = GEO.plate;  // slices
+const RIM_R = GEO.rim;      // outer edge of the cream rim
 
-const easeOut = (t: number) => 1 - Math.pow(1 - t, 4);
-const sliceAngle = (i: number, n: number) => (i * 2 * Math.PI) / n;
+/** slice i spans [i, i+1]·(2π/n) from the back, like the 2D wheel; this is its middle */
+const sliceAngle = (i: number, n: number) => ((i + 0.5) * 2 * Math.PI) / n;
 /** plate-local point at angle θ (0 = back, clockwise from above), radius r, height y */
 const at = (theta: number, r: number, y = 0) => new THREE.Vector3(Math.sin(theta) * r, y, -Math.cos(theta) * r);
 
@@ -77,7 +76,7 @@ function Slice({ i, n, dish, geo, phi }: { i: number; n: number; dish: WheelDish
       <group position={lp} rotation={[0, -theta, 0]}>
         <group rotation={[-Math.PI / 2, 0, 0]}>
           <group ref={label}>
-            <Text font={FONT} fontSize={0.085} color={LABEL[col]} anchorX="center" anchorY="middle" maxWidth={0.7} letterSpacing={0.02}>
+            <Text font={FONT} fontSize={0.1} color={LABEL[col]} anchorX="center" anchorY="middle" maxWidth={0.7} letterSpacing={0.02}>
               {toMtavruli(dish.name)}
             </Text>
           </group>
@@ -114,39 +113,45 @@ function Bulbs({ count = 28 }: { count?: number }) {
   );
 }
 
-function Plate({ dishes, onLanded, elev }: { dishes: WheelDish[]; onLanded: (d: WheelDish) => void; elev: number }) {
+type SceneProps = {
+  dishes: WheelDish[];
+  /** total plate turn in degrees, clockwise from above (the 2D wheel's `rotation + offset`) */
+  deg: number;
+  spinning: boolean;
+  spinMs: number;
+  /** show the back pin (single diner) */
+  pointer: boolean;
+  /** fired once the spin animation reaches `deg` */
+  onSettled: () => void;
+  view?: View;
+};
+
+function Plate({ dishes, deg, spinning, spinMs, pointer, onSettled }: Omit<SceneProps, "view">) {
   const n = dishes.length;
   if (n < 2) throw new Error(`Wheel3D needs at least 2 dishes, got ${n}`);
   const geo = useMemo(() => wedge(n, 0.012), [n]);
   const group = useRef<THREE.Group>(null);
-  const phi = useRef(0);
-  const spin = useRef<{ from: number; to: number; t0: number; win: number } | null>(null);
-  const [hover, setHover] = useState(false);
-  const hub = useRef<THREE.Group>(null);
+  const phi = useRef((-deg * Math.PI) / 180);      // plate turn φ = −deg (see header)
+  const anim = useRef<{ from: number; to: number; t0: number; ms: number } | null>(null);
+  const settled = useRef(onSettled);
+  useEffect(() => { settled.current = onSettled; });
 
-  useFrame(({ clock }) => {
-    const s = spin.current;
-    if (s) {
-      const t = Math.min(1, (performance.now() - s.t0) / SPIN_MS);
-      phi.current = s.from + (s.to - s.from) * easeOut(t);
-      if (t === 1) { spin.current = null; onLanded(dishes[s.win]); }
+  // a new target: animate when spinning, follow the finger otherwise
+  useEffect(() => {
+    const to = (-deg * Math.PI) / 180;
+    if (spinning) anim.current = { from: phi.current, to, t0: performance.now(), ms: spinMs };
+    else { anim.current = null; phi.current = to; }
+  }, [deg, spinning, spinMs]);
+
+  useFrame(() => {
+    const a = anim.current;
+    if (a) {
+      const t = Math.min(1, (performance.now() - a.t0) / a.ms);
+      phi.current = a.from + (a.to - a.from) * spinEase(t);
+      if (t === 1) { anim.current = null; settled.current(); }
     }
     if (group.current) group.current.rotation.y = phi.current;
-    if (hub.current) {
-      const k = hover && !spin.current ? 1.06 : 1 + Math.sin(clock.elapsedTime * 2.4) * 0.015;
-      hub.current.scale.lerp(new THREE.Vector3(k, 1, k), 0.2);
-    }
   });
-
-  const go = (e: ThreeEvent<MouseEvent>) => {
-    e.stopPropagation();
-    if (spin.current) return;
-    const win = Math.floor(Math.random() * n);
-    const theta = sliceAngle(win, n);
-    const from = phi.current;
-    const delta = (((theta - from) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-    spin.current = { from, to: from + TURNS * 2 * Math.PI + delta, t0: performance.now(), win };
-  };
 
   return (
     <group>
@@ -159,72 +164,51 @@ function Plate({ dishes, onLanded, elev }: { dishes: WheelDish[]; onLanded: (d: 
         <cylinderGeometry args={[RIM_R, RIM_R, 0.05, 96]} />
         <meshStandardMaterial color={C.cream} roughness={0.6} />
       </mesh>
-      <mesh position={[0, 0.03, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[0, GEO.top, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <ringGeometry args={[PLATE_R + 0.005, PLATE_R + 0.03, 96]} />
         <meshStandardMaterial color={C.teal} roughness={0.6} />
       </mesh>
       <Bulbs />
-      {/* back pointer: where the winner lands */}
-      <group position={at(0, RIM_R + 0.02, 0.2)}>
-        <mesh rotation={[Math.PI, 0, 0]} castShadow>
-          <coneGeometry args={[0.07, 0.2, 24]} />
-          <meshStandardMaterial color={C.coral} roughness={0.4} />
-        </mesh>
-        <mesh position={[0, 0.13, 0]} castShadow>
-          <sphereGeometry args={[0.06, 24, 16]} />
-          <meshStandardMaterial color={C.mustard} roughness={0.4} />
-        </mesh>
-      </group>
+      {pointer && (
+        <group position={at(0, RIM_R + 0.02, 0.2)}>
+          <mesh rotation={[Math.PI, 0, 0]} castShadow>
+            <coneGeometry args={[0.07, 0.2, 24]} />
+            <meshStandardMaterial color={C.coral} roughness={0.4} />
+          </mesh>
+          <mesh position={[0, 0.13, 0]} castShadow>
+            <sphereGeometry args={[0.06, 24, 16]} />
+            <meshStandardMaterial color={C.mustard} roughness={0.4} />
+          </mesh>
+        </group>
+      )}
 
       {/* the turning plate */}
-      <group ref={group} position={[0, 0.03, 0]}>
+      <group ref={group} position={[0, GEO.top, 0]}>
         {dishes.map((d, i) => <Slice key={d.slug + i} i={i} n={n} dish={d} geo={geo} phi={phi} />)}
       </group>
 
-      {/* hub = the spin button */}
-      <group ref={hub} position={[0, 0.12, 0]}
-        onClick={go}
-        onPointerOver={(e) => { e.stopPropagation(); setHover(true); document.body.style.cursor = "pointer"; }}
-        onPointerOut={() => { setHover(false); document.body.style.cursor = ""; }}>
-        <mesh castShadow>
-          <cylinderGeometry args={[0.3, 0.32, 0.14, 64]} />
-          <meshStandardMaterial color={C.coral} roughness={0.35} />
-        </mesh>
-        <mesh position={[0, 0.072, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[0.28, 64]} />
-          <meshStandardMaterial color={C.ink} roughness={0.4} />
-        </mesh>
-        {/* the label faces the camera (tilted by the view's elevation) instead of lying flat,
-            so perspective doesn't squash it; it sits on the button like a little plaque */}
-        <Text font={FONT} position={[0, 0.12, 0.06]} rotation={[-elev, 0, 0]} fontSize={0.088} color={C.cream} anchorX="center" anchorY="middle"
-          outlineWidth={0.012} outlineColor={C.teal} letterSpacing={0.02}>
-          {toMtavruli("დაატრიალე")}
-        </Text>
-      </group>
+      {/* hub base; the clickable top is the HTML button laid over it (components/Wheel.tsx) */}
+      <mesh position={[0, GEO.hubTop - 0.07, 0]} castShadow>
+        <cylinderGeometry args={[GEO.hubR, GEO.hubR + 0.02, 0.14, 64]} />
+        <meshStandardMaterial color={C.ink} roughness={0.35} />
+      </mesh>
     </group>
   );
 }
 
-/** Camera: a long lens from far away (like a product shot of a miniature) keeps the near edge
- *  from ballooning and the far edge from squashing. `elev` = degrees above the table. */
-export type View = { elev: number; fov: number };
-export const DEFAULT_VIEW: View = { elev: 38, fov: 15 };
-const FIT = 1.22;  // world radius kept in frame (rim + drum); the canvas is wider than tall, so width fits
-
-export function Wheel3D({ dishes, onLanded, view = DEFAULT_VIEW }: { dishes: WheelDish[]; onLanded: (d: WheelDish) => void; view?: View }) {
-  if (view.fov <= 0 || view.fov >= 90) throw new Error(`Wheel3D: fov must be 0–90, got ${view.fov}`);
-  const d = FIT / Math.tan(((view.fov / 2) * Math.PI) / 180);
-  const e = (view.elev * Math.PI) / 180;
+export function Wheel3D({ view = VIEW, ...props }: SceneProps) {
+  const pos = cameraPosition(view);
+  const target = cameraTarget();
   return (
-    <Canvas className="wheel3d" flat shadows dpr={[1, 2]} camera={{ position: [0, d * Math.sin(e), d * Math.cos(e)], fov: view.fov, near: 0.1, far: 100 }} gl={{ antialias: true }}
-      onCreated={({ camera }) => camera.lookAt(0, -0.02, 0)}>
+    <Canvas className="wheel3d" flat shadows dpr={[1, 2]} camera={{ position: pos, fov: view.fov, near: 0.1, far: 100 }} gl={{ antialias: true, alpha: true }}
+      onCreated={({ camera }) => camera.lookAt(...target)} aria-hidden="true">
       <hemisphereLight args={["#FFFFFF", "#F8B4C0", 1.5]} />
       <ambientLight intensity={0.35} />
       <directionalLight position={[2.5, 5, 3]} intensity={1.9} castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004}>
         <orthographicCamera attach="shadow-camera" args={[-2, 2, 2, -2, 0.1, 12]} />
       </directionalLight>
       <directionalLight position={[-3, 2, -2]} intensity={0.35} color="#F8B4C0" />
-      <Plate dishes={dishes} onLanded={onLanded} elev={e} />
+      <Plate {...props} />
       <ContactShadows position={[0, -0.28, 0]} opacity={0.35} scale={4} blur={2.6} far={1} color={C.teal} />
     </Canvas>
   );
