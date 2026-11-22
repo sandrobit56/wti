@@ -5,12 +5,14 @@
  * Author:      Sandro Germanishvili
  * Date:        2026-11-22
  * Version:     v1.1 — "კრიტიკოსი" (not "მსაჯი"), no 3D jury figures, one button style
- * Description: The closing section's one action: "გახდი ჩანგლის კრიტიკოსი" (become a fork critic).
- *              A warm invitation and ONE button. The
+ * Description: The closing section's one action: "გახდი კრიტიკოსი" (become a critic).
+ *              A 3D "critic's kit" (notebook, magnifier, medal, khinkali — reusable later for the
+ *              rating system), a short invitation and ONE button. The
  *              button opens a short form in place (name, email, district, one line), with a
  *              consent box linked to /privacy. Same validator as the server (lib/critics.ts).
  *              Honeypot field "website" is hidden from people and screen readers.
  */
+import Image from "next/image";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { checkSignup, DISTRICTS, LIMITS } from "@/lib/critics.ts";
@@ -40,10 +42,11 @@ export function JoinCritics() {
   return (
     <section className="join sect" id="join" aria-labelledby="join-title">
       <div className="container join__inner">
-        <h2 id="join-title" className="section-title display join__title"><Words caps parts={["გახდი ჩანგლის ", ["კრიტიკოსი", "accent"]]} /></h2>
+        <Image className="join__kit" src="/illustrations/critic-kit.webp" alt="" width={1000} height={698} sizes="(max-width: 640px) 80vw, 420px" />
+        <h2 id="join-title" className="section-title display join__title"><Words caps parts={["გახდი ", ["კრიტიკოსი", "accent"]]} /></h2>
         <p className="join__lead">
           ჭამ, აკვირდები, გული გწყდება ცუდ ხინკალზე? ვეძებთ ადამიანებს, ვინც რესტორნებს შეამოწმებს და
-          გულწრფელად დაწერს. შეფასება არ იყიდება — ამიტომაც ღირს.
+          გულწრფელად დაწერს.
         </p>
 
         {status.kind === "closed" && (

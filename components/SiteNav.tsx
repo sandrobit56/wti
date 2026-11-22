@@ -19,7 +19,7 @@
 import Image from "next/image";
 import { useEffect, useState, type ReactNode } from "react";
 
-type SectionId = "wheel" | "paths" | "game" | "persona" | "join" | "trust";
+type SectionId = "wheel" | "paths" | "game" | "persona" | "join";
 const LEFT: { id: SectionId; label: string }[] = [
   { id: "wheel", label: "ბორბალი" },
   { id: "paths", label: "ადგილები" },
@@ -28,7 +28,7 @@ const LEFT: { id: SectionId; label: string }[] = [
 ];
 
 /** Page order — the last section whose top passed the line wins. */
-const SECTIONS: SectionId[] = ["wheel", "paths", "game", "persona", "join", "trust"];
+const SECTIONS: SectionId[] = ["wheel", "paths", "game", "persona", "join"];
 
 /**
  * Which section is under the 45% line of the screen. Scroll-based on purpose: the
@@ -86,7 +86,7 @@ export function SiteHeader() {
         <Image src="/logo.svg" alt="რა ვჭამოთ?" width={61} height={57} priority />
       </a>
       <nav className="header__nav header__nav--right nav-live" aria-label="დამატებითი">
-        <a className={`only-desktop${active === "trust" ? " on" : ""}`} href="#trust">როგორ ვაფასებთ</a>
+        <a className={`only-desktop${active === "join" ? " on" : ""}`} href="#join">გახდი კრიტიკოსი</a>
         <span className="only-desktop nav-live__soon" title="მალე">ბლოგი<sup>მალე</sup></span>
         <span className="header__user" title="პროფილი — მალე" role="img" aria-label="პროფილი (მალე)">
           <Image src="/icons/user.svg" alt="" width={24} height={24} />

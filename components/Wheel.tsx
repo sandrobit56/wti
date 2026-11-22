@@ -34,8 +34,8 @@ import { toMtavruli } from "@/lib/mtavruli.ts";
 import { stickerSrc } from "@/lib/stickers.ts";
 import { MAX_DINERS, seatAngles } from "@/lib/seats.ts";
 
-const SLICE_COLORS = ["#3B0D18", "#FFC93C", "#F8B4C0", "#FFF8EC"];
-const INK = ["#FFF1DC", "#3B0D18", "#3B0D18", "#3B0D18"];
+const SLICE_COLORS = ["#163C3A", "#FFC93C", "#F8B4C0", "#FFF8EC"];
+const INK = ["#FFF1DC", "#163C3A", "#163C3A", "#163C3A"];
 /** Cycle the palette; when n leaves one slice over, recolour it so it never matches slice 0. */
 const colorOf = (i: number, n: number) => (i === n - 1 && n % SLICE_COLORS.length === 1 ? 2 : i % SLICE_COLORS.length);
 
@@ -246,8 +246,8 @@ function Defs() {
         <stop offset="0.55" stopColor="#fff" stopOpacity="0" />
       </radialGradient>
       <radialGradient id="wheel-edge" cx="0.5" cy="0.5" r="0.5">
-        <stop offset="0.78" stopColor="#3B0D18" stopOpacity="0" />
-        <stop offset="1" stopColor="#3B0D18" stopOpacity="0.28" />
+        <stop offset="0.78" stopColor="#163C3A" stopOpacity="0" />
+        <stop offset="1" stopColor="#163C3A" stopOpacity="0.28" />
       </radialGradient>
       <clipPath id="wheel-well"><circle r={R} /></clipPath>
     </defs>

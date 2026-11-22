@@ -23,14 +23,12 @@ import { FilterPanel, MY_LOCATION, type Place } from "./FilterPanel";
 import { coarse } from "@/lib/security.ts";
 import { Paths } from "./Paths";
 import { PersonaSection } from "./PersonaSection";
-import { TrustCard } from "./TrustCard";
 import { Quiz } from "./Quiz";
 import { PersonaGallery } from "./PersonaGallery";
 import { SupraFlyer } from "./SupraFlyer";
 import { FilterTokens } from "./FilterTokens";
 import { Sheet } from "./Sheet";
 import { HeroTitle } from "./HeroTitle";
-import { SectionBridge } from "./SectionBridge";
 import { WaveBand } from "./WaveBand";
 import { JoinCritics } from "./JoinCritics";
 import { mapsSearchUrl } from "@/lib/places.ts";
@@ -414,24 +412,19 @@ export function Randomizer() {
           onAgain={spinAgain}
         />
       </div>
-
-      <SectionBridge creature="khinkali" fact="„მხოლოდ ხუთს შევჭამ“ — ყველაზე ხშირი ტყუილი თბილისში." />
       </div>
       <div className="chapter chapter--wine">
         <WaveBand tone="mustard" curve="b" text="მშიერი კაცი ბორბალს არ ეკამათება" />
         <SupraFlyer onDish={openDish} />
-        <SectionBridge creature="cupcake" side="right" fact="ბებიასთან „უკვე ვჭამე“ არ მუშაობს. აქაც ვერ გაგვექცევი." />
       </div>
       <div className="chapter chapter--mustard">
         <WaveBand tone="brand" text="სუფრასთან ყველა ვიღაცაა" />
         <PersonaSection persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />
       {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} onDish={(slug) => { setGalleryOpen(false); openDish(slug); }} />}
-        <SectionBridge creature="chili" fact="„ცოტა ცხარეა“ — თქვა მან და ცრემლები მოიწმინდა." />
       </div>
       <div className="chapter chapter--blush">
         <WaveBand tone="wine" curve="b" text="გემოზე არ დავობთ — ვაფასებთ" />
         <JoinCritics />
-        <TrustCard />
       </div>
     </>
   );

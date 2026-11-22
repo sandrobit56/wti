@@ -4,7 +4,7 @@
  * Author:      Sandro Germanishvili
  * Date:        2026-11-22
  * Version:     v1.0
- * Description: "გახდი ჩანგლის კრიტიკოსი" sign-up: one validator shared by the form (instant hints)
+ * Description: "გახდი კრიტიკოსი" sign-up: one validator shared by the form (instant hints)
  *              and the API route (the real gate). Minimal data on purpose: name, email, district,
  *              one line about what they love, and the time they consented. No phone, no address.
  */
