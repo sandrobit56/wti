@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-18
- * Version:     v1.3 — header tone follows the section under it (data-on), "join" in scroll-spy;
+ * Version:     v1.4 — polished logo (bolder arc lettering, brand colours);
+ *              v1.3 — header tone follows the section under it (data-on), "join" in scroll-spy;
  *              v1.2 — "თამაში" link; scroll-spy sections in page order (fixes "ადგილები"
  *              staying lit further down the page)
  *              v1.1 — one consistent link style (was: measured sliding pill)
@@ -83,7 +84,7 @@ export function SiteHeader() {
         ))}
       </nav>
       <a href="#wheel" className="header__logo" aria-label="რა ვჭამოთ? — მთავარი">
-        <Image src="/logo.svg" alt="რა ვჭამოთ?" width={61} height={57} priority />
+        <Image src="/logo.svg" alt="რა ვჭამოთ?" width={66} height={60} priority />
       </a>
       <nav className="header__nav header__nav--right nav-live" aria-label="დამატებითი">
         <a className={`only-desktop${active === "join" ? " on" : ""}`} href="#join">გახდი კრიტიკოსი</a>

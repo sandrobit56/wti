@@ -1970,3 +1970,12 @@ main, .page { overflow-x: clip; }
 @media (max-width: 1023px) { .hero__stage { margin-top: 30px; width: min(76vw, 36svh); } }
 @media (max-width: 640px) and (max-height: 720px) { .hero__stage { width: min(64vw, 29svh); } }
 @media (max-width: 640px) { .hero__stage { margin-top: 52px; } }
+
+/* ── Logo v2 + the arc motif (2026-11-22) ── */
+.header__logo img { width: 76px; height: auto; }
+.header--scrolled .header__logo img { width: 60px; }
+.arc-text { display: block; overflow: visible; pointer-events: none; }
+.arc-text text { font: 900 26px/1 var(--display); font-stretch: 62.5%; letter-spacing: .04em; fill: var(--brand); }
+.paths2__plate { position: relative; }
+.paths2__arc { position: absolute; inset: -16%; width: 132%; height: 132%; }
+@media (max-width: 1023px) { .header__logo img { width: 58px; } }

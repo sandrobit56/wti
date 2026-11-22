@@ -15,6 +15,7 @@
  */
 "use client";
 
+import { ArcText } from "./ArcText";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { priceBand, type Dish } from "@/lib/catalog.ts";
@@ -82,6 +83,7 @@ export function Paths({ dish, place, radius, group, onPickPlace, onSpin, onAgain
         </h2>
 
         <div className="paths2__plate" aria-hidden={!dish}>
+          <ArcText className="paths2__arc" text={dish ? "დღეს შენი სუფრაა" : "ჯერ არაფერია"} />
           {dish
             ? <Image key={dish.slug} className="paths2__dish" src={stickerSrc(dish.slug)} alt="" width={256} height={256} />
             : <button className="paths2__empty" onClick={onSpin}>{toMtavruli("ჯერ დაატრიალე")} ↑</button>}
