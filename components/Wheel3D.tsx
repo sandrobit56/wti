@@ -114,7 +114,7 @@ function Bulbs({ count = 28 }: { count?: number }) {
   );
 }
 
-function Plate({ dishes, onLanded }: { dishes: WheelDish[]; onLanded: (d: WheelDish) => void }) {
+function Plate({ dishes, onLanded, elev }: { dishes: WheelDish[]; onLanded: (d: WheelDish) => void; elev: number }) {
   const n = dishes.length;
   if (n < 2) throw new Error(`Wheel3D needs at least 2 dishes, got ${n}`);
   const geo = useMemo(() => wedge(n, 0.012), [n]);
@@ -187,14 +187,17 @@ function Plate({ dishes, onLanded }: { dishes: WheelDish[]; onLanded: (d: WheelD
         onPointerOver={(e) => { e.stopPropagation(); setHover(true); document.body.style.cursor = "pointer"; }}
         onPointerOut={() => { setHover(false); document.body.style.cursor = ""; }}>
         <mesh castShadow>
-          <cylinderGeometry args={[0.27, 0.29, 0.14, 64]} />
+          <cylinderGeometry args={[0.3, 0.32, 0.14, 64]} />
           <meshStandardMaterial color={C.coral} roughness={0.35} />
         </mesh>
         <mesh position={[0, 0.072, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[0.25, 64]} />
+          <circleGeometry args={[0.28, 64]} />
           <meshStandardMaterial color={C.ink} roughness={0.4} />
         </mesh>
-        <Text font={FONT} position={[0, 0.076, 0.01]} rotation={[-Math.PI / 2, 0, 0]} fontSize={0.062} color={C.cream} anchorX="center" anchorY="middle">
+        {/* the label faces the camera (tilted by the view's elevation) instead of lying flat,
+            so perspective doesn't squash it; it sits on the button like a little plaque */}
+        <Text font={FONT} position={[0, 0.12, 0.06]} rotation={[-elev, 0, 0]} fontSize={0.088} color={C.cream} anchorX="center" anchorY="middle"
+          outlineWidth={0.012} outlineColor={C.teal} letterSpacing={0.02}>
           {toMtavruli("დაატრიალე")}
         </Text>
       </group>
@@ -202,17 +205,26 @@ function Plate({ dishes, onLanded }: { dishes: WheelDish[]; onLanded: (d: WheelD
   );
 }
 
-export function Wheel3D({ dishes, onLanded }: { dishes: WheelDish[]; onLanded: (d: WheelDish) => void }) {
+/** Camera: a long lens from far away (like a product shot of a miniature) keeps the near edge
+ *  from ballooning and the far edge from squashing. `elev` = degrees above the table. */
+export type View = { elev: number; fov: number };
+export const DEFAULT_VIEW: View = { elev: 38, fov: 15 };
+const FIT = 1.22;  // world radius kept in frame (rim + drum); the canvas is wider than tall, so width fits
+
+export function Wheel3D({ dishes, onLanded, view = DEFAULT_VIEW }: { dishes: WheelDish[]; onLanded: (d: WheelDish) => void; view?: View }) {
+  if (view.fov <= 0 || view.fov >= 90) throw new Error(`Wheel3D: fov must be 0–90, got ${view.fov}`);
+  const d = FIT / Math.tan(((view.fov / 2) * Math.PI) / 180);
+  const e = (view.elev * Math.PI) / 180;
   return (
-    <Canvas className="wheel3d" flat shadows dpr={[1, 2]} camera={{ position: [0, 2.55, 3.05], fov: 32 }} gl={{ antialias: true }}
-      onCreated={({ camera }) => camera.lookAt(0, -0.05, 0)}>
+    <Canvas className="wheel3d" flat shadows dpr={[1, 2]} camera={{ position: [0, d * Math.sin(e), d * Math.cos(e)], fov: view.fov, near: 0.1, far: 100 }} gl={{ antialias: true }}
+      onCreated={({ camera }) => camera.lookAt(0, -0.02, 0)}>
       <hemisphereLight args={["#FFFFFF", "#F8B4C0", 1.5]} />
       <ambientLight intensity={0.35} />
       <directionalLight position={[2.5, 5, 3]} intensity={1.9} castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004}>
         <orthographicCamera attach="shadow-camera" args={[-2, 2, 2, -2, 0.1, 12]} />
       </directionalLight>
       <directionalLight position={[-3, 2, -2]} intensity={0.35} color="#F8B4C0" />
-      <Plate dishes={dishes} onLanded={onLanded} />
+      <Plate dishes={dishes} onLanded={onLanded} elev={e} />
       <ContactShadows position={[0, -0.28, 0]} opacity={0.35} scale={4} blur={2.6} far={1} color={C.teal} />
     </Canvas>
   );
