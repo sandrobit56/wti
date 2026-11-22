@@ -1529,3 +1529,40 @@ main, .page { overflow-x: clip; }
 .hero__stage { width: min(80vw, 40svh); }
 @media (min-width: 1024px) { .hero__stage { width: min(44vw, calc((100svh - 72px - 96px) / 1.1), 580px); } }
 @media (max-width: 640px) and (max-height: 720px) { .hero__stage { width: min(70vw, 34svh); } }
+
+/* ── Sign v5 (2026-11-22): embroidered chenille patch (Welly-style) instead of the painted
+   board. The patch art has a dark felt centre; text sits in it (measured: x 11–88 %, y 27–82 %). */
+.sign {
+  container-type: inline-size;
+  width: min(560px, 42vw); aspect-ratio: 1000 / 776; justify-self: start;
+  border: 0 !important; border-image: none !important; padding: 0 !important;
+  background: url("/illustrations/hero/patch.webp") center / 100% 100% no-repeat;
+  rotate: -2.5deg; filter: drop-shadow(0 16px 18px rgba(59, 13, 24, .28));
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 27cqw 12cqw 18cqw 11cqw !important; box-sizing: border-box;
+}
+.sign .hero__title { font-size: 11cqw; color: var(--cream); line-height: .9; white-space: nowrap; margin: 0; }
+.sign .hero__title .w:not(.accent) {
+  text-shadow: .02em .02em 0 var(--brand), .04em .04em 0 var(--brand), .06em .06em 0 var(--brand-ink);
+}
+.sign .accent, .sign .sign__line--won { color: var(--mustard); font-size: 10.5cqw; line-height: 1; margin-top: 1cqw; }
+.sign__go { font-size: max(12px, 3.2cqw); padding: 1.4cqw 3cqw; margin-top: 1.4cqw; background: var(--mustard); color: var(--wine); }
+.sign__go:hover { background: var(--cream); }
+@media (max-width: 1023px) { .sign { width: min(92vw, 460px); justify-self: center; } }
+@media (max-width: 640px) and (max-height: 720px) { .sign { width: min(78vw, 360px); } }
+/* padding in % (of the sign's width): cq units on the container itself resolve against
+   the next container up, which blew the padding up. Children's cqw = the felt width. */
+.sign { padding: 21% 12% 14% 11% !important; align-self: center; height: auto; }
+.sign .hero__title { font-size: 15cqw; }
+.sign .accent, .sign .sign__line--won { font-size: 14cqw; }
+.sign__go { font-size: max(12px, 4.2cqw); padding: 1.8cqw 4cqw; margin-top: 2cqw; }
+.sign { padding-top: 23% !important; }
+@media (max-width: 640px) {
+  .sign { width: min(76vw, 340px); }
+  .hero__stage { width: min(74vw, 36svh); }
+  .hero__inner { gap: var(--s1); }
+}
+@media (max-width: 640px) and (max-height: 720px) {
+  .sign { width: min(58vw, 260px); }
+  .hero__stage { width: min(60vw, 30svh); }
+}
