@@ -1851,3 +1851,31 @@ main, .page { overflow-x: clip; }
 .game2__toast small { color: var(--wine); font-weight: 700; }
 .game2__toast::before { width: min(680px, 92%); }
 .game2__toast p { font-size: clamp(22px, 3vw, 38px); max-width: min(620px, 84vw); padding: 0 var(--s2); }
+
+/* ── Closing chapter v2 (2026-11-22): warm blush, one invitation, one button ── */
+.chapter--blush { background: var(--blush); color: var(--wine); --accent: var(--brand-ink); }
+.chapter--blush .wave__fill { fill: var(--blush); }
+.join__inner { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--s2); max-width: 640px; }
+.join__jury { display: flex; justify-content: center; margin-bottom: calc(-1 * var(--s2)); }
+.join__jury img { width: clamp(64px, 9vw, 104px); height: auto; margin: 0 -10px; filter: drop-shadow(0 8px 8px rgba(59, 13, 24, .2));
+  rotate: calc((var(--i) - 3) * 4deg); translate: 0 calc(abs(var(--i) - 3) * 6px); }
+.join__title { margin: 0; font-size: clamp(40px, 5.5vw, 76px); white-space: nowrap; }
+.join__title .accent { display: inline; }
+.join__lead { margin: 0; font-size: 17px; line-height: 1.55; }
+.join__cta { font-size: 19px; padding: 18px 34px; }
+.join__form { width: 100%; max-width: 480px; display: grid; gap: var(--s2); text-align: left; background: var(--surface); padding: var(--s3); border-radius: 24px;
+  box-shadow: 0 8px 0 rgba(59, 13, 24, .12); animation: sign-flip .5s var(--spring) both; }
+.join__form label { display: grid; gap: 6px; font: 700 14px/1.2 var(--font); }
+.join__form small { font-weight: 500; color: var(--muted); }
+.join__form input:not([type=checkbox]), .join__form select { font: 500 16px/1.2 var(--font); padding: 12px 14px; border-radius: 14px; border: 2px solid var(--line); background: #fff; color: var(--wine); }
+.join__form input:focus-visible, .join__form select:focus-visible { outline: none; border-color: var(--brand); }
+.join__form [aria-invalid="true"] { border-color: var(--brand) !important; }
+.join__consent { grid-template-columns: auto 1fr; align-items: start; font-weight: 500 !important; }
+.join__consent input { width: 20px; height: 20px; accent-color: var(--brand); margin-top: 1px; }
+.join__consent a { color: var(--brand-ink); }
+.join__hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.join__error { margin: 0; color: var(--brand-ink); font-weight: 700; }
+.join__form .paths2__main { justify-self: center; border: 0; cursor: pointer; }
+.join__done { font: 700 18px/1.4 var(--font); background: var(--surface); padding: var(--s2) var(--s3); border-radius: 20px; }
+.chapter--blush .trust2 { margin-top: var(--s6); }
+@media (max-width: 640px) { .join__title { white-space: normal; font-size: 40px; } }

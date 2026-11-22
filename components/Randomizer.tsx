@@ -31,6 +31,7 @@ import { Sheet } from "./Sheet";
 import { HeroTitle } from "./HeroTitle";
 import { SectionBridge } from "./SectionBridge";
 import { WaveBand } from "./WaveBand";
+import { JoinCritics } from "./JoinCritics";
 import { mapsSearchUrl } from "@/lib/places.ts";
 import { MAX_DINERS, fillSeats, seatAngles, seatsFor, sharedVenue, sliceAt, venueLabel } from "@/lib/seats.ts";
 import { ResultModal } from "./ResultModal";
@@ -426,8 +427,9 @@ export function Randomizer() {
       {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} onDish={(slug) => { setGalleryOpen(false); openDish(slug); }} />}
         <SectionBridge creature="chili" fact="„ცოტა ცხარეა“ — თქვა მან და ცრემლები მოიწმინდა." />
       </div>
-      <div className="chapter chapter--cream">
+      <div className="chapter chapter--blush">
         <WaveBand tone="wine" curve="b" text="გემოზე არ დავობთ — ვაფასებთ" />
+        <JoinCritics />
         <TrustCard />
       </div>
     </>
