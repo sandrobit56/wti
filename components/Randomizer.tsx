@@ -32,6 +32,7 @@ import { Trail } from "./Trail";
 import { HeroTitle } from "./HeroTitle";
 import { SectionBridge } from "./SectionBridge";
 import { WaveBand } from "./WaveBand";
+import { MAX_DINERS, seatAngles, sliceAt } from "@/lib/seats.ts";
 import { ResultModal } from "./ResultModal";
 import { Wheel } from "./Wheel";
 
@@ -102,6 +103,7 @@ export function Randomizer() {
   const [never, setNever] = useState<string[]>(init.never ?? []);
   const [history, setHistory] = useState<Win[]>(init.history ?? []);
   const [mood, setMood] = useState<Mood | null>(null);
+  const [diners, setDiners] = useState(1); // group mode: people around the table (1 = just you)
   const excluded = useMemo(() => [...Object.keys(notToday), ...never], [notToday, never]);
   const doSpinRef = useRef<(random: boolean) => void>(() => {});
   const [locating, setLocating] = useState(false);
@@ -187,7 +189,8 @@ export function Randomizer() {
   function onLanded() {
     setSpun((s) => (s ? { ...s, landed: true } : s));
     if (spun) setHistory((h) => [...h, { slug: spun.wheel[spun.winner].slug, at: Date.now() }].slice(-HISTORY_MAX));
-    window.setTimeout(() => setModalOpen(true), 350); // let the eye see the pointer settle first
+    if (diners === 1) window.setTimeout(() => setModalOpen(true), 350); // let the eye see the pointer settle first
+    // group mode: no popup — each diner's dish appears at their seat; tap a seat to open it
   }
 
   function pickPlace() {
@@ -266,6 +269,9 @@ export function Randomizer() {
     return name === d.name ? d : { ...d, name, search: name }; // search Google/Maps/Wolt for the version, too
   });
   const winner = spun?.landed ? spun.winner : null;
+  // Group mode: never more seats than slices, so nobody shares a slice by accident.
+  const seated = Math.min(diners, Math.max(1, wheel.length));
+  const seatSlices = spun?.landed && seated > 1 ? seatAngles(seated).map((deg) => sliceAt(rotation, deg, wheel.length)) : null;
   const dish = spun?.landed ? wheel[spun.winner] : null;
   const spinning = Boolean(spun && !spun.landed);
   const matching = preview.result?.matching ?? preview.error ?? 0;
@@ -293,7 +299,14 @@ export function Randomizer() {
           <HeroTitle winner={spun?.landed ? dish?.name ?? null : null} onOpen={() => setModalOpen(true)} />
           <div className="hero__stage">
             {wheel.length > 0
-              ? <Wheel dishes={wheel} rotation={rotation} spinning={spinning} spinMs={spinMs} winnerIndex={winner} landedOnce={Boolean(spun?.landed)} onSpin={() => doSpin(false)} onFling={onFling} onLanded={onLanded} />
+              ? <Wheel
+                  dishes={wheel} rotation={rotation} spinning={spinning} spinMs={spinMs} winnerIndex={winner} landedOnce={Boolean(spun?.landed)}
+                  onSpin={() => doSpin(false)} onFling={onFling} onLanded={onLanded}
+                  diners={seated} seatDishes={seatSlices ? seatSlices.map((i) => wheel[i].name) : null}
+                  onSeat={(d) => { if (!seatSlices) return; const i = seatSlices[d]; setSpun((s) => (s ? { ...s, winner: i, why: d === 0 ? s.why : [] } : s)); setModalOpen(true); }}
+                  onAddDiner={() => { setDiners((n) => Math.min(MAX_DINERS, n + 1)); setSpun((s) => (s?.landed ? null : s)); }}
+                  onRemoveDiner={(d) => { void d; setDiners((n) => Math.max(1, n - 1)); setSpun((s) => (s?.landed ? null : s)); }}
+                />
               : <div className="wheel wheel--empty"><p>ფილტრებს მხოლოდ {matching} კერძი ერგება.<br />შეარბილე ბიუჯეტი, დიეტა ან გაზარდე რადიუსი.</p></div>}
           </div>
           <div className="hero__controls">

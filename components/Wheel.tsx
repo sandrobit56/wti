@@ -3,7 +3,9 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-22
- * Version:     v6.4 — 3D miniature turntable (toy diorama style) as the plate;
+ * Version:     v7.0 — 3/4 perspective (the table is tilted back in CSS 3D, diners stand upright),
+ *              group mode: up to 5 diners around the table, each gets the slice in front of them;
+ *              v6.4 — 3D miniature turntable (toy diorama style) as the plate;
  *              v6.3 — stickers sit ABOVE the glaze/grain (no blur), modern plump pointer
  *              instead of the antique fork; v6.2 — narrow rim, a sticker on every slice;
  *              v6.1 — stickers pilot, hub position/aspect computed here; v6.0 — painted plate + silver fork (raster art), glazed/painterly slices,
@@ -25,10 +27,12 @@
  */
 "use client";
 
+import Image from "next/image";
 import { useId, useRef, useState, type PointerEvent } from "react";
 import type { Dish } from "@/lib/catalog.ts";
 import { toMtavruli } from "@/lib/mtavruli.ts";
 import { stickerSrc } from "@/lib/stickers.ts";
+import { MAX_DINERS, seatAngles } from "@/lib/seats.ts";
 
 const SLICE_COLORS = ["#3B0D18", "#FFC93C", "#F8B4C0", "#FFF8EC"];
 const INK = ["#FFF1DC", "#3B0D18", "#3B0D18", "#3B0D18"];
@@ -83,9 +87,20 @@ type Props = {
   /** velocity: deg/ms, signed (clockwise > 0). offset: how far the plate was dragged, in degrees. */
   onFling: (velocity: number, offset: number) => void;
   onLanded: () => void;
+  /** Group mode: how many diners sit at the table (1 = just you, the fork). */
+  diners: number;
+  /** After landing: the dish name in front of each diner (index = diner). */
+  seatDishes: string[] | null;
+  onSeat: (diner: number) => void;
+  onAddDiner: () => void;
+  onRemoveDiner: (diner: number) => void;
 };
 
-export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedOnce, onSpin, onFling, onLanded }: Props) {
+/** Table tilt (degrees). Keep in sync with --tilt in globals.css. */
+const TILT = 26;
+const SEAT_R = 52;   // diner distance from the centre, in cqw of the wheel box (rim ≈ 49)
+
+export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedOnce, onSpin, onFling, onLanded, diners, seatDishes, onSeat, onAddDiner, onRemoveDiner }: Props) {
   const n = dishes.length;
   const a = 360 / n;
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
@@ -98,7 +113,8 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
   function angleOf(e: PointerEvent): number {
     const r = svgRef.current!.getBoundingClientRect();
     const cx = r.left + r.width / 2, cy = r.top + r.height * CENTER_Y;
-    return (Math.atan2(e.clientY - cy, e.clientX - cx) * 180) / Math.PI;
+    // the table is tilted back, so vertical distances look shorter by cos(tilt)
+    return (Math.atan2((e.clientY - cy) / Math.cos((TILT * Math.PI) / 180), e.clientX - cx) * 180) / Math.PI;
   }
   function down(e: PointerEvent<SVGSVGElement>) {
     if (spinning || e.button !== 0) return;
@@ -132,6 +148,7 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
 
   return (
     <div className={dragging ? "wheel wheel--dragging" : "wheel"} style={BOX}>
+      <div className="wheel__table">
       <svg
         ref={svgRef}
         viewBox={VIEWBOX}
@@ -182,11 +199,28 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
             );
           })}
         </g>
-        <Fork />
+        {diners === 1 && <Fork />}
       </svg>
       <button className="wheel__hub" style={{ top: `${CENTER_Y * 100}%` }} onClick={onSpin} disabled={spinning} aria-label="დაატრიალე ბორბალი">
         <span aria-hidden="true">{toMtavruli(hubLabel)}</span>
       </button>
+      {diners > 1 && seatAngles(diners).map((deg, i) => {
+        const rad = (deg * Math.PI) / 180;
+        const dish = seatDishes?.[i];
+        return (
+          <div key={i} className="seat" style={{ left: `calc(50% + ${Math.sin(rad) * SEAT_R}cqw)`, top: `calc(${CENTER_Y * 100}% - ${Math.cos(rad) * SEAT_R}cqw)` }}>
+            <button className="seat__who" onClick={() => dish && onSeat(i)} disabled={!dish} aria-label={dish ? `${i === 0 ? "შენ" : `სტუმარი ${i + 1}`}: ${dish}` : `სტუმარი ${i + 1}`}>
+              <Image src={`/illustrations/people/p${i + 1}.webp`} alt="" width={64} height={64} />
+              {dish && <span className="seat__dish">{dish}</span>}
+            </button>
+            {i > 0 && !spinning && <button className="seat__x" onClick={() => onRemoveDiner(i)} aria-label={`მოაშორე სტუმარი ${i + 1}`}>×</button>}
+          </div>
+        );
+      })}
+      </div>
+      {diners < MAX_DINERS && !spinning && (
+        <button className="wheel__add" onClick={onAddDiner} aria-label="დაამატე ადამიანი">+ <span>{diners}/{MAX_DINERS}</span></button>
+      )}
     </div>
   );
 }

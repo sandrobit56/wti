@@ -1656,3 +1656,61 @@ main, .page { overflow-x: clip; }
 @media (max-width: 1023px) { .sign { width: min(80vw, 400px); } }
 @media (max-width: 640px) { .hero__stage { width: min(70vw, 34svh); } }
 @media (max-width: 640px) and (max-height: 720px) { .sign { width: min(56vw, 250px); } .hero__stage { width: min(58vw, 29svh); } }
+
+/* ── Hero v9 (2026-11-22): one 3/4 scene. The sign hangs ABOVE the table; the table is tilted
+   back in 3D (perspective matches the sign); diners stand upright around it (billboards). ── */
+.hero__inner {
+  grid-template-columns: 1fr auto 1fr; grid-template-areas: "left title right" "left wheel right";
+  justify-items: center; align-items: center; column-gap: var(--s6); row-gap: 0;
+}
+.hero__inner > .sign { grid-area: title; z-index: 2; margin-bottom: -6%; }
+.hero__stage { grid-area: wheel; }
+.hero__controls { grid-area: left; align-self: center; justify-self: end; align-items: flex-end; max-width: 300px; }
+.hero__controls .tokens { flex-direction: column; align-items: flex-end; flex-wrap: nowrap; }
+.sign { width: min(400px, 30vw); justify-self: center; }
+.hero__stage { width: min(38vw, calc((100svh - 72px - 64px - min(400px, 30vw) * .7) / 1.12), 520px); }
+
+.wheel { perspective: 1400px; }
+.wheel__table { position: relative; width: 100%; height: 100%; transform-style: preserve-3d;
+  transform: rotateX(26deg); transform-origin: 50% 58%; }
+.wheel__table > svg { display: block; width: 100%; height: 100%; }
+.wheel__hub { position: absolute; }
+
+.seat { position: absolute; width: 17cqw; translate: -50% -70%; transform: rotateX(-26deg); transform-origin: 50% 100%; z-index: 4; }
+.seat__who { all: unset; display: block; width: 100%; cursor: pointer; position: relative; }
+.seat__who:disabled { cursor: default; }
+.seat__who img { width: 100%; height: auto; display: block; filter: drop-shadow(0 6px 6px rgba(59, 13, 24, .3)); }
+.seat__who:not(:disabled):hover img { translate: 0 -4px; transition: translate .2s var(--spring); }
+.seat__dish { position: absolute; left: 50%; bottom: -6px; translate: -50% 100%; white-space: nowrap;
+  background: var(--cream); color: var(--wine); font: 800 13px/1 var(--font); padding: 6px 10px; border-radius: 999px;
+  box-shadow: 0 2px 0 rgba(59, 13, 24, .25); animation: sign-flip .5s var(--spring) both; }
+.seat__x { position: absolute; top: 4%; right: 4%; width: 22px; height: 22px; border-radius: 50%; border: 0;
+  background: var(--wine); color: var(--cream); font: 700 14px/1 var(--font); cursor: pointer; }
+.wheel__add { position: absolute; right: 2%; bottom: 4%; z-index: 5; border: 0; cursor: pointer;
+  background: var(--cream); color: var(--wine); font: 900 22px/1 var(--font); padding: 10px 14px; border-radius: 999px;
+  box-shadow: 0 3px 0 rgba(59, 13, 24, .3); }
+.wheel__add span { font-size: 12px; font-weight: 700; opacity: .7; margin-left: 2px; }
+.wheel__add:hover { background: var(--mustard); }
+
+@media (max-width: 1023px) {
+  .hero__inner { grid-template-columns: 1fr; grid-template-areas: "title" "wheel" "left"; }
+  .hero__controls { justify-self: center; align-items: center; max-width: none; }
+  .hero__controls .tokens { flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; }
+  .sign { width: min(64vw, 320px); }
+  .hero__stage { width: min(78vw, 38svh); }
+}
+@media (max-width: 640px) and (max-height: 720px) { .sign { width: min(50vw, 220px); } .hero__stage { width: min(62vw, 30svh); } }
+@media (prefers-reduced-motion: reduce) { .seat__dish { animation: none; } }
+.wheel__table > svg { transform: translateZ(-2px); } /* keep hub + diners clickable above the plate in 3D */
+.sign { width: min(330px, 24vw); }
+.hero__inner > .sign { margin-bottom: -9%; }
+.hero__stage { width: min(36vw, calc((100svh - 72px - 96px - min(330px, 24vw) * .6) / 1.2), 500px); margin-bottom: var(--s4); }
+@media (max-width: 1023px) { .sign { width: min(58vw, 290px); } .hero__stage { width: min(74vw, 36svh); } }
+@media (max-width: 640px) and (max-height: 720px) { .sign { width: min(46vw, 200px); } .hero__stage { width: min(60vw, 29svh); } }
+.hero__stage { width: min(34vw, calc((100svh - 72px - 170px - min(330px, 24vw) * .6) / 1.2), 480px); margin-bottom: var(--s8); }
+.seat { width: 15cqw; }
+@media (max-width: 1023px) { .hero__stage { width: min(68vw, 33svh); margin-bottom: var(--s6); } }
+@media (max-width: 640px) and (max-height: 720px) { .hero__stage { width: min(56vw, 27svh); } }
+.seat { transform: translateZ(40px) rotateX(-26deg); }   /* stand in front of the table plane, not through it */
+.seat__dish { font-size: 12px; }
+@media (max-width: 1023px) { .hero__stage { margin-top: var(--s4); } .seat__dish { font-size: 11px; padding: 4px 8px; } .seat { width: 18cqw; } }
