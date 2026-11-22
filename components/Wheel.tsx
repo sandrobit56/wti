@@ -35,7 +35,7 @@ const INK = ["#FFF1DC", "#3B0D18", "#3B0D18", "#3B0D18"];
 const colorOf = (i: number, n: number) => (i === n - 1 && n % SLICE_COLORS.length === 1 ? 2 : i % SLICE_COLORS.length);
 
 const PLATE = 200;     // painted plate radius (the image is cropped to the plate's circle)
-const R = 156;         // slice radius = the plate's inner well (narrow embroidered rim stays visible)
+const R = 160;         // slice radius = the plate's inner well (thin rim, small ornament)
 const FORK_TIP = -R - 10;                // pointer tip touches the slices' outer edge (labels stay readable)
 const FORK_H = 66;                       // pointer length (see Fork)
 const TOP = Math.floor(FORK_TIP - FORK_H) - 6;
