@@ -28,7 +28,6 @@ import { PersonaGallery } from "./PersonaGallery";
 import { StomachChallenge } from "./StomachChallenge";
 import { FilterTokens } from "./FilterTokens";
 import { Sheet } from "./Sheet";
-import { Trail } from "./Trail";
 import { HeroTitle } from "./HeroTitle";
 import { SectionBridge } from "./SectionBridge";
 import { WaveBand } from "./WaveBand";
@@ -320,7 +319,7 @@ export function Randomizer() {
     <>
       <section className="hero" id="wheel" ref={heroRef}>
         <div className="hero__inner container">
-          <HeroTitle winner={spun?.landed ? dish?.name ?? null : null} onOpen={() => setModalOpen(true)} />
+          <HeroTitle winner={spun?.landed ? dish?.name ?? null : null} onOpen={() => pathsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })} />
           <div className="hero__stage">
             {wheel.length > 0
               ? <Wheel
@@ -402,17 +401,16 @@ export function Randomizer() {
       <div className="chapter chapter--cream">
       <WaveBand tone="wine" text="ბედმა აირჩია — ახლა შენი ჯერია" />
       <div ref={pathsRef} className="paths-anchor">
-        <Trail icon={dish?.icon ?? null} label={dish ? dish.name : null} />
         <Paths
-          dish={dish} place={place} radius={radius}
-          onPickPlace={pickPlace}
+          dish={dish} place={place} radius={radius} onPickPlace={pickPlace}
+          group={together && seatSlices ? {
+            dishes: seatSlices.map((i) => wheel[i].name),
+            summary: `${together.covered === seatSlices.length ? "ყველა ერთად" : `${together.covered} / ${seatSlices.length} ერთად`} — ${venueLabel(together.cat)}`,
+            searchTerm: together.cat ? `${together.cat.replace(/_/g, " ")} restaurant` : null,
+          } : null}
+          onSpin={() => heroRef.current?.scrollIntoView({ behavior: "smooth" })}
+          onAgain={spinAgain}
         />
-        {dish && (
-          <div className="container again">
-            <button className="pill pill--dark" onClick={spinAgain}>კიდევ დაატრიალე</button>
-            <button className="pill pill--outline" onClick={notTodayWinner}>„{dish.name}“ დღეს არა</button>
-          </div>
-        )}
       </div>
 
       <SectionBridge creature="khinkali" fact="„მხოლოდ ხუთს შევჭამ“ — ყველაზე ხშირი ტყუილი თბილისში." />
