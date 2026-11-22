@@ -290,7 +290,7 @@ export function Randomizer() {
     <>
       <section className="hero" id="wheel" ref={heroRef}>
         <div className="hero__inner container">
-          <HeroTitle />
+          <HeroTitle winner={spun?.landed ? dish?.name ?? null : null} onOpen={() => setModalOpen(true)} />
           <div className="hero__stage">
             {wheel.length > 0
               ? <Wheel dishes={wheel} rotation={rotation} spinning={spinning} spinMs={spinMs} winnerIndex={winner} landedOnce={Boolean(spun?.landed)} onSpin={() => doSpin(false)} onFling={onFling} onLanded={onLanded} />
@@ -299,28 +299,7 @@ export function Randomizer() {
           <div className="hero__controls">
             <FilterTokens filters={filters} place={place?.label ?? null} radius={radius} onOpen={() => setSheetOpen(true)} />
             <p className="hero__status" aria-live="polite">{status}</p>
-            {(Object.keys(notToday).length > 0 || never.length > 0) && (
-              <div className="hidden-today">
-                {Object.keys(notToday).length > 0 && <span>დღეს დამალული:</span>}
-                {Object.keys(notToday).map((slug) => (
-                  <button key={slug} className="chip chip--sm" onClick={() => { const { [slug]: _gone, ...rest } = notToday; void _gone; setNotToday(rest); changed(); }} aria-label={`დააბრუნე ${nameOf(slug)}`}>
-                    {nameOf(slug)} ×
-                  </button>
-                ))}
-                {never.length > 0 && <span>არ მიყვარს:</span>}
-                {never.map((slug) => (
-                  <button key={slug} className="chip chip--sm chip--never" onClick={() => { setNever((n) => n.filter((x) => x !== slug)); changed(); }} aria-label={`დააბრუნე ${nameOf(slug)}`}>
-                    {nameOf(slug)} ×
-                  </button>
-                ))}
-              </div>
-            )}
             {spinError && <p className="hero__error" role="alert">{spinError}</p>}
-            {dish && (
-              <button className="hero__winner" onClick={() => setModalOpen(true)}>
-                ბორბალმა აირჩია: <strong>{dish.name}</strong> <span className="hero__winner-go">ნახე →</span>
-              </button>
-            )}
           </div>
         </div>
       </section>
@@ -346,6 +325,23 @@ export function Randomizer() {
               ))}
             </div>
           </div>
+          {/* "not today" / "never" lists live here now — the hero stays: title, wheel, filters */}
+          {(Object.keys(notToday).length > 0 || never.length > 0) && (
+              <div className="hidden-today">
+                {Object.keys(notToday).length > 0 && <span>დღეს დამალული:</span>}
+                {Object.keys(notToday).map((slug) => (
+                  <button key={slug} className="chip chip--sm" onClick={() => { const { [slug]: _gone, ...rest } = notToday; void _gone; setNotToday(rest); changed(); }} aria-label={`დააბრუნე ${nameOf(slug)}`}>
+                    {nameOf(slug)} ×
+                  </button>
+                ))}
+                {never.length > 0 && <span>არ მიყვარს:</span>}
+                {never.map((slug) => (
+                  <button key={slug} className="chip chip--sm chip--never" onClick={() => { setNever((n) => n.filter((x) => x !== slug)); changed(); }} aria-label={`დააბრუნე ${nameOf(slug)}`}>
+                    {nameOf(slug)} ×
+                  </button>
+                ))}
+              </div>
+            )}
         </Sheet>
       )}
 
@@ -379,7 +375,7 @@ export function Randomizer() {
       <SectionBridge creature="khinkali" fact="„მხოლოდ ხუთს შევჭამ“ — ყველაზე ხშირი ტყუილი თბილისში." />
       </div>
       <div className="chapter chapter--wine">
-        <WaveBand tone="mustard" tilt={2.5} text="მშიერი კაცი ბორბალს არ ეკამათება" />
+        <WaveBand tone="mustard" curve="b" text="მშიერი კაცი ბორბალს არ ეკამათება" />
         <StomachChallenge wheelSlugs={(spun?.wheel ?? preview.result?.wheel ?? []).map((d) => d.slug)} personaId={prefs.persona} onDish={openDish} />
         <SectionBridge creature="cupcake" side="right" fact="ბებიასთან „უკვე ვჭამე“ არ მუშაობს. აქაც ვერ გაგვექცევი." />
       </div>
@@ -390,7 +386,7 @@ export function Randomizer() {
         <SectionBridge creature="chili" fact="„ცოტა ცხარეა“ — თქვა მან და ცრემლები მოიწმინდა." />
       </div>
       <div className="chapter chapter--cream">
-        <WaveBand tone="wine" tilt={2} text="გემოზე არ დავობთ — ვაფასებთ" />
+        <WaveBand tone="wine" curve="b" text="გემოზე არ დავობთ — ვაფასებთ" />
         <TrustCard />
       </div>
     </>

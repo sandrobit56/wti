@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-21
- * Version:     v2.0 — the creature hops in, then "talks": typing dots, then the line
+ * Version:     v3.0 — order fixed: the creature walks in and stops FIRST, then the bubble
+ *              opens next to it and the line types (v2 typed while it was still walking).
  *              types out in its bubble (was: everything appeared at once — "rough")
  *              v1.1 — shared-experience jokes instead of food facts
  * Description: The pause between two sections. Hop-in is scroll-driven CSS
@@ -24,7 +25,8 @@ const DOTS_MS = 650, CHAR_MS = 26;
 export function SectionBridge({ creature, fact, side = "left" }: { creature: CreatureName; fact: string; side?: "left" | "right" }) {
   const ref = useRef<HTMLElement>(null);
   const total = [...fact].length;
-  const [shown, setShown] = useState(-1);   // -1 = not started, 0 = typing dots, n = chars typed
+  const [walking, setWalking] = useState(false); // creature is on its way in
+  const [shown, setShown] = useState(-1);        // -1 = not arrived, 0 = typing dots, n = chars typed
 
   useEffect(() => {
     const el = ref.current;
@@ -33,8 +35,8 @@ export function SectionBridge({ creature, fact, side = "left" }: { creature: Cre
     const io = new IntersectionObserver(([e]) => {
       if (!e.isIntersecting) return;
       io.disconnect();
-      setShown(0);
-    }, { threshold: 0.7 });
+      setWalking(true); // CSS walk-in; onAnimationEnd below starts the talking
+    }, { threshold: 0.6 });
     io.observe(el);
     return () => io.disconnect();
   }, [total]);
@@ -46,8 +48,11 @@ export function SectionBridge({ creature, fact, side = "left" }: { creature: Cre
   }, [shown, total]);
 
   return (
-    <aside ref={ref} className={`bridge bridge--${side}${shown >= 0 ? " is-on" : ""}`}>
-      <Image className="bridge__creature" src={`/illustrations/creatures/${creature}.webp`} alt="" width={96} height={96} />
+    <aside ref={ref} className={`bridge bridge--${side}${walking ? " is-walking" : ""}${shown >= 0 ? " is-on" : ""}`}>
+      <Image
+        className="bridge__creature" src={`/illustrations/creatures/${creature}.webp`} alt="" width={96} height={96}
+        onAnimationEnd={(e) => { if (e.animationName === "bridge-walk" || e.animationName === "bridge-walk-r") setShown((n) => (n < 0 ? 0 : n)); }}
+      />
       <p className="bridge__bubble">
         <span className="sr-only">{fact}</span>
         <span className="bridge__ghost" aria-hidden="true">{fact}</span>

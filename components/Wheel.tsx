@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-22
- * Version:     v6.2 — narrow embroidered rim, bigger slices, a 3D food sticker on every slice;
+ * Version:     v6.3 — stickers sit ABOVE the glaze/grain (no blur), modern plump pointer
+ *              instead of the antique fork; v6.2 — narrow rim, a sticker on every slice;
  *              v6.1 — stickers pilot, hub position/aspect computed here; v6.0 — painted plate + silver fork (raster art), glazed/painterly slices,
  *              flick-to-spin with a pointer (mouse, touch, pen); was v5.0 — vector plate
  * Description: Presentational wheel. It does NOT choose anything: it gets the dishes and a
@@ -35,10 +36,9 @@ const colorOf = (i: number, n: number) => (i === n - 1 && n % SLICE_COLORS.lengt
 
 const PLATE = 200;     // painted plate radius (the image is cropped to the plate's circle)
 const R = 156;         // slice radius = the plate's inner well (narrow embroidered rim stays visible)
-const FORK_W = 17;     // fork.webp is 190×1425 → keep that ratio
-const FORK_H = FORK_W * (1425 / 190);
-const FORK_TIP = -R + 16;                // tines end inside the top slice
-const TOP = Math.floor(FORK_TIP - FORK_H) - 2;
+const FORK_TIP = -R - 10;                // pointer tip touches the slices' outer edge (labels stay readable)
+const FORK_H = 66;                       // pointer length (see Fork)
+const TOP = Math.floor(FORK_TIP - FORK_H) - 6;
 export const VIEWBOX = `-200 ${TOP} 400 ${200 - TOP}`;
 /** Where the plate centre sits inside the box, as a fraction of its height (CSS uses it for the hub). */
 export const CENTER_Y = -TOP / (200 - TOP);
@@ -126,6 +126,8 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
     if (Math.abs(v) >= FLING_MIN) { onFling(v, offset); setOffset(0); }
   }
 
+  const spinCls = spinning ? "wheel__disc wheel__disc--spinning" : "wheel__disc";
+  const discStyle = { transform: `rotate(${rotation + offset}deg)`, ["--spin-ms" as string]: `${spinMs}ms` };
   const hubLabel = spinning ? "…" : dragging ? "გაუშვი!" : landedOnce ? "კიდევ!" : "დაატრიალე";
 
   return (
@@ -142,16 +144,21 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
       >
         <Defs />
         <Plate />
-        <g
-          className={spinning ? "wheel__disc wheel__disc--spinning" : "wheel__disc"}
-          style={{ transform: `rotate(${rotation + offset}deg)`, ["--spin-ms" as string]: `${spinMs}ms` }}
-          onTransitionEnd={(e) => { if (e.propertyName === "transform") onLanded(); }}
-        >
+        {/* 1 · slices (rotate) */}
+        <g className={spinCls} style={discStyle}>
           <g>
             {dishes.map((d, i) => (
               <path key={d.slug} d={slicePath(i, n)} fill={SLICE_COLORS[colorOf(i, n)]} stroke="#FFF1DC" strokeWidth={3} strokeLinejoin="round" />
             ))}
           </g>
+        </g>
+        {/* 2 · glaze + grain on the slices only (static light, like a real glazed plate) */}
+        
+        <circle r={R} fill="url(#wheel-glaze)" pointerEvents="none" />
+        <circle r={R} fill="url(#wheel-edge)" pointerEvents="none" />
+        <image href="/illustrations/hero/grain.webp" x={-R} y={-R} width={R * 2} height={R * 2} clipPath="url(#wheel-well)" preserveAspectRatio="none" pointerEvents="none" opacity={0.4} />
+        {/* 3 · stickers + names (rotate with the slices; above the grain so food stays crisp) */}
+        <g className={spinCls} style={discStyle} onTransitionEnd={(e) => { if (e.propertyName === "transform") onLanded(); }}>
           {dishes.map((d, i) => {
             const mid = i * a + a / 2;
             const won = !spinning && winnerIndex === i;
@@ -175,10 +182,6 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
             );
           })}
         </g>
-        {/* glaze: light from the top-left, a soft shade at the well's edge, then paper grain */}
-        <circle r={R} fill="url(#wheel-glaze)" pointerEvents="none" />
-        <circle r={R} fill="url(#wheel-edge)" pointerEvents="none" />
-        <image href="/illustrations/hero/grain.webp" x={-R} y={-R} width={R * 2} height={R * 2} clipPath="url(#wheel-well)" preserveAspectRatio="none" pointerEvents="none" opacity={0.4} />
         <Fork />
       </svg>
       <button className="wheel__hub" style={{ top: `${CENTER_Y * 100}%` }} onClick={onSpin} disabled={spinning} aria-label="დაატრიალე ბორბალი">
@@ -211,9 +214,16 @@ function Plate() {
   return <image className="wheel__plate" href="/illustrations/hero/plate.webp" x={-PLATE} y={-PLATE} width={PLATE * 2} height={PLATE * 2} />;
 }
 
-/** The pointer: an old silver fork, tines down into the winning slice. */
+/** The pointer: a plump cream-outlined fork in brand coral — toy-like, not antique. */
 function Fork() {
-  return <image className="wheel__fork" href="/illustrations/hero/fork.webp" x={-FORK_W / 2} y={FORK_TIP - FORK_H} width={FORK_W} height={FORK_H} />;
+  const y = FORK_TIP - FORK_H;
+  return (
+    <g className="wheel__fork" transform={`translate(0 ${y})`}>
+      <path d="M-6 0 h12 a3 3 0 0 1 3 3 v28 c0 4 9 3 9 10 v20 a3.5 3.5 0 0 1 -7 0 v-13 h-4 v17 a3.5 3.5 0 0 1 -7 0 v-17 h-4 v13 a3.5 3.5 0 0 1 -7 0 v-20 c0 -7 9 -6 9 -10 v-28 a3 3 0 0 1 3 -3 z"
+        fill="#F1435E" stroke="#FFF1DC" strokeWidth={3.5} strokeLinejoin="round" paintOrder="stroke" />
+      <path d="M-2.5 5 v22" stroke="#fff" strokeOpacity={0.55} strokeWidth={2.5} strokeLinecap="round" />
+    </g>
+  );
 }
 
 /** Static shell shown while the interactive wheel loads: same box, plate and fork. */
