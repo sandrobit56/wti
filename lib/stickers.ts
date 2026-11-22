@@ -3,14 +3,10 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-22
- * Version:     v1.0 — pilot set (9 Georgian dishes)
- * Description: Which dish types have an illustrated food sticker in public/stickers/<slug>.webp.
- *              The wheel shows the sticker when there is one and falls back to the flat icon
- *              otherwise. One list, so adding a sticker = drop the file + add the slug here.
+ * Version:     v2.0 — full set: every dish type has a sticker (63)
+ * Description: Illustrated 3D food stickers, public/stickers/<slug>.webp (256×256, die-cut,
+ *              transparent). The wheel shows the sticker instead of the flat icon.
+ *              One rule: a dish's sticker file is named after its slug. A missing file is a
+ *              bug, so stickers.test.ts checks the folder against the catalogue.
  */
-export const STICKERS: ReadonlySet<string> = new Set([
-  "khinkali", "khachapuri", "mtsvadi", "georgian-sweets", "badrijani",
-  "lobiani", "pkhali", "chakapuli", "shawarma",
-]);
-
-export const stickerSrc = (slug: string): string | null => (STICKERS.has(slug) ? `/stickers/${slug}.webp` : null);
+export const stickerSrc = (slug: string): string => `/stickers/${slug}.webp`;

@@ -3,8 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-22
- * Version:     v6.1 — embroidered-ornament plate, 3D food stickers on slices (lib/stickers.ts),
- *              hub position/aspect computed here; v6.0 — painted plate + silver fork (raster art), glazed/painterly slices,
+ * Version:     v6.2 — narrow embroidered rim, bigger slices, a 3D food sticker on every slice;
+ *              v6.1 — stickers pilot, hub position/aspect computed here; v6.0 — painted plate + silver fork (raster art), glazed/painterly slices,
  *              flick-to-spin with a pointer (mouse, touch, pen); was v5.0 — vector plate
  * Description: Presentational wheel. It does NOT choose anything: it gets the dishes and a
  *              target rotation and animates there with a CSS transition; onLanded fires when
@@ -34,8 +34,8 @@ const INK = ["#FFF1DC", "#3B0D18", "#3B0D18", "#3B0D18"];
 const colorOf = (i: number, n: number) => (i === n - 1 && n % SLICE_COLORS.length === 1 ? 2 : i % SLICE_COLORS.length);
 
 const PLATE = 200;     // painted plate radius (the image is cropped to the plate's circle)
-const R = 116;         // slice radius = the plate's inner well (embroidered rim stays visible)
-const FORK_W = 21;     // fork.webp is 190×1425 → keep that ratio
+const R = 156;         // slice radius = the plate's inner well (narrow embroidered rim stays visible)
+const FORK_W = 17;     // fork.webp is 190×1425 → keep that ratio
 const FORK_H = FORK_W * (1425 / 190);
 const FORK_TIP = -R + 16;                // tines end inside the top slice
 const TOP = Math.floor(FORK_TIP - FORK_H) - 2;
@@ -65,8 +65,8 @@ function labelArc(n: number, flip: boolean): string {
   const x = r * Math.sin(h), y = -r * Math.cos(h);
   return flip ? `M${x} ${y} A${r} ${r} 0 0 0 ${-x} ${y}` : `M${-x} ${y} A${r} ${r} 0 0 1 ${x} ${y}`;
 }
-const ICON_R = R - 44;   // icon/sticker centre, measured from the plate centre
-const STICKER = 52;      // sticker box (the food fills most of it)
+const ICON_R = R - 58;   // sticker centre, measured from the plate centre
+const STICKER = 66;      // sticker box (the food fills most of it)
 
 /** Names longer than this are not printed on the wheel — the icon carries the slice. */
 export const LABEL_MAX = 8;
@@ -161,12 +161,7 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
             return (
               <g key={d.slug} transform={`rotate(${mid})`}>
                 <g transform={flip ? `rotate(180 0 ${-ICON_R})` : undefined}>
-                  {stickerSrc(d.slug)
-                    ? <image className="wheel__sticker" href={stickerSrc(d.slug)!} x={-STICKER / 2} y={-ICON_R - STICKER / 2} width={STICKER} height={STICKER} />
-                    : <>
-                        <circle cy={-ICON_R} r={20} className="wheel__disc-icon" />
-                        <image href={`/icons/${d.icon}.svg`} x={-14} y={-ICON_R - 14} width={28} height={28} />
-                      </>}
+                  <image className="wheel__sticker" href={stickerSrc(d.slug)} x={-STICKER / 2} y={-ICON_R - STICKER / 2} width={STICKER} height={STICKER} />
                 </g>
                 {d.name.length <= LABEL_MAX && (
                   <>
