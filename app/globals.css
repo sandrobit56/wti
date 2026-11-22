@@ -1607,3 +1607,24 @@ main, .page { overflow-x: clip; }
   .sign .hero__title { font-size: 42px; } .sign .accent, .sign .sign__line--won { font-size: 38px; }
 }
 @media (prefers-reduced-motion: reduce) { .sign .hero__title .w { animation: none; } }
+
+/* ── Hero v8 (2026-11-22): toy-diorama turntable + cartoon light title (refs: Hong Kong
+   Series miniatures, Chi Kim's bold-outline type, pixel-art backgrounds). */
+.hero { background: linear-gradient(180deg, #f27a8b 0%, #f497a4 60%, #f8b6be 100%); }
+.sign { rotate: -2deg; }
+.sign .hero__title, .sign .sign__winner { filter: none; }
+.sign .hero__title .w:not(.accent), .sign .accent, .sign .sign__line--won {
+  animation: none; background: none; -webkit-background-clip: border-box; background-clip: border-box;
+  -webkit-text-stroke: .085em var(--wine); paint-order: stroke fill;
+  text-shadow: .05em .06em 0 var(--wine);
+}
+.sign .hero__title .w:not(.accent) { color: var(--cream); }
+.sign .accent, .sign .sign__line--won { color: var(--mustard); -webkit-text-stroke-width: .07em; }
+.sign .sign__line--won { animation: sign-flip .7s var(--spring) both; }
+.sign__go { background: var(--cream); color: var(--wine); box-shadow: 3px 4px 0 var(--wine); border: 2.5px solid var(--wine); }
+.sign__go:hover { background: var(--mustard); }
+.wheel__plate { filter: drop-shadow(0 18px 18px rgba(59, 13, 24, .3)); }
+.wheel__fork { filter: drop-shadow(2px 4px 0 rgba(59, 13, 24, .45)); }
+.token { border: 2px solid var(--wine); box-shadow: 2px 3px 0 var(--wine); }
+.hero__status { background: rgba(59, 13, 24, .14); color: var(--cream); }
+@media (min-width: 1024px) { .hero__controls .tokens { max-width: none; flex-wrap: nowrap; } }

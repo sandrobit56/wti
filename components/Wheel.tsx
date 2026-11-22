@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-22
- * Version:     v6.3 — stickers sit ABOVE the glaze/grain (no blur), modern plump pointer
+ * Version:     v6.4 — 3D miniature turntable (toy diorama style) as the plate;
+ *              v6.3 — stickers sit ABOVE the glaze/grain (no blur), modern plump pointer
  *              instead of the antique fork; v6.2 — narrow rim, a sticker on every slice;
  *              v6.1 — stickers pilot, hub position/aspect computed here; v6.0 — painted plate + silver fork (raster art), glazed/painterly slices,
  *              flick-to-spin with a pointer (mouse, touch, pen); was v5.0 — vector plate
@@ -34,8 +35,7 @@ const INK = ["#FFF1DC", "#3B0D18", "#3B0D18", "#3B0D18"];
 /** Cycle the palette; when n leaves one slice over, recolour it so it never matches slice 0. */
 const colorOf = (i: number, n: number) => (i === n - 1 && n % SLICE_COLORS.length === 1 ? 2 : i % SLICE_COLORS.length);
 
-const PLATE = 200;     // painted plate radius (the image is cropped to the plate's circle)
-const R = 160;         // slice radius = the plate's inner well (thin rim, small ornament)
+const R = 150;         // slice radius = the turntable's cream top (rim props stay visible)
 const FORK_TIP = -R - 10;                // pointer tip touches the slices' outer edge (labels stay readable)
 const FORK_H = 66;                       // pointer length (see Fork)
 const TOP = Math.floor(FORK_TIP - FORK_H) - 6;
@@ -209,9 +209,13 @@ function Defs() {
   );
 }
 
-/** The painted ceramic plate (rim ornament: grapes and vine leaves). */
+/** The turntable: a miniature 3D diorama (plate.webp, 867×851 crop). Its cream top is not
+ *  centred in the image (the side of the disc shows at the bottom), so the image is offset to
+ *  put that top's centre on (0,0). Numbers measured from the image. */
+const PLATE_W = R / 0.3927 / 0.97;
+const PLATE_H = PLATE_W * (851 / 867);
 function Plate() {
-  return <image className="wheel__plate" href="/illustrations/hero/plate.webp" x={-PLATE} y={-PLATE} width={PLATE * 2} height={PLATE * 2} />;
+  return <image className="wheel__plate" href="/illustrations/hero/plate.webp" x={-PLATE_W * 0.4723} y={-PLATE_H * 0.4824} width={PLATE_W} height={PLATE_H} />;
 }
 
 /** The pointer: a plump cream-outlined fork in brand coral — toy-like, not antique. */
