@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-22
- * Version:     v6.0 — painted plate + silver fork (raster art), glazed/painterly slices,
+ * Version:     v6.1 — embroidered-ornament plate, 3D food stickers on slices (lib/stickers.ts),
+ *              hub position/aspect computed here; v6.0 — painted plate + silver fork (raster art), glazed/painterly slices,
  *              flick-to-spin with a pointer (mouse, touch, pen); was v5.0 — vector plate
  * Description: Presentational wheel. It does NOT choose anything: it gets the dishes and a
  *              target rotation and animates there with a CSS transition; onLanded fires when
@@ -25,6 +26,7 @@
 import { useId, useRef, useState, type PointerEvent } from "react";
 import type { Dish } from "@/lib/catalog.ts";
 import { toMtavruli } from "@/lib/mtavruli.ts";
+import { stickerSrc } from "@/lib/stickers.ts";
 
 const SLICE_COLORS = ["#3B0D18", "#FFC93C", "#F8B4C0", "#FFF8EC"];
 const INK = ["#FFF1DC", "#3B0D18", "#3B0D18", "#3B0D18"];
@@ -32,7 +34,7 @@ const INK = ["#FFF1DC", "#3B0D18", "#3B0D18", "#3B0D18"];
 const colorOf = (i: number, n: number) => (i === n - 1 && n % SLICE_COLORS.length === 1 ? 2 : i % SLICE_COLORS.length);
 
 const PLATE = 200;     // painted plate radius (the image is cropped to the plate's circle)
-const R = 134;         // slice radius = the plate's inner well (rim ornament stays visible)
+const R = 116;         // slice radius = the plate's inner well (embroidered rim stays visible)
 const FORK_W = 21;     // fork.webp is 190×1425 → keep that ratio
 const FORK_H = FORK_W * (1425 / 190);
 const FORK_TIP = -R + 16;                // tines end inside the top slice
@@ -40,6 +42,8 @@ const TOP = Math.floor(FORK_TIP - FORK_H) - 2;
 export const VIEWBOX = `-200 ${TOP} 400 ${200 - TOP}`;
 /** Where the plate centre sits inside the box, as a fraction of its height (CSS uses it for the hub). */
 export const CENTER_Y = -TOP / (200 - TOP);
+/** The box follows the viewBox, so CSS never has to know these numbers. */
+const BOX = { aspectRatio: `400 / ${200 - TOP}` };
 
 /** Release speed (degrees per millisecond) above which a drag becomes a spin. */
 export const FLING_MIN = 0.35;
@@ -57,11 +61,12 @@ function slicePath(i: number, n: number): string {
  *  flip: drawn right→left with the baseline nearer the rim, so it reads upright at the bottom. */
 function labelArc(n: number, flip: boolean): string {
   const h = (Math.PI / n) * 0.92;
-  const r = flip ? R - 9 : R - 18;
+  const r = flip ? R - 4 : R - 13;
   const x = r * Math.sin(h), y = -r * Math.cos(h);
   return flip ? `M${x} ${y} A${r} ${r} 0 0 0 ${-x} ${y}` : `M${-x} ${y} A${r} ${r} 0 0 1 ${x} ${y}`;
 }
-const ICON_R = R - 50;   // icon disc centre, measured from the plate centre
+const ICON_R = R - 44;   // icon/sticker centre, measured from the plate centre
+const STICKER = 52;      // sticker box (the food fills most of it)
 
 /** Names longer than this are not printed on the wheel — the icon carries the slice. */
 export const LABEL_MAX = 8;
@@ -124,7 +129,7 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
   const hubLabel = spinning ? "…" : dragging ? "გაუშვი!" : landedOnce ? "კიდევ!" : "დაატრიალე";
 
   return (
-    <div className={dragging ? "wheel wheel--dragging" : "wheel"}>
+    <div className={dragging ? "wheel wheel--dragging" : "wheel"} style={BOX}>
       <svg
         ref={svgRef}
         viewBox={VIEWBOX}
@@ -156,8 +161,12 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
             return (
               <g key={d.slug} transform={`rotate(${mid})`}>
                 <g transform={flip ? `rotate(180 0 ${-ICON_R})` : undefined}>
-                  <circle cy={-ICON_R} r={22} className="wheel__disc-icon" />
-                  <image href={`/icons/${d.icon}.svg`} x={-16} y={-ICON_R - 16} width={32} height={32} />
+                  {stickerSrc(d.slug)
+                    ? <image className="wheel__sticker" href={stickerSrc(d.slug)!} x={-STICKER / 2} y={-ICON_R - STICKER / 2} width={STICKER} height={STICKER} />
+                    : <>
+                        <circle cy={-ICON_R} r={20} className="wheel__disc-icon" />
+                        <image href={`/icons/${d.icon}.svg`} x={-14} y={-ICON_R - 14} width={28} height={28} />
+                      </>}
                 </g>
                 {d.name.length <= LABEL_MAX && (
                   <>
@@ -177,7 +186,7 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
         <image href="/illustrations/hero/grain.webp" x={-R} y={-R} width={R * 2} height={R * 2} clipPath="url(#wheel-well)" preserveAspectRatio="none" pointerEvents="none" opacity={0.4} />
         <Fork />
       </svg>
-      <button className="wheel__hub" onClick={onSpin} disabled={spinning} aria-label="დაატრიალე ბორბალი">
+      <button className="wheel__hub" style={{ top: `${CENTER_Y * 100}%` }} onClick={onSpin} disabled={spinning} aria-label="დაატრიალე ბორბალი">
         <span aria-hidden="true">{toMtavruli(hubLabel)}</span>
       </button>
     </div>
@@ -215,7 +224,7 @@ function Fork() {
 /** Static shell shown while the interactive wheel loads: same box, plate and fork. */
 export function WheelShell() {
   return (
-    <div className="wheel wheel--skeleton" aria-label="იტვირთება">
+    <div className="wheel wheel--skeleton" aria-label="იტვირთება" style={BOX}>
       <svg viewBox={VIEWBOX} aria-hidden="true">
         <Plate />
         <Fork />

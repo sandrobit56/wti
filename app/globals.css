@@ -1429,3 +1429,7 @@ body { font-family: var(--font); color: var(--wine); background: var(--cream); o
   .hero__stage { width: min(70vw, 34svh); }
   .hero__inner { gap: var(--s1); }
 }
+/* v6.1: stickers carry their own die-cut border; a small shadow lifts them off the slice */
+.wheel__sticker { filter: drop-shadow(0 2px 1.5px rgba(59, 13, 24, .35)); }
+.wheel__hub { width: 20%; font-size: 2.9cqw; }
+.wheel__label { font-size: 12.5px; }
