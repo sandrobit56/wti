@@ -18,11 +18,8 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { priceBand, type Dish } from "@/lib/catalog.ts";
-import type { Persona } from "@/lib/personas.ts";
-import { PERSONA_IDS, type PersonaId } from "@/lib/quiz.ts";
 import { stickerSrc } from "@/lib/stickers.ts";
 import { toMtavruli } from "@/lib/mtavruli.ts";
-import { TarotCard } from "./TarotCard";
 import { Words } from "./Words";
 import { deliveryLinks, mapsDirectionsUrl, mapsSearchUrl, type RadiusKm, type VenueMatch } from "@/lib/places.ts";
 import { MY_LOCATION, type Place } from "./FilterPanel";
@@ -131,50 +128,3 @@ export function Paths({ dish, place, radius, group, onPickPlace, onSpin, onAgain
     </section>
   );
 }
-
-/** Three cards fanned out: the user's persona in the middle, or three crowd favourites. */
-function fanOf(persona: Persona | null): PersonaId[] {
-  if (!persona) return ["spice", "tamada", "khinkali"];
-  const i = PERSONA_IDS.indexOf(persona.id);
-  return [PERSONA_IDS[(i + 11) % 12], persona.id, PERSONA_IDS[(i + 1) % 12]];
-}
-
-export function PersonaTeaser({ persona, onStart, onGallery }: { persona: Persona | null; onStart: () => void; onGallery: () => void }) {
-  const fan = fanOf(persona);
-  return (
-    <section className="container sect" id="persona">
-      <div className="persona reveal-pop">
-        <div className="persona__copy">
-          {persona ? (
-            <>
-              <p className="caps">შენი პერსონა</p>
-              <h2>{persona.name}</h2>
-              <p>{persona.line}</p>
-              <div className="row persona__actions">
-                <button className="pill pill--dark" onClick={onStart}>ტესტი თავიდან</button>
-                <button className="pill pill--white" onClick={onGallery}>12 პერსონა</button>
-              </div>
-            </>
-          ) : (
-            <>
-              <h2 className="display"><Words caps parts={["გაიგე შენი ", ["პერსონა", "accent"]]} /></h2>
-              <p><Words parts={["7 კითხვა, ერთი წუთი — ბორბალი შენს გემოზე მოირგება."]} /></p>
-              <div className="row persona__actions">
-                <button className="pill pill--dark" onClick={onStart}>ტესტის დაწყება</button>
-                <button className="pill pill--white" onClick={onGallery}>12 პერსონა</button>
-              </div>
-            </>
-          )}
-        </div>
-        <button type="button" className="persona__fan" onClick={onGallery} aria-label="12 პერსონის ბარათი">
-          {fan.map((id, i) => (
-            <span key={id} className="persona__fan-card" style={{ ["--i" as string]: i - 1 }}>
-              <TarotCard id={id} size="md" tilt={false} me={persona?.id === id} />
-            </span>
-          ))}
-        </button>
-      </div>
-    </section>
-  );
-}
-

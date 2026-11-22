@@ -21,7 +21,8 @@ import { applyQuiz, scoreQuiz } from "@/lib/quiz.ts";
 import { NO_PREFS, normalizeFilters, SpinError, displayName, explain, pickVariants, seeded, spin, targetRotation, type Filters, type Mood, type Prefs, type SpinContext, type Win, isAllowed } from "@/lib/spin.ts";
 import { FilterPanel, MY_LOCATION, type Place } from "./FilterPanel";
 import { coarse } from "@/lib/security.ts";
-import { Paths, PersonaTeaser } from "./Paths";
+import { Paths } from "./Paths";
+import { PersonaSection } from "./PersonaSection";
 import { TrustCard } from "./TrustCard";
 import { Quiz } from "./Quiz";
 import { PersonaGallery } from "./PersonaGallery";
@@ -423,7 +424,7 @@ export function Randomizer() {
       </div>
       <div className="chapter chapter--mustard">
         <WaveBand tone="brand" text="სუფრასთან ყველა ვიღაცაა" />
-        <PersonaTeaser persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />
+        <PersonaSection persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />
       {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} onDish={(slug) => { setGalleryOpen(false); openDish(slug); }} />}
         <SectionBridge creature="chili" fact="„ცოტა ცხარეა“ — თქვა მან და ცრემლები მოიწმინდა." />
       </div>

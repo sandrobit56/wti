@@ -1879,3 +1879,19 @@ main, .page { overflow-x: clip; }
 .join__done { font: 700 18px/1.4 var(--font); background: var(--surface); padding: var(--s2) var(--s3); border-radius: 20px; }
 .chapter--blush .trust2 { margin-top: var(--s6); }
 @media (max-width: 640px) { .join__title { white-space: normal; font-size: 40px; } }
+
+/* ── Persona v3 (2026-11-22): one object — the fate deck ── */
+.persona2__inner { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--s2); }
+.persona2__title { margin: 0 0 var(--s2); font-size: clamp(44px, 5.5vw, 76px); white-space: nowrap; color: var(--wine); }
+.persona2__title .accent { display: inline; }
+.persona2__deck { all: unset; cursor: pointer; position: relative; width: 220px; aspect-ratio: 3 / 4; display: block; margin: var(--s2) 0; }
+.persona2__deck:focus-visible { outline: 3px solid var(--brand); outline-offset: 10px; border-radius: 20px; }
+.persona2__under, .persona2__top { position: absolute; inset: 0; display: grid; place-items: center; transition: rotate .45s var(--spring), translate .45s var(--spring); }
+.persona2__under { rotate: calc((var(--i) - 1) * 7deg); translate: calc((var(--i) - 1) * 10px) 6px; filter: brightness(.94); }
+.persona2__deck:hover .persona2__under { rotate: calc((var(--i) - 1) * 16deg); translate: calc((var(--i) - 1) * 46px) 10px; }
+.persona2__deck:hover .persona2__top { translate: 0 -10px; }
+.persona2__top { filter: drop-shadow(0 18px 18px rgba(59, 13, 24, .28)); }
+.persona2__line { margin: 0; font-size: 18px; max-width: 460px; color: var(--wine); }
+.persona2__all { color: var(--wine); font-weight: 700; }
+@media (max-width: 640px) { .persona2__title { white-space: normal; font-size: 40px; } .persona2__deck { width: 180px; } }
+@media (prefers-reduced-motion: reduce) { .persona2__under, .persona2__top { transition: none; } }
