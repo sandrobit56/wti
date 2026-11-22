@@ -1363,3 +1363,69 @@ body { font-family: var(--font); color: var(--wine); background: var(--cream); o
   .chapter { padding-top: calc(var(--s8) + var(--s6)); }
   .chapter > .bridge:last-child { margin-bottom: calc(var(--s8) + var(--s4)); }
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   Hero v6 (2026-11-22) — painted props. Reference technique: phin.helenadang.work
+   (one hand-painted object world, a signboard title, direct manipulation).
+   Art is ours: AI-assisted paintings in public/illustrations/hero, keyed in PIL.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Signboard: a 9-slice border-image, so the painted frame and corner vines keep their
+   size while the board stretches to whatever the title needs (desktop or phone).
+   Slice numbers are pixels of sign.webp (1400×474): corners = ornament extent. */
+.hero__title.sign {
+  --f: clamp(48px, 13vw, 58px);
+  font-size: var(--f);
+  display: inline-block; width: fit-content; justify-self: center;
+  border-style: solid;
+  border-width: calc(var(--f) * .5) calc(var(--f) * .7);
+  border-image: url("/illustrations/hero/sign.webp") 200 270 200 270 fill / calc(var(--f) * .5) calc(var(--f) * .7) stretch;
+  padding: 0 calc(var(--f) * .12);
+  rotate: -1.5deg;
+  filter: drop-shadow(0 14px 14px rgba(59, 13, 24, .32));
+  color: var(--wine); text-align: center; line-height: .9;
+  text-shadow: none;
+}
+/* painted letters with an extruded edge: stacked 1-step shadows read as depth, not glow */
+.hero__title.sign .w:not(.accent) {
+  text-shadow: .012em .012em 0 var(--brand), .024em .024em 0 var(--brand), .036em .036em 0 var(--brand),
+               .048em .048em 0 var(--brand-ink), .06em .06em 0 var(--brand-ink);
+}
+.hero__title.sign .accent { display: block; color: var(--brand); font-size: .92em; margin-top: .02em; }
+@media (min-width: 1024px) {
+  .hero__title.sign { --f: clamp(64px, 6vw, 100px); justify-self: start; }
+}
+
+/* Wheel: taller box (the fork stands above the plate) — keep in sync with Wheel.tsx VIEWBOX */
+.wheel { aspect-ratio: 400 / 478; }
+.wheel svg { overflow: visible; touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+.wheel--dragging svg { cursor: grabbing; }
+.wheel__plate { filter: drop-shadow(0 14px 16px rgba(59, 13, 24, .35)); }
+.wheel__fork { filter: drop-shadow(4px 8px 5px rgba(59, 13, 24, .38)); }
+.wheel__disc-icon { fill: #fff8ec; filter: drop-shadow(0 1.5px 0 rgba(59, 13, 24, .22)); }
+.wheel__label { font-size: 14px; }
+.wheel__disc--spinning { transition: transform var(--spin-ms, 2300ms) cubic-bezier(0.12, 0.75, 0.15, 1); }
+/* hub: a glazed ceramic button — light top-left, shade bottom-right, cream ring */
+.wheel__hub {
+  top: 58.16%; width: 22%;
+  background: radial-gradient(circle at 34% 28%, #ff8a9b 0, #f1435e 46%, #c3203f 100%) !important;
+  box-shadow: 0 0 0 4px var(--cream), inset 0 -6px 10px rgba(59, 13, 24, .35), inset 0 4px 6px rgba(255, 255, 255, .35), 0 10px 18px rgba(59, 13, 24, .35);
+  font-size: clamp(13px, 1.5vw, 19px);
+}
+.wheel--skeleton, .wheel--empty { aspect-ratio: 400 / 478; }
+@media (max-width: 640px) {
+  .hero__stage { width: min(80vw, 40svh); }
+}
+@media (prefers-reduced-motion: reduce) { .wheel__disc--spinning { transition-duration: .6s; } }
+@media (min-width: 1024px) {
+  .hero__stage { width: min(44vw, calc((100svh - 72px - 96px) / 1.195), 580px); }
+}
+.wheel { container-type: inline-size; }
+.wheel__label { font-size: 15px; letter-spacing: .02em; }
+.wheel__hub { width: 24%; font-size: 3.3cqw; letter-spacing: .01em; line-height: 1; }
+/* short phones (iPhone SE): smaller sign and plate so the filters stay above the tab bar */
+@media (max-width: 640px) and (max-height: 720px) {
+  .hero__title.sign { --f: 40px; }
+  .hero__stage { width: min(70vw, 34svh); }
+  .hero__inner { gap: var(--s1); }
+}

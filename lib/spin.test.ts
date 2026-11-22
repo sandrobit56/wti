@@ -94,6 +94,15 @@ test("rotation lands the chosen slice under the pointer", () => {
   }
 });
 
+test("anticlockwise fling still lands the chosen slice, and moves backwards", () => {
+  for (const [i, n, cur] of [[0, 8, 1234], [5, 8, -200], [1, 5, 0]]) {
+    const rot = targetRotation(cur, i, n, 4, -1);
+    const center = (i * 360) / n + 180 / n;
+    assert.equal(((center + rot) % 360 + 360) % 360, 0);
+    assert.ok(rot < cur - 360 * 2, `went back: ${cur} → ${rot}`);
+  }
+});
+
 test("venue matching: name hit first, radius respected", () => {
   const khinkali = DISHES.find((d) => d.slug === "khinkali")!;
   const origin = { lat: 41.7095, lng: 44.756 };

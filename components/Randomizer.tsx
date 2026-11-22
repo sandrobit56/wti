@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v3.1 — mood chips, memory of past winners, "never" list, "why this"
+ * Version:     v3.2 — flick-to-spin: a fast drag on the plate spins it (strength → turns and
+ *              duration, direction follows the flick); v3.1 — mood chips, past winners, "never" list
  * Description: Page state: filters, place, radius → available dishes → wheel →
  *              spin → three paths. Logic lives in lib/spin.ts.
  *              Client-only (RandomizerClient) so initial state can read storage.
@@ -36,6 +37,10 @@ import { Wheel } from "./Wheel";
 
 const KEY = "wti:v2";
 const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** How a spin moves: the hub button uses the default; a flick sets its own. offset = drag already applied. */
+type SpinHow = { turns: number; ms: number; dir: 1 | -1; offset: number };
+const DEFAULT_SPIN: SpinHow = { turns: 7, ms: 2300, dir: 1, offset: 0 };
 
 type Stored = { filters: Filters; place: Place | null; radius: RadiusKm; notToday: Record<string, number>; quizAnswers?: string[] | null; never?: string[]; history?: Win[] };
 const HISTORY_MAX = 30;
@@ -84,6 +89,7 @@ export function Randomizer() {
   const [counts, setCounts] = useState<Counts | null>(null);
   const [spun, setSpun] = useState<Spun | null>(null);
   const [rotation, setRotation] = useState(0);
+  const [spinMs, setSpinMs] = useState(DEFAULT_SPIN.ms);
   const [spinError, setSpinError] = useState<string | null>(null);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
@@ -151,7 +157,15 @@ export function Randomizer() {
   const onPlace = (p: Place | null) => { setPlace(p); setLocateError(null); changed(); };
   const onRadius = (r: RadiusKm) => { setRadius(r); changed(); };
 
-  function doSpin(random: boolean, extraExcluded: string[] = []) {
+  /** A flick → spin strength. Faster flick = more turns and a longer glide, capped so it never drags on. */
+  function onFling(velocity: number, offset: number) {
+    const strength = Math.min(1, Math.abs(velocity) / 2.2);            // 0.35…2.2 deg/ms → ~0.16…1
+    const turns = Math.round(4 + strength * 5);                         // 4…9 turns
+    const ms = Math.round(1700 + strength * 1500);                      // 1.7…3.2 s
+    doSpin(false, [], { turns, ms, dir: velocity < 0 ? -1 : 1, offset });
+  }
+
+  function doSpin(random: boolean, extraExcluded: string[] = [], how: SpinHow = DEFAULT_SPIN) {
     if (spun && !spun.landed) return;
     try {
       const c = { ...ctx(random), excluded: [...excluded, ...extraExcluded] };
@@ -162,7 +176,8 @@ export function Randomizer() {
       setSpinError(null);
       setSheetOpen(false);
       setSpun({ wheel: r.wheel, winner: r.winnerIndex, landed: false, why, ctx: c });
-      setRotation((cur) => targetRotation(cur, r.winnerIndex, r.wheel.length));
+      setSpinMs(how.ms);
+      setRotation((cur) => targetRotation(cur + how.offset, r.winnerIndex, r.wheel.length, how.turns, how.dir));
     } catch (e) {
       if (!(e instanceof SpinError)) throw e;
       setSpinError(`ფილტრებს მხოლოდ ${e.matching} კერძი ერგება. შეარბილე ბიუჯეტი, დიეტა ან გაზარდე რადიუსი.`);
@@ -278,7 +293,7 @@ export function Randomizer() {
           <HeroTitle />
           <div className="hero__stage">
             {wheel.length > 0
-              ? <Wheel dishes={wheel} rotation={rotation} spinning={spinning} winnerIndex={winner} onSpin={() => doSpin(false)} onLanded={onLanded} />
+              ? <Wheel dishes={wheel} rotation={rotation} spinning={spinning} spinMs={spinMs} winnerIndex={winner} landedOnce={Boolean(spun?.landed)} onSpin={() => doSpin(false)} onFling={onFling} onLanded={onLanded} />
               : <div className="wheel wheel--empty"><p>ფილტრებს მხოლოდ {matching} კერძი ერგება.<br />შეარბილე ბიუჯეტი, დიეტა ან გაზარდე რადიუსი.</p></div>}
           </div>
           <div className="hero__controls">

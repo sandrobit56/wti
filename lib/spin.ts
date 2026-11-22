@@ -309,10 +309,11 @@ export function seeded(seed: number): Rng {
  * Final wheel rotation (deg, clockwise) so slice `index` sits under the top pointer.
  * Slice i spans [i·a, (i+1)·a] measured clockwise from 12 o'clock.
  */
-export function targetRotation(current: number, index: number, count: number, turns = 7): number {
+export function targetRotation(current: number, index: number, count: number, turns = 7, dir: 1 | -1 = 1): number {
   const a = 360 / count;
   const sliceCenter = index * a + a / 2;
-  const wanted = (360 - sliceCenter) % 360;
-  const base = current - (((current % 360) + 360) % 360);
-  return base + turns * 360 + wanted;
+  const wanted = (360 - sliceCenter) % 360;          // plate angle that puts the slice under the fork
+  const base = current - (((current % 360) + 360) % 360); // last full turn at or below current
+  // clockwise: go forward `turns` full turns; anticlockwise (a fling to the left): go back.
+  return dir === 1 ? base + turns * 360 + wanted : base - turns * 360 + wanted;
 }
