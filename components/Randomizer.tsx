@@ -18,7 +18,7 @@ import { DISHES, type Dish } from "@/lib/catalog.ts";
 import type { RadiusKm } from "@/lib/places.ts";
 import { PERSONAS } from "@/lib/personas.ts";
 import { applyQuiz, scoreQuiz } from "@/lib/quiz.ts";
-import { NO_PREFS, normalizeFilters, SpinError, displayName, explain, pickVariants, seeded, spin, targetRotation, type Filters, type Mood, type Prefs, type SpinContext, type Win } from "@/lib/spin.ts";
+import { NO_PREFS, normalizeFilters, SpinError, displayName, explain, pickVariants, seeded, spin, targetRotation, type Filters, type Mood, type Prefs, type SpinContext, type Win, isAllowed } from "@/lib/spin.ts";
 import { FilterPanel, MY_LOCATION, type Place } from "./FilterPanel";
 import { coarse } from "@/lib/security.ts";
 import { Paths, PersonaTeaser } from "./Paths";
@@ -32,7 +32,8 @@ import { Trail } from "./Trail";
 import { HeroTitle } from "./HeroTitle";
 import { SectionBridge } from "./SectionBridge";
 import { WaveBand } from "./WaveBand";
-import { MAX_DINERS, seatAngles, sliceAt } from "@/lib/seats.ts";
+import { mapsSearchUrl } from "@/lib/places.ts";
+import { MAX_DINERS, fillSeats, seatAngles, seatsFor, sharedVenue, sliceAt, venueLabel } from "@/lib/seats.ts";
 import { ResultModal } from "./ResultModal";
 import { Wheel } from "./Wheel";
 
@@ -171,15 +172,36 @@ export function Randomizer() {
     if (spun && !spun.landed) return;
     try {
       const c = { ...ctx(random), excluded: [...excluded, ...extraExcluded] };
-      const r = spin(DISHES, c, Math.random);
+      let r = spin(DISHES, c, Math.random);
+      if (diners > 1) {
+        // Group: everyone should eat at ONE place. Your random dish (diner 0) decides the venue
+        // type — sushi → a sushi bar, khinkali → a Georgian place — so the type still varies;
+        // diners whose slice doesn't fit get an allowed dish of that type instead.
+        const seats = seatsFor(r.winnerIndex, r.wheel.length, Math.min(diners, r.wheel.length));
+        const mineDish = r.wheel[seats[0]];
+        const cat = [...mineDish.venue.cats].sort((x, y) =>
+          seats.filter((i) => r.wheel[i].venue.cats.includes(y)).length - seats.filter((i) => r.wheel[i].venue.cats.includes(x)).length)[0];
+        const pool = DISHES.filter((d) => isAllowed(d, c));
+        if (cat) r = { ...r, wheel: fillSeats(r.wheel, seats, cat, pool, Math.random) };
+        // too few dishes of that type (e.g. donuts)? fall back to the type the seated dishes share most
+        const left = sharedVenue(seats.map((i) => r.wheel[i]));
+        if (left.covered < seats.length) {
+          const cats = [...new Set(seats.flatMap((i) => r.wheel[i].venue.cats))];
+          const roomiest = cats.sort((x, y) => pool.filter((d) => d.venue.cats.includes(y)).length - pool.filter((d) => d.venue.cats.includes(x)).length)[0];
+          if (roomiest) r = { ...r, wheel: fillSeats(r.wheel, seats, roomiest, pool, Math.random) };
+        }
+      }
       const dishWon = r.wheel[r.winnerIndex];
       const near = current && "counts" in current ? current.counts[dishWon.slug] : undefined;
       const why = [...explain(dishWon, c, persona?.name ?? null), ...(near ? [`${near} ადგილი ${radius} კმ-ში`] : [])].slice(0, 3);
       setSpinError(null);
       setSheetOpen(false);
-      setSpun({ wheel: r.wheel, winner: r.winnerIndex, landed: false, why, ctx: c });
+      // the plate turns `aim` to the top; "your" dish is the one in front of diner 0
+      const aim = r.winnerIndex;
+      const mine = diners > 1 ? seatsFor(aim, r.wheel.length, Math.min(diners, r.wheel.length))[0] : aim;
+      setSpun({ wheel: r.wheel, winner: mine, landed: false, why: mine === aim ? why : [], ctx: c });
       setSpinMs(how.ms);
-      setRotation((cur) => targetRotation(cur + how.offset, r.winnerIndex, r.wheel.length, how.turns, how.dir));
+      setRotation((cur) => targetRotation(cur + how.offset, aim, r.wheel.length, how.turns, how.dir));
     } catch (e) {
       if (!(e instanceof SpinError)) throw e;
       setSpinError(`ფილტრებს მხოლოდ ${e.matching} კერძი ერგება. შეარბილე ბიუჯეტი, დიეტა ან გაზარდე რადიუსი.`);
@@ -272,6 +294,7 @@ export function Randomizer() {
   // Group mode: never more seats than slices, so nobody shares a slice by accident.
   const seated = Math.min(diners, Math.max(1, wheel.length));
   const seatSlices = spun?.landed && seated > 1 ? seatAngles(seated).map((deg) => sliceAt(rotation, deg, wheel.length)) : null;
+  const together = seatSlices ? sharedVenue(seatSlices.map((i) => wheel[i])) : null;
   const dish = spun?.landed ? wheel[spun.winner] : null;
   const spinning = Boolean(spun && !spun.landed);
   const matching = preview.result?.matching ?? preview.error ?? 0;
@@ -309,6 +332,12 @@ export function Randomizer() {
                 />
               : <div className="wheel wheel--empty"><p>ფილტრებს მხოლოდ {matching} კერძი ერგება.<br />შეარბილე ბიუჯეტი, დიეტა ან გაზარდე რადიუსი.</p></div>}
           </div>
+          {together && seatSlices && (
+            <p className="group-note" role="status">
+              {together.covered === seatSlices.length ? "ყველა ერთად" : `${together.covered} / ${seatSlices.length} ერთად`} — <strong>{venueLabel(together.cat)}</strong>
+              {together.cat && <a href={mapsSearchUrl(together.cat.replace(/_/g, " ") + " restaurant", place?.label ?? null)} target="_blank" rel="noopener noreferrer">იპოვე რუკაზე ↗</a>}
+            </p>
+          )}
           <div className="hero__controls">
             <FilterTokens filters={filters} place={place?.label ?? null} radius={radius} onOpen={() => setSheetOpen(true)} />
             <p className="hero__status" aria-live="polite">{status}</p>
