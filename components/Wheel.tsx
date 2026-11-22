@@ -3,7 +3,9 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-22
- * Version:     v7.0 — 3/4 perspective (the table is tilted back in CSS 3D, diners stand upright),
+ * Version:     v7.1 — diners laid out on the plate's on-screen ellipse (2D layer): back seats stand
+ *              behind the table, side seats in front; dish names are place cards on the rim;
+ *              v7.0 — 3/4 perspective (the table is tilted back in CSS 3D, diners stand upright),
  *              group mode: up to 5 diners around the table, each gets the slice in front of them;
  *              v6.4 — 3D miniature turntable (toy diorama style) as the plate;
  *              v6.3 — stickers sit ABOVE the glaze/grain (no blur), modern plump pointer
@@ -99,7 +101,28 @@ type Props = {
 
 /** Table tilt (degrees). Keep in sync with --tilt in globals.css. */
 const TILT = 26;
-const SEAT_R = 52;   // diner distance from the centre, in cqw of the wheel box (rim ≈ 49)
+
+/* The plate's rim as it lands on screen (measured on the render, in % of the wheel box).
+ * Seats live in a flat layer over the tilted table, so they follow this ellipse, not 3D math. */
+const RIM = { cy: 53.9, rx: 44, ry: 32.8 };   // middle of the rim ring: where place cards sit
+const OUTER = { rx: 47.5, ry: 36 };              // outer edge of the rim
+const BACK_SINK = 0.5;                            // back seats: feet hidden this far behind the rim edge (% of height)
+const FRONT_OUT = 1.16;                         // side seats stand just outside the rim
+type Seat = { i: number; deg: number; dish: string | null; back: boolean; scale: number; fx: number; fy: number; cx: number; cy: number };
+function seatAt(deg: number, i: number, dish: string | null): Seat {
+  const rad = (deg * Math.PI) / 180, sin = Math.sin(rad), cos = Math.cos(rad);
+  const back = Math.abs(deg) <= 90;
+  const cx = 50 + sin * RIM.rx, cy = RIM.cy - cos * RIM.ry;
+  const k = back ? 1 : FRONT_OUT;
+  return {
+    i, deg, dish, back,
+    scale: 1 - 0.14 * cos,                      // farther = smaller
+    fx: back ? 50 + sin * OUTER.rx : 50 + sin * RIM.rx * k,
+    fy: back ? RIM.cy - cos * OUTER.ry + BACK_SINK : RIM.cy - cos * RIM.ry * k,
+    cx: back ? cx : 50 + sin * RIM.rx * k,
+    cy: back ? cy : RIM.cy - cos * RIM.ry * k + 3,   // side seats: the card sits at their feet
+  };
+}
 
 export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedOnce, onSpin, onFling, onLanded, diners, seatDishes, onSeat, onAddDiner, onRemoveDiner }: Props) {
   const n = dishes.length;
@@ -157,8 +180,19 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
   const discStyle = { transform: `rotate(${rotation + offset}deg)`, ["--spin-ms" as string]: `${spinMs}ms` };
   const hubLabel = spinning ? "…" : dragging ? "გაუშვი!" : landedOnce ? "კიდევ!" : "დაატრიალე";
 
+  const seats = diners > 1 ? seatAngles(diners).map((deg, i) => seatAt(deg, i, seatDishes?.[i] ?? null)) : [];
+  const seatFigure = (t: Seat) => (
+    <div key={t.i} className={`seat ${t.back ? "seat--back" : "seat--front"}${t.deg > 0 ? " seat--r" : ""}`} style={{ left: `${t.fx}%`, top: `${t.fy}%`, ["--depth" as string]: t.scale }}>
+      <button className="seat__who" onClick={() => t.dish && onSeat(t.i)} disabled={!t.dish} tabIndex={-1} aria-hidden="true">
+        <Image src={`/illustrations/people/p${t.i + 1}.webp`} alt="" width={64} height={64} />
+      </button>
+      {t.i > 0 && !spinning && <button className="seat__x" onClick={() => onRemoveDiner(t.i)} aria-label={`მოაშორე სტუმარი ${t.i + 1}`}>×</button>}
+    </div>
+  );
+
   return (
     <div className={dragging ? "wheel wheel--dragging" : "wheel"} style={BOX}>
+      {diners > 1 && seats.filter((t) => t.back).map(seatFigure)}
       <div className="wheel__table">
       <svg
         ref={svgRef}
@@ -215,20 +249,11 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
       <button className="wheel__hub" style={{ top: `${CENTER_Y * 100}%` }} onClick={() => { const o = offset; setOffset(0); onSpin(o); }} disabled={spinning} aria-label="დაატრიალე ბორბალი">
         <span aria-hidden="true">{toMtavruli(hubLabel)}</span>
       </button>
-      {diners > 1 && seatAngles(diners).map((deg, i) => {
-        const rad = (deg * Math.PI) / 180;
-        const dish = seatDishes?.[i];
-        return (
-          <div key={i} className={deg > 0 ? "seat seat--r" : "seat"} style={{ left: `calc(50% + ${Math.sin(rad) * SEAT_R}cqw)`, top: `calc(${CENTER_Y * 100}% - ${Math.cos(rad) * SEAT_R}cqw)` }}>
-            <button className="seat__who" onClick={() => dish && onSeat(i)} disabled={!dish} aria-label={dish ? `${i === 0 ? "შენ" : `სტუმარი ${i + 1}`}: ${dish}` : `სტუმარი ${i + 1}`}>
-              <Image src={`/illustrations/people/p${i + 1}.webp`} alt="" width={64} height={64} />
-              {dish && <span className="seat__dish">{dish}</span>}
-            </button>
-            {i > 0 && !spinning && <button className="seat__x" onClick={() => onRemoveDiner(i)} aria-label={`მოაშორე სტუმარი ${i + 1}`}>×</button>}
-          </div>
-        );
-      })}
       </div>
+      {diners > 1 && seats.filter((t) => !t.back).map(seatFigure)}
+      {diners > 1 && seats.map((t) => t.dish && (
+        <button key={`c${t.i}`} className="seat-card" style={{ left: `${t.cx}%`, top: `${t.cy}%` }} onClick={() => onSeat(t.i)} aria-label={`${t.i === 0 ? "შენ" : `სტუმარი ${t.i + 1}`}: ${t.dish}`}>{t.dish}</button>
+      ))}
       {diners < MAX_DINERS && !spinning && (
         <button className="wheel__add" onClick={onAddDiner} aria-label="დაამატე ადამიანი">+ <span>{diners}/{MAX_DINERS}</span></button>
       )}

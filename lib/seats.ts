@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-22
- * Version:     v1.0
+ * Version:     v1.1 — seats hug the back half of the table (people stand behind it, not on the food)
  * Description: Group mode ("ვინ რას შეჭამს"): up to 5 diners sit evenly around the lazy-susan.
  *              When the table stops, each diner gets the slice in front of them — one spin,
  *              everyone served. Pure math, no React.
@@ -14,7 +14,8 @@ export const MAX_DINERS = 5;
  *  A group sits along the BACK arc of the table (−120°…+120°): in the 3/4 view the front edge
  *  faces the viewer, so nobody sits there and blocks the plate. Spacing ≥ 60° → with 8 slices
  *  (45° each) two diners never face the same slice. */
-const ARCS: Record<number, number[]> = { 1: [0], 2: [-60, 60], 3: [-90, 0, 90], 4: [-120, -40, 40, 120], 5: [-120, -60, 0, 60, 120] };
+// degrees clockwise from the back of the table; ≥45° apart so 8 slices never repeat a dish
+const ARCS: Record<number, number[]> = { 1: [0], 2: [-70, 70], 3: [-95, 0, 95], 4: [-105, -35, 35, 105], 5: [-110, -55, 0, 55, 110] };
 export function seatAngles(count: number): number[] {
   const a = ARCS[count];
   if (!a) throw new Error(`seatAngles: bad count ${count}`);

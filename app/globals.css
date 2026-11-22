@@ -1935,3 +1935,38 @@ main, .page { overflow-x: clip; }
 @keyframes kit-float { 50% { translate: 0 -8px; rotate: -1deg; } }
 @media (prefers-reduced-motion: reduce) { .join__kit { animation: none; } }
 .chapter:last-of-type { padding-bottom: var(--s8); }
+
+/* ── Hero v12 (2026-11-22): diners on the plate's real ellipse; hover that works; no dish leaking into the hero ── */
+.wheel { position: relative; }
+.wheel__table { z-index: 2; pointer-events: none; }            /* the box is bigger than the plate: let clicks reach back seats */
+.wheel__table > svg > *, .wheel__hub { pointer-events: auto; }
+.wheel__plate { pointer-events: none; }
+.seat { position: absolute; width: calc(17% * var(--depth, 1)); translate: none; transform: translate(-50%, -100%); z-index: 1; }   /* transform, not translate: the minifier merges translate with the old .seat rule */
+.seat--front { z-index: 3; }
+.seat__who { transition: transform .3s var(--spring); transform-origin: 50% 100%; }
+/* the pop-in animation owns the img's translate/scale (fill: both), so hover moves the button instead */
+.seat__who:not(:disabled):hover, .seat:has(+ .seat-card:hover) .seat__who { transform: translateY(-8%) rotate(-4deg); }
+.seat--r .seat__who:not(:disabled):hover { transform: translateY(-8%) rotate(4deg); }
+.seat__x { z-index: 1; }
+.seat-card { position: absolute; z-index: 4; translate: -50% -50%; border: 0; cursor: pointer; white-space: nowrap;
+  background: var(--cream); color: var(--wine); font: 700 12px/1 var(--font); padding: 6px 10px; border-radius: 999px;
+  box-shadow: 0 2px 0 rgba(22, 60, 58, .25); transition: transform .2s var(--spring), background-color .2s;
+  animation: card-in .45s .15s var(--spring) both; }
+.seat-card:hover { transform: translateY(-2px) scale(1.06); background: var(--mustard); }
+.seat-card:focus-visible { outline: 3px solid var(--brand-ink); outline-offset: 2px; }
+@keyframes card-in { from { opacity: 0; scale: .6; } to { opacity: 1; scale: 1; } }
+@media (max-width: 640px) { .seat-card { font-size: 10px; padding: 4px 7px; } }
+@media (prefers-reduced-motion: reduce) { .seat-card { animation: none; } .seat__who { transition: none; } }
+/* section 2's dish fades in while it falls — no hard clip line, and nothing peeks out under the wheel */
+@keyframes dish-drop {
+  0% { translate: 0 -38vh; rotate: -140deg; scale: .7; opacity: 0; }
+  30% { opacity: 1; }
+  70% { translate: 0 6%; rotate: 8deg; scale: 1.04; }
+  85% { translate: 0 -3%; rotate: -3deg; }
+  100% { translate: 0 0; rotate: 0deg; scale: 1; opacity: 1; }
+}
+/* room above the plate for the diner standing at the back (centre seat) — the button sits right above it */
+.hero__stage { margin-top: 34px; width: min(46vw, calc((100svh - 72px - 82px - min(440px, 31vw) * .34) / 1.13), 640px); }
+@media (max-width: 1023px) { .hero__stage { margin-top: 30px; width: min(76vw, 36svh); } }
+@media (max-width: 640px) and (max-height: 720px) { .hero__stage { width: min(64vw, 29svh); } }
+@media (max-width: 640px) { .hero__stage { margin-top: 52px; } }
