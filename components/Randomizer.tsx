@@ -25,7 +25,7 @@ import { Paths, PersonaTeaser } from "./Paths";
 import { TrustCard } from "./TrustCard";
 import { Quiz } from "./Quiz";
 import { PersonaGallery } from "./PersonaGallery";
-import { StomachChallenge } from "./StomachChallenge";
+import { SupraFlyer } from "./SupraFlyer";
 import { FilterTokens } from "./FilterTokens";
 import { Sheet } from "./Sheet";
 import { HeroTitle } from "./HeroTitle";
@@ -417,7 +417,7 @@ export function Randomizer() {
       </div>
       <div className="chapter chapter--wine">
         <WaveBand tone="mustard" curve="b" text="მშიერი კაცი ბორბალს არ ეკამათება" />
-        <StomachChallenge wheelSlugs={(spun?.wheel ?? preview.result?.wheel ?? []).map((d) => d.slug)} personaId={prefs.persona} onDish={openDish} />
+        <SupraFlyer onDish={openDish} />
         <SectionBridge creature="cupcake" side="right" fact="ბებიასთან „უკვე ვჭამე“ არ მუშაობს. აქაც ვერ გაგვექცევი." />
       </div>
       <div className="chapter chapter--mustard">
