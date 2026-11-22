@@ -1895,3 +1895,35 @@ main, .page { overflow-x: clip; }
 .persona2__all { color: var(--wine); font-weight: 700; }
 @media (max-width: 640px) { .persona2__title { white-space: normal; font-size: 40px; } .persona2__deck { width: 180px; } }
 @media (prefers-reduced-motion: reduce) { .persona2__under, .persona2__top { transition: none; } }
+
+/* ── One button language (2026-11-22, Sandro: one style everywhere) ──────────
+   Primary = coral pill with a darker coral base. Secondary = underlined text link.
+   Old .pill--dark (sheets, popups) is mapped onto the same look. */
+.btn, .pill--dark {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; border: 0;
+  background: var(--brand) !important; color: var(--cream) !important; text-decoration: none;
+  font: 800 16px/1 var(--font); padding: 15px 26px; border-radius: 999px;
+  box-shadow: 0 4px 0 var(--brand-ink) !important; transition: translate .15s, box-shadow .15s;
+}
+.btn:hover, .pill--dark:hover { translate: 0 -2px; box-shadow: 0 6px 0 var(--brand-ink) !important; }
+.btn:active, .pill--dark:active { translate: 0 2px; box-shadow: 0 2px 0 var(--brand-ink) !important; }
+.btn:disabled { opacity: .6; cursor: default; translate: none; }
+.btn:focus-visible, .pill--dark:focus-visible { outline: 3px solid var(--wine); outline-offset: 3px; }
+.btn--lg { font-size: 18px; padding: 18px 32px; }
+.pill--outline, .pill--white { background: transparent !important; color: inherit !important; box-shadow: none !important;
+  text-decoration: underline; text-underline-offset: 4px; font-weight: 800; }
+.link { color: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }
+.sign__go { position: absolute; border: 0; box-shadow: 0 4px 0 var(--brand-ink) !important; }
+.wheel__add { background: var(--brand); color: var(--cream); box-shadow: 0 4px 0 var(--brand-ink); }
+.wheel__add:hover { background: var(--brand); translate: 0 -2px; }
+.token { border: 0; box-shadow: 0 2px 0 rgba(59, 13, 24, .2); }
+.group-note a { color: var(--brand-ink); text-decoration: underline; text-underline-offset: 3px; }
+.join__jury { display: none; }
+
+/* ── Header follows the section under it: cream on colour, wine on the cream section ── */
+.header, .header::after { transition: background-color .35s ease, color .35s ease; }
+.header[data-on="paths"], .header[data-on="paths"]::after { background: var(--wine); }
+.header[data-on="paths"] .nav-live a, .header[data-on="paths"] .nav-live__soon, .header[data-on="paths"] .nav-live__soon sup { color: var(--cream); }
+.header[data-on="paths"] .nav-live a.on { color: var(--wine); }
+.header[data-on="paths"] .nav-live a::before, .header[data-on="paths"] .nav-live__pill { background: var(--cream) !important; }
+.header[data-on="paths"] .header__user img { filter: invert(.95) sepia(.2); }

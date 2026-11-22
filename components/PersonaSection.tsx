@@ -44,7 +44,7 @@ export function PersonaSection({ persona, onStart, onGallery }: Props) {
         <p className="persona2__line">
           {persona ? persona.line : "7 კითხვა, ერთი წუთი — და ბორბალი შენს კუჭზე მოირგება."}
         </p>
-        <button className="paths2__main" onClick={onStart}>{persona ? "ტესტი თავიდან" : "გაიარე ტესტი ✦"}</button>
+        <button className="btn" onClick={onStart}>{persona ? "ტესტი თავიდან" : "გაიარე ტესტი ✦"}</button>
         <button className="link persona2__all" onClick={onGallery}>ნახე 12-ვე პერსონა →</button>
       </div>
     </section>

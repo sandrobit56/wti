@@ -26,7 +26,7 @@ export function HeroTitle({ winner = null, onOpen }: Props) {
           <>
             {/* key → remount → the flip animation replays for every new winner */}
             <span key={winner} className="accent sign__line sign__line--won">{winner}!</span>
-            {onOpen && <button className="sign__go" onClick={onOpen}>სად შეჭამ? ↓</button>}
+            {onOpen && <button className="btn sign__go" onClick={onOpen}>სად შეჭამ? ↓</button>}
           </>
         )}
       </p>

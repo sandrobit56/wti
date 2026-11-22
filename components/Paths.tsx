@@ -101,7 +101,7 @@ export function Paths({ dish, place, radius, group, onPickPlace, onSpin, onAgain
               <button role="radio" aria-checked={way === "order"} className={way === "order" ? "on" : ""} onClick={() => setWay("order")}>გამოიძახე</button>
             </div>
 
-            {main && <a className="paths2__main" href={main.href} target="_blank" rel="noreferrer">{main.label} ↗</a>}
+            {main && <a className="btn" href={main.href} target="_blank" rel="noreferrer">{main.label} ↗</a>}
 
             <ul className="paths2__rows">
               {way === "go" && venues.kind === "no-place" && (

@@ -211,7 +211,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
             <div className="game2__screen">
               <Image src="/icons/mascot.svg" alt="" width={84} height={84} />
               <p>4 რიგი · 3 სიცოცხლე · წიწაკა = −♥</p>
-              <button className="paths2__main" onClick={start}>▶ აფრენა</button>
+              <button className="btn" onClick={start}>▶ აფრენა</button>
             </div>
           )}
 
@@ -241,7 +241,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
                   ))}
                 </div>
               )}
-              <button className="paths2__main" onClick={start}>↻ თავიდან</button>
+              <button className="btn" onClick={start}>↻ თავიდან</button>
             </div>
           )}
         </div>

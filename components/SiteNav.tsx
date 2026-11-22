@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-18
- * Version:     v1.2 — "თამაში" link; scroll-spy sections in page order (fixes "ადგილები"
+ * Version:     v1.3 — header tone follows the section under it (data-on), "join" in scroll-spy;
+ *              v1.2 — "თამაში" link; scroll-spy sections in page order (fixes "ადგილები"
  *              staying lit further down the page)
  *              v1.1 — one consistent link style (was: measured sliding pill)
  * Description: Header (desktop) + tab bar (mobile), made "alive":
@@ -18,7 +19,7 @@
 import Image from "next/image";
 import { useEffect, useState, type ReactNode } from "react";
 
-type SectionId = "wheel" | "paths" | "game" | "persona" | "trust";
+type SectionId = "wheel" | "paths" | "game" | "persona" | "join" | "trust";
 const LEFT: { id: SectionId; label: string }[] = [
   { id: "wheel", label: "ბორბალი" },
   { id: "paths", label: "ადგილები" },
@@ -27,7 +28,7 @@ const LEFT: { id: SectionId; label: string }[] = [
 ];
 
 /** Page order — the last section whose top passed the line wins. */
-const SECTIONS: SectionId[] = ["wheel", "paths", "game", "persona", "trust"];
+const SECTIONS: SectionId[] = ["wheel", "paths", "game", "persona", "join", "trust"];
 
 /**
  * Which section is under the 45% line of the screen. Scroll-based on purpose: the
@@ -73,7 +74,7 @@ export function SiteHeader() {
   const scrolled = useScrolled();
 
   return (
-    <header className={scrolled ? "header header--scrolled" : "header"}>
+    <header className={scrolled ? "header header--scrolled" : "header"} data-on={active}>
       <nav className="header__nav nav-live only-desktop" aria-label="მთავარი">
         {LEFT.map((l) => (
           <a key={l.id} data-id={l.id} href={`#${l.id}`} className={active === l.id ? "on" : undefined} aria-current={active === l.id ? "true" : undefined}>
