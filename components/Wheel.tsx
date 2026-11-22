@@ -135,7 +135,7 @@ export function Wheel({ dishes, rotation, spinning, spinMs, landedOnce, onSpin, 
   const seatFigure = (t: Seat) => (
     <div key={t.i} className={`seat ${t.back ? "seat--back" : "seat--front"}${t.deg > 0 ? " seat--r" : ""}`} style={{ left: `${t.fx}%`, top: `${t.fy}%`, ["--depth" as string]: t.scale }}>
       <button className="seat__who" onClick={() => t.dish && onSeat(t.i)} disabled={!t.dish} tabIndex={-1} aria-hidden="true">
-        <Image src={`/illustrations/people/p${t.i + 1}.webp`} alt="" width={64} height={64} />
+        <Image src={`/illustrations/people/diner-${t.i + 1}.webp`} alt="" width={64} height={64} />
       </button>
       {t.i > 0 && !spinning && <button className="seat__x" onClick={() => onRemoveDiner(t.i)} aria-label={`მოაშორე სტუმარი ${t.i + 1}`}>×</button>}
     </div>

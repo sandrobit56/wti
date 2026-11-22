@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-22
- * Version:     v1.0
+ * Version:     v1.1 — high camera (62°), squarer box
  * Description: The 3D wheel's camera as plain math, shared by the three.js scene and the HTML
  *              layer on top of it (hub button, diners, place cards, drag zone). Because both use
  *              the same numbers, HTML lands exactly on the rendered plate — no measuring renders.
@@ -17,11 +17,11 @@ export type View = { elev: number; fov: number };
 export type Vec3 = [number, number, number];
 
 /** Long lens from far away: the near edge doesn't balloon, the far edge doesn't squash. */
-export const VIEW: View = { elev: 38, fov: 15 };
+export const VIEW: View = { elev: 62, fov: 15 };   // high, almost top-down: the plate reads as a full circle (Sandro's pick)
 /** Width / height of the wheel box (and the canvas). */
-export const ASPECT = 1 / 0.78;
+export const ASPECT = 1 / 0.92;
 /** World radius that must fit the frame width (rim + drum). */
-const FIT = 1.22;
+const FIT = 1.3;
 const TARGET: Vec3 = [0, -0.02, 0];
 
 /** Geometry shared with the scene. */
