@@ -209,6 +209,7 @@ export function Randomizer() {
   }
 
   function onLanded() {
+    if (!spun || spun.landed) return; // the fallback timer and transitionend may both call this
     setSpun((s) => (s ? { ...s, landed: true } : s));
     if (spun) setHistory((h) => [...h, { slug: spun.wheel[spun.winner].slug, at: Date.now() }].slice(-HISTORY_MAX));
     if (diners === 1) window.setTimeout(() => setModalOpen(true), 350); // let the eye see the pointer settle first
@@ -324,7 +325,7 @@ export function Randomizer() {
             {wheel.length > 0
               ? <Wheel
                   dishes={wheel} rotation={rotation} spinning={spinning} spinMs={spinMs} winnerIndex={winner} landedOnce={Boolean(spun?.landed)}
-                  onSpin={() => doSpin(false)} onFling={onFling} onLanded={onLanded}
+                  onSpin={(o) => doSpin(false, [], { ...DEFAULT_SPIN, offset: o })} onFling={onFling} onLanded={onLanded}
                   diners={seated} seatDishes={seatSlices ? seatSlices.map((i) => wheel[i].name) : null}
                   onSeat={(d) => { if (!seatSlices) return; const i = seatSlices[d]; setSpun((s) => (s ? { ...s, winner: i, why: d === 0 ? s.why : [] } : s)); setModalOpen(true); }}
                   onAddDiner={() => { setDiners((n) => Math.min(MAX_DINERS, n + 1)); setSpun((s) => (s?.landed ? null : s)); }}

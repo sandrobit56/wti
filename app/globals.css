@@ -1738,3 +1738,24 @@ main, .page { overflow-x: clip; }
   .wheel__add { right: auto; left: 50%; bottom: -2%; translate: -50% 0; }
   .group-note { font-size: 13px; padding: 6px 12px; }
 }
+
+/* ── Hero v11 (2026-11-22): sign without hooks, bigger sign + table, diners face the table
+   (3/4 renders; right-side seats mirrored) and pop in when added. ── */
+.sign { width: min(440px, 31vw); aspect-ratio: 1226 / 517; padding: 6% 4.2% 12.9% 4.4% !important;
+  filter: drop-shadow(0 14px 14px rgba(59, 13, 24, .22)) !important; }
+.sign .hero__title { font-size: 9.4cqw; }
+.sign .accent, .sign .sign__line--won { font-size: 8.4cqw; }
+.sign__go { top: 92%; }
+.hero__inner > .sign { margin-bottom: -2%; }
+.hero__stage { width: min(46vw, calc((100svh - 72px - 48px - min(440px, 31vw) * .34) / 1.13), 640px); margin-bottom: var(--s1); }
+.seat { width: 18cqw; }
+.seat--r .seat__who img { transform: scaleX(-1); }   /* renders face right; right-side diners turn to face the table */
+.seat__who img { animation: seat-in .6s var(--spring) both; transform-origin: 50% 100%; }
+@keyframes seat-in { from { translate: 0 30%; scale: .3; opacity: 0; } to { translate: 0 0; scale: 1; opacity: 1; } }
+@media (max-width: 1023px) {
+  .sign { width: min(80vw, 380px); }
+  .hero__stage { width: min(76vw, 38svh); }
+}
+@media (max-width: 640px) and (max-height: 720px) { .sign { width: min(62vw, 270px); } .hero__stage { width: min(64vw, 31svh); } }
+@media (prefers-reduced-motion: reduce) { .seat__who img { animation: none; } }
+.hero__status { white-space: nowrap; }

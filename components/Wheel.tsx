@@ -28,7 +28,7 @@
 "use client";
 
 import Image from "next/image";
-import { useId, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useId, useRef, useState, type PointerEvent } from "react";
 import type { Dish } from "@/lib/catalog.ts";
 import { toMtavruli } from "@/lib/mtavruli.ts";
 import { stickerSrc } from "@/lib/stickers.ts";
@@ -83,7 +83,8 @@ type Props = {
   spinMs: number;
   winnerIndex: number | null;
   landedOnce: boolean;
-  onSpin: () => void;
+  /** offset: degrees the plate was left turned by a slow drag (folded into the spin). */
+  onSpin: (offset: number) => void;
   /** velocity: deg/ms, signed (clockwise > 0). offset: how far the plate was dragged, in degrees. */
   onFling: (velocity: number, offset: number) => void;
   onLanded: () => void;
@@ -107,6 +108,16 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
   const svgRef = useRef<SVGSVGElement>(null);
   const drag = useRef<{ last: number; t: number; v: number } | null>(null);
   const [offset, setOffset] = useState(0);
+
+  // Safety net: transitionend can be skipped (tab hidden mid-spin, transition interrupted).
+  // Without it the wheel stayed "spinning" and the hub stayed disabled. Land on time anyway.
+  const landedRef = useRef(onLanded);
+  useEffect(() => { landedRef.current = onLanded; });
+  useEffect(() => {
+    if (!spinning) return;
+    const t = window.setTimeout(() => landedRef.current(), spinMs + 400);
+    return () => window.clearTimeout(t);
+  }, [spinning, spinMs]);
   const [dragging, setDragging] = useState(false);
 
   /** Pointer angle around the plate centre, in degrees (clockwise from 3 o'clock). */
@@ -201,14 +212,14 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
         </g>
         {diners === 1 && <Fork />}
       </svg>
-      <button className="wheel__hub" style={{ top: `${CENTER_Y * 100}%` }} onClick={onSpin} disabled={spinning} aria-label="დაატრიალე ბორბალი">
+      <button className="wheel__hub" style={{ top: `${CENTER_Y * 100}%` }} onClick={() => { const o = offset; setOffset(0); onSpin(o); }} disabled={spinning} aria-label="დაატრიალე ბორბალი">
         <span aria-hidden="true">{toMtavruli(hubLabel)}</span>
       </button>
       {diners > 1 && seatAngles(diners).map((deg, i) => {
         const rad = (deg * Math.PI) / 180;
         const dish = seatDishes?.[i];
         return (
-          <div key={i} className="seat" style={{ left: `calc(50% + ${Math.sin(rad) * SEAT_R}cqw)`, top: `calc(${CENTER_Y * 100}% - ${Math.cos(rad) * SEAT_R}cqw)` }}>
+          <div key={i} className={deg > 0 ? "seat seat--r" : "seat"} style={{ left: `calc(50% + ${Math.sin(rad) * SEAT_R}cqw)`, top: `calc(${CENTER_Y * 100}% - ${Math.cos(rad) * SEAT_R}cqw)` }}>
             <button className="seat__who" onClick={() => dish && onSeat(i)} disabled={!dish} aria-label={dish ? `${i === 0 ? "შენ" : `სტუმარი ${i + 1}`}: ${dish}` : `სტუმარი ${i + 1}`}>
               <Image src={`/illustrations/people/p${i + 1}.webp`} alt="" width={64} height={64} />
               {dish && <span className="seat__dish">{dish}</span>}
