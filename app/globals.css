@@ -1566,3 +1566,44 @@ main, .page { overflow-x: clip; }
   .sign { width: min(58vw, 260px); }
   .hero__stage { width: min(60vw, 30svh); }
 }
+
+/* ── Sign v6 (2026-11-22), option B: no board — the title itself is the object.
+   Puffy rubber letters: a vertical gradient fill (light top → deep base) clipped to the
+   glyphs, a thick same-colour stroke to round the corners, and stacked drop-shadows as
+   the coral side + a soft floor shadow. drop-shadow (not text-shadow) because it follows
+   the clipped fill's alpha. Words bob slightly out of phase, like squishy toys. */
+.sign {
+  background: none !important; filter: none; rotate: -2deg; aspect-ratio: auto; width: auto;
+  padding: 0 !important; container-type: normal; align-items: flex-start; justify-self: start;
+}
+.sign .hero__title, .sign .sign__winner { filter:
+  drop-shadow(0 .018em 0 #f1435e) drop-shadow(0 .018em 0 #f1435e) drop-shadow(0 .018em 0 #e0344f)
+  drop-shadow(0 .018em 0 #c92744) drop-shadow(0 .14em .1em rgba(59, 13, 24, .28)); }
+.sign .hero__title { font-size: clamp(64px, 7.6vw, 132px); line-height: .92; white-space: normal; color: var(--wine); }
+.sign .hero__title .w:not(.accent) {
+  text-shadow: none;
+  background: radial-gradient(120% 70% at 35% 18%, #9b3550 0%, #5a1626 38%, #3b0d18 70%, #2a0710 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  -webkit-text-stroke: .045em #3b0d18; paint-order: stroke fill;
+  animation: puff 3.2s ease-in-out infinite; animation-delay: calc(var(--w, 0) * -.6s);
+}
+.sign .accent, .sign .sign__line--won {
+  display: block; font-size: calc(clamp(64px, 7.6vw, 132px) * .9); line-height: 1; margin-top: .02em;
+  background: radial-gradient(120% 80% at 35% 20%, #ffd0d8 0%, #ff7a8f 35%, #f1435e 65%, #c92744 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  -webkit-text-stroke: .02em #f1435e; paint-order: stroke fill;
+}
+.sign .sign__winner { text-align: left; }
+.sign__go { font-size: 15px; padding: 10px 18px; margin-top: var(--s2); background: var(--wine); color: var(--cream); filter: none; }
+@keyframes puff { 0%, 100% { transform: translateY(0) scale(1, 1); } 50% { transform: translateY(-.04em) scale(1.015, .985); } }
+.sign .sign__line--won { animation: sign-flip .7s var(--spring) both; }
+@media (max-width: 1023px) {
+  .sign { justify-self: center; align-items: center; }
+  .sign .hero__title { font-size: clamp(48px, 15vw, 72px); text-align: center; }
+  .sign .accent, .sign .sign__line--won { font-size: clamp(44px, 13.5vw, 66px); }
+  .sign .sign__winner { text-align: center; }
+}
+@media (max-width: 640px) and (max-height: 720px) {
+  .sign .hero__title { font-size: 42px; } .sign .accent, .sign .sign__line--won { font-size: 38px; }
+}
+@media (prefers-reduced-motion: reduce) { .sign .hero__title .w { animation: none; } }
