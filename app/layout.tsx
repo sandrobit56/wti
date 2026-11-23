@@ -13,6 +13,7 @@ import "@fontsource-variable/noto-sans-georgian/standard.css";
 import "@fontsource-variable/noto-serif-georgian";
 import "@fontsource-variable/google-sans";
 import "./globals.css";
+import "./collage.css";   // collage art direction (v7): the look, loaded last
 import { SITE_DESC, SITE_NAME, SITE_URL } from "@/lib/site.ts";
 
 export const metadata: Metadata = {

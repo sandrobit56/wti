@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-21
- * Version:     v2.0 — short: ~1.5 s, the mascot runs in eating dots and the name pops
+ * Version:     v3 — collage portal (paper window, cloud sky, Hermes flies through, zoom in);
+ *              was:     v2.0 — short: ~1.5 s, the mascot runs in eating dots and the name pops
  *              (v1 typed three lines — too long, "like a poem")
  * Description: The curtain before the site (refs: siglitos.com, 197historias…).
  *   - Once per browser session: an inline script in app/page.tsx marks
@@ -16,9 +17,10 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { Ransom } from "./Ransom";
 
 const WORD = "რა ვჭამოთ?";
-const SHOW_MS = 1500, LIFT_MS = 600;
+const SHOW_MS = 2100, LIFT_MS = 900;   // portal: Hermes flies through, then we zoom into the window
 export const INTRO_KEY = "wti:intro";
 
 type Phase = "play" | "lift" | "done";
@@ -54,15 +56,19 @@ export function Intro() {
   if (phase === "done") return null;
 
   return (
-    <div className={`intro${phase === "lift" ? " intro--lift" : ""}`} onClick={finish} role="presentation">
-      <div className="intro__track" aria-hidden="true">
-        {Array.from({ length: 5 }, (_, i) => <span key={i} className="intro__dot" style={{ ["--i" as string]: i }} />)}
-        <Image className="intro__mascot" src="/icons/mascot.svg" alt="" width={72} height={74} priority />
+    <div className={`intro intro--portal${phase === "lift" ? " intro--lift" : ""}`} onClick={finish} role="presentation">
+      <div className="portal" aria-hidden="true">
+        <div className="portal__sky">
+          <span className="portal__cloud portal__cloud--a" />
+          <span className="portal__cloud portal__cloud--b" />
+          <span className="portal__cloud portal__cloud--c" />
+          <Image className="portal__hermes" src="/collage/hermes-sm.webp" alt="" width={444} height={759} priority />
+        </div>
+        <span className="portal__bar portal__bar--v" />
+        <span className="portal__bar portal__bar--h" />
       </div>
-      <p className="intro__word">
-        {[...WORD].map((ch, i) => <span key={i} style={{ ["--i" as string]: i }}>{ch === " " ? "\u00a0" : ch}</span>)}
-      </p>
-      <button type="button" className="intro__skip" onClick={(e) => { e.stopPropagation(); finish(); }}>[ გამოტოვე ]</button>
+      <Ransom text={WORD} caps={0.6} className="intro__word" as="p" />
+      <button type="button" className="intro__skip" onClick={(e) => { e.stopPropagation(); finish(); }}>გამოტოვე</button>
     </div>
   );
 }

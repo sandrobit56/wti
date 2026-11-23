@@ -28,7 +28,9 @@ import { PersonaGallery } from "./PersonaGallery";
 import { SupraFlyer } from "./SupraFlyer";
 import { FilterTokens } from "./FilterTokens";
 import { Sheet } from "./Sheet";
+import Image from "next/image";
 import { HeroTitle } from "./HeroTitle";
+import { Scribble } from "./Scribble";
 import { WaveBand } from "./WaveBand";
 import { JoinCritics } from "./JoinCritics";
 import { mapsSearchUrl } from "@/lib/places.ts";
@@ -318,6 +320,14 @@ export function Randomizer() {
   return (
     <>
       <section className="hero" id="wheel" ref={heroRef}>
+        {/* collage layer: Hermes (marble, AI) flies in with a fork; sun, tape and doodles around */}
+        <div className="hero__collage" aria-hidden="true">
+          <span className="hero__sun" />
+          <Image className="hero__hermes" src="/collage/hermes.webp" alt="" width={888} height={1519} priority sizes="(max-width: 1023px) 40vw, 360px" />
+          <Scribble kind="sparkle" className="hero__spark hero__spark--a" />
+          <Scribble kind="star" className="hero__spark hero__spark--b" />
+          <Scribble kind="loop" className="hero__loop" />
+        </div>
         <div className="hero__inner container">
           <HeroTitle winner={spun?.landed ? dish?.name ?? null : null} onOpen={() => pathsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })} />
           <div className="hero__stage">

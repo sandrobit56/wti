@@ -20,6 +20,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { priceBand, type Dish } from "@/lib/catalog.ts";
 import { stickerSrc } from "@/lib/stickers.ts";
+import { typePhoto } from "@/lib/photos.ts";
 import { toMtavruli } from "@/lib/mtavruli.ts";
 import { Words } from "./Words";
 import { deliveryLinks, mapsDirectionsUrl, mapsSearchUrl, type RadiusKm, type VenueMatch } from "@/lib/places.ts";
@@ -85,7 +86,7 @@ export function Paths({ dish, place, radius, group, onPickPlace, onSpin, onAgain
         <div className="paths2__plate" aria-hidden={!dish}>
           <ArcText className="paths2__arc" text={dish ? "დღეს შენი სუფრაა" : "ჯერ არაფერია"} />
           {dish
-            ? <Image key={dish.slug} className="paths2__dish" src={stickerSrc(dish.slug)} alt="" width={256} height={256} />
+            ? <Image key={dish.slug} className="paths2__dish paths2__dish--photo" src={typePhoto(dish.slug)?.src ?? stickerSrc(dish.slug)} alt="" width={256} height={256} sizes="260px" />
             : <button className="paths2__empty" onClick={onSpin}>{toMtavruli("ჯერ დაატრიალე")} ↑</button>}
         </div>
 
