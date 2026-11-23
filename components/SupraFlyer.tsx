@@ -58,7 +58,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
     const load = (key: string, src: string) => { const im = new window.Image(); im.src = src; imgs.current[key] = im; };
     for (const c of COURSES) for (const s of c.dishes) load(s, stickerSrc(s));
     load("chili", "/illustrations/creatures/chili.webp");
-    load("mascot", "/icons/mascot.svg");
+    load("mascot", "/icons/flyer.svg");   // the logo's chomper with a wing, no crumb
     load("table", "/illustrations/hero/plate.webp");
   }, []);
 
@@ -209,7 +209,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
 
           {screen === "idle" && (
             <div className="game2__screen">
-              <Image src="/icons/mascot.svg" alt="" width={84} height={84} />
+              <Image src="/icons/flyer.svg" alt="" width={84} height={84} />
               <p>4 რიგი · 3 სიცოცხლე · წიწაკა = −♥</p>
               <button className="btn" onClick={start}>▶ აფრენა</button>
             </div>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" fill="none">
+<title>რა ვჭამოთ? — the flyer</title>
+<clipPath id="h"><path d="M106 112L158.03 151.14A70 70 0 1 1 158.03 72.86Z"/></clipPath>
+<path d="M106 112L158.03 151.14A70 70 0 1 1 158.03 72.86Z" fill="#FFC93C"/>
+<g clip-path="url(#h)"><circle cx="100" cy="112" r="70" fill="#F2A91E"/><circle cx="103" cy="99" r="70" fill="#FFC93C"/></g>
+<path d="M76 106C56 82 30 62 8 66C6 76 12 82 20 84C12 92 16 102 28 102C24 112 34 120 46 116C54 124 68 122 76 114Z" fill="#FFF1DC" stroke="#163C3A" stroke-width="4" stroke-linejoin="round"/>
+<circle cx="104" cy="76" r="10" fill="#163C3A"/><circle cx="107" cy="73" r="3" fill="#fff"/>
+<path d="M59.0 56L59.0 34.92L73.5 45.8L88.0 22L102.5 45.8L117.0 34.92L117.0 56Z" fill="#F1435E" stroke="#F1435E" stroke-width="5" stroke-linejoin="round" transform="rotate(-8 88.0 56)"/>
+</svg>

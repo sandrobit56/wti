@@ -18,7 +18,8 @@
 
 import { Billboard, ContactShadows, Text, useTexture } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useEffect, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
+import { DISHES } from "@/lib/catalog.ts";
 import * as THREE from "three";
 import { configureTextBuilder } from "troika-three-text";
 import { toMtavruli } from "@/lib/mtavruli.ts";
@@ -57,7 +58,6 @@ function wedge(n: number, gap: number): THREE.ExtrudeGeometry {
 function Slice({ i, n, dish, geo, phi }: { i: number; n: number; dish: WheelDish; geo: THREE.ExtrudeGeometry; phi: React.RefObject<number> }) {
   const theta = sliceAngle(i, n);
   const col = i === n - 1 && n % SLICE.length === 1 ? 2 : i % SLICE.length;
-  const tex = useTexture(stickerSrc(dish.slug), (t) => { (Array.isArray(t) ? t : [t]).forEach((x) => { x.colorSpace = THREE.SRGBColorSpace; }); });
   const label = useRef<THREE.Group>(null);
   const lp = at(theta, 0.86, 0.075);
   useFrame(() => {
@@ -82,14 +82,33 @@ function Slice({ i, n, dish, geo, phi }: { i: number; n: number; dish: WheelDish
           </group>
         </group>
       </group>
-      <Billboard position={sp}>
-        <mesh>
-          <planeGeometry args={[0.36, 0.36]} />
-          <meshBasicMaterial map={tex} transparent alphaTest={0.05} toneMapped={false} />
-        </mesh>
-      </Billboard>
+      {/* each sticker suspends on its own: a texture still loading never blanks the scene */}
+      <Suspense fallback={null}><Sticker slug={dish.slug} position={sp} /></Suspense>
     </group>
   );
+}
+
+const srgb = (t: THREE.Texture | THREE.Texture[]) => { (Array.isArray(t) ? t : [t]).forEach((x) => { x.colorSpace = THREE.SRGBColorSpace; }); };
+
+function Sticker({ slug, position }: { slug: string; position: THREE.Vector3 }) {
+  const tex = useTexture(stickerSrc(slug), srgb);
+  return (
+    <Billboard position={position}>
+      <mesh>
+        <planeGeometry args={[0.36, 0.36]} />
+        <meshBasicMaterial map={tex} transparent alphaTest={0.05} toneMapped={false} />
+      </mesh>
+    </Billboard>
+  );
+}
+
+/** Warm the texture cache with every sticker once the first frame is up (each spin brings new dishes). */
+function PreloadStickers() {
+  useEffect(() => {
+    const id = window.setTimeout(() => DISHES.forEach((d) => useTexture.preload(stickerSrc(d.slug))), 1500);
+    return () => window.clearTimeout(id);
+  }, []);
+  return null;
 }
 
 function Bulbs({ count = 28 }: { count?: number }) {
@@ -209,6 +228,7 @@ export function Wheel3D({ view = VIEW, ...props }: SceneProps) {
       </directionalLight>
       <directionalLight position={[-3, 2, -2]} intensity={0.35} color="#F8B4C0" />
       <Plate {...props} />
+      <PreloadStickers />
       <ContactShadows position={[0, -0.28, 0]} opacity={0.35} scale={4} blur={2.6} far={1} color={C.teal} />
     </Canvas>
   );
