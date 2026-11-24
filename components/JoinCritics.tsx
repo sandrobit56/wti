@@ -3,8 +3,8 @@
  * File:        components/JoinCritics.tsx
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
- * Date:        2026-11-22
- * Version:     v1.3 — flat critic badge (logo style, arc lettering) instead of the 3D kit; was v1.1 — "კრიტიკოსი" (not "მსაჯი"), no 3D jury figures, one button style
+ * Date:        2026-11-25
+ * Version:     v1.4 — word-mosaic pomegranate (collage) replaces the flat badge; v1.3 — flat critic badge (logo style, arc lettering) instead of the 3D kit; was v1.1 — "კრიტიკოსი" (not "მსაჯი"), no 3D jury figures, one button style
  * Description: The closing section's one action: "გახდი კრიტიკოსი" (become a critic).
  *              A 3D "critic's kit" (notebook, magnifier, medal, khinkali — reusable later for the
  *              rating system), a short invitation and ONE button. The
@@ -42,7 +42,8 @@ export function JoinCritics() {
   return (
     <section className="join sect" id="join" aria-labelledby="join-title">
       <div className="container join__inner">
-        <Image className="join__kit" src="/illustrations/critic-badge.svg" alt="" width={400} height={400} unoptimized />
+        {/* a pomegranate pieced together from thousands of paper scraps — dish names and critic words */}
+        <Image className="join__kit join__mosaic" src="/collage/mosaic-pomegranate.webp" alt="" width={906} height={1000} sizes="(max-width: 640px) 70vw, 380px" />
         <h2 id="join-title" className="section-title display join__title"><Words caps parts={["გახდი ", ["კრიტიკოსი", "accent"]]} /></h2>
         <p className="join__lead">
           ჭამ, აკვირდები, გული გწყდება ცუდ ხინკალზე? ვეძებთ ადამიანებს, ვინც რესტორნებს შეამოწმებს და

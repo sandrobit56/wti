@@ -340,3 +340,35 @@ dialog::backdrop { background: rgba(22, 60, 58, .55) !important; backdrop-filter
 .offer__empty { position: absolute; right: 2%; bottom: 66%; white-space: nowrap; }
 .paths2__name { margin-top: 4px; }
 .paths2__name .strip { font-size: clamp(30px, 4vw, 48px); }
+
+/* ── 13 · v7.3 (refs: floating-object collage, cut-paper word mosaic) ─── */
+/* clouds: a soft seam between the hero and section 2 */
+.clouds { position: absolute; left: 0; right: 0; top: 0; z-index: 5; translate: 0 -66%; pointer-events: none; overflow-x: clip; }
+.clouds__img { display: block; width: 104%; max-width: none; margin-left: -2%; height: auto;
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 96%); mask-image: linear-gradient(to bottom, #000 62%, transparent 96%); }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .clouds__img { animation: clouds-drift linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+  }
+}
+@keyframes clouds-drift { from { translate: -3% 6%; } to { translate: 3% -6%; } }
+/* the khinkali hand comes down out of the clouds (bridge z 6 > clouds z 5) */
+
+/* floating real-food cut-outs: one per section, slow bob */
+.float { position: absolute; z-index: 3; height: auto; pointer-events: none; filter: drop-shadow(0 14px 14px rgba(28, 26, 23, .25)); animation: float-bob 7s ease-in-out infinite; }
+@keyframes float-bob { 0%, 100% { translate: 0 0; rotate: var(--r0, -8deg); } 50% { translate: 0 -14px; rotate: var(--r1, 4deg); } }
+.hero__chili { left: 9%; top: 26%; width: clamp(70px, 8vw, 130px); --r0: -24deg; --r1: -12deg; }
+.paths__churchkhela { right: 12%; top: 22%; width: clamp(28px, 3vw, 46px); --r0: 6deg; --r1: -6deg; animation-duration: 9s; }
+.persona__tarragon { right: 8%; top: 18%; width: clamp(90px, 10vw, 160px); --r0: 14deg; --r1: 24deg; animation-duration: 8s; }
+
+/* the critic mosaic: no sway (it is a heavy object), just pasted in */
+.join__kit.join__mosaic { width: min(380px, 70vw); animation: none; rotate: -4deg; filter: drop-shadow(0 20px 22px rgba(28, 26, 23, .3)); }
+
+@media (prefers-reduced-motion: reduce) { .float { animation: none; } }
+@media (max-width: 640px) {
+  .clouds { translate: 0 -60%; }
+  .clouds__img { width: 140%; margin-left: -20%; }
+  .hero__chili { left: 3%; top: 30%; width: 54px; }
+  .paths__churchkhela { right: 6%; top: 12%; }
+  .persona__tarragon { right: 2%; top: 8%; width: 70px; }
+}

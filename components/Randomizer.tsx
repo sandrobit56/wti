@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v3.3 — collage bridges between chapters (was torn seams), hero doodles removed;
+ * Version:     v3.4 — clouds over the first seam, floating food cut-outs;
+ *              v3.3 — collage bridges between chapters (was torn seams), hero doodles removed;
  *              v3.2 — flick-to-spin: a fast drag on the plate spins it (strength → turns and
  *              duration, direction follows the flick); v3.1 — mood chips, past winners, "never" list
  * Description: Page state: filters, place, radius → available dishes → wheel →
@@ -32,6 +33,7 @@ import { Sheet } from "./Sheet";
 import Image from "next/image";
 import { HeroTitle } from "./HeroTitle";
 import { Bridge } from "./Bridge";
+import { Float } from "./Float";
 import { JoinCritics } from "./JoinCritics";
 import { mapsSearchUrl } from "@/lib/places.ts";
 import { MAX_DINERS, fillSeats, seatAngles, seatsFor, sharedVenue, sliceAt, venueLabel } from "@/lib/seats.ts";
@@ -324,6 +326,7 @@ export function Randomizer() {
         <div className="hero__collage" aria-hidden="true">
           <span className="hero__sun" />
           <Image className="hero__hermes" src="/collage/hermes.webp" alt="" width={888} height={1519} priority sizes="(max-width: 1023px) 40vw, 360px" />
+          <Float item="chili" className="hero__chili" />
         </div>
         <div className="hero__inner container">
           <HeroTitle winner={spun?.landed ? dish?.name ?? null : null} onOpen={() => pathsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })} />
@@ -406,7 +409,10 @@ export function Randomizer() {
       {quizOpen && <Quiz onClose={() => setQuizOpen(false)} onApply={applyPersona} onDish={(slug) => { setQuizOpen(false); openDish(slug); }} />}
 
       <div className="chapter chapter--cream">
+      {/* pink cotton-candy clouds hide the seam between the hero and section 2 */}
+      <div className="clouds" aria-hidden="true"><Image className="clouds__img" src="/collage/clouds.webp" alt="" width={1600} height={406} sizes="100vw" /></div>
       <Bridge figure="khinkali-hand" side="left" />
+      <Float item="churchkhela" className="paths__churchkhela" />
       <div ref={pathsRef} className="paths-anchor">
         <Paths
           dish={dish} place={place} radius={radius} onPickPlace={pickPlace}
@@ -426,6 +432,7 @@ export function Randomizer() {
       </div>
       <div className="chapter chapter--mustard">
         <Bridge figure="athena" side="left" />
+        <Float item="tarragon" className="persona__tarragon" />
         <PersonaSection persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />
       {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} onDish={(slug) => { setGalleryOpen(false); openDish(slug); }} />}
       </div>
