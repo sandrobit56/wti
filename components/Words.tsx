@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-18
- * Version:     v2.1 — the "accent" part is cut-out ransom letters (collage v7);
+ * Version:     v2.2 — accent = paper strip (was ransom letters); v2.1 — the "accent" part is cut-out ransom letters (collage v7);
  *              v2.0 — caps: display titles set plain words in Mtavruli
  * Description: Splits text into words so CSS can scrub them in one by one with the
  *              scroll. Pure markup; the motion lives in globals.css under `.words`.
@@ -12,7 +12,7 @@
  *              serif voice word. `caps` turns plain parts into Mtavruli capitals;
  *              classed parts keep their own lettering.
  */
-import { Ransom } from "./Ransom";
+import { Strip } from "./Strip";
 import { toMtavruli } from "@/lib/mtavruli.ts";
 
 type Part = string | [string, string];
@@ -26,7 +26,7 @@ export function Words({ parts, caps = false }: { parts: Part[]; caps?: boolean }
       {parts.flatMap((p, pi) => {
         const [text, cls] = typeof p === "string" ? [p, ""] : p;
         // a styled part stays one piece, so "ვერ იყიდი" moves as one phrase
-        if (cls === "accent") return [<span key={`${pi}`} className="w accent" style={{ ["--w" as string]: i++ }} aria-hidden="true"><Ransom text={text} decorative /></span>];   // collage v7: the accent word is cut out of magazines
+        if (cls === "accent") return [<span key={`${pi}`} className="w accent" style={{ ["--w" as string]: i++ }} aria-hidden="true"><Strip text={text} decorative /></span>];   // collage v7.1: the accent word is one taped paper strip
         if (cls) return [<span key={`${pi}`} className={`w ${cls}`} style={{ ["--w" as string]: i++ }} aria-hidden="true">{text}</span>];
         return (caps ? toMtavruli(text) : text).split(/(\s+)/).filter(Boolean).map((w, wi) =>
           /^\s+$/.test(w) ? w : (

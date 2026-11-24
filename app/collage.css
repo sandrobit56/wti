@@ -5,7 +5,7 @@
  * Date:        2026-11-23
  * Version:     v1.0
  * Description: Collage art direction (v7). Loaded after globals.css and overrides it: paper,
- *              grain, tape, ransom letters, scissor-cut photos, marker doodles, torn seams,
+ *              grain, tape, paper strips, scissor-cut photos, marker doodles, torn seams,
  *              and the motion that goes with them (things get "pasted" in). Layout and logic
  *              stay in globals.css / components; this file is the look.
  *              References: wiro.ae (surreal photo scene, portal window, tape labels, motion),
@@ -31,33 +31,29 @@ body::after {
 /* every chapter is a sheet of paper: fibres on top of its colour */
 .hero, .chapter { background-image: var(--paper-tex); background-size: 1024px 1024px; background-blend-mode: multiply; }
 
-/* ── 2 · ransom letters ─────────────────────────────────────────────────── */
-.ransom { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .04em; line-height: 1; vertical-align: middle; }
-.ransom__gap { width: .28em; }
-.ransom { column-gap: .3em; row-gap: .08em; justify-content: center; }
-.ransom__word { display: inline-flex; flex-wrap: nowrap; gap: .04em; }
-.ransom__l {
-  display: inline-grid; place-items: center; min-width: .78em; padding: .07em .13em .1em;
-  background: var(--bg); color: var(--fg); font-family: var(--display); font-stretch: 100%;
-  transform: translateY(var(--dy)) rotate(var(--r)) scale(var(--s));
-  box-shadow: var(--paste); position: relative;
-  animation: paste .5s var(--paste-ease) both; animation-delay: calc(var(--i) * 45ms);
+/* ── 2 · paper strips (v7.1: one cut strip per phrase, replaces ransom letters) ── */
+.strip { position: relative; display: inline-block; rotate: var(--rot); line-height: 1; vertical-align: middle; animation: paste .5s var(--paste-ease) both; }
+.strip__paper {
+  display: block; padding: .12em .42em .2em; clip-path: var(--cut);
+  font-family: var(--display); font-weight: 800; font-stretch: 75%; letter-spacing: -.005em; white-space: nowrap;
+  background: var(--strip-bg) var(--paper-tex) 0 0 / 400px; background-blend-mode: multiply; color: var(--strip-fg);
 }
-.ransom__l--cond { font-stretch: 62.5%; letter-spacing: -.01em; }
-.ransom__l--serif { font-family: var(--serif); font-weight: 600 !important; font-style: normal; letter-spacing: -.02em; }
-.ransom__l--outline { color: transparent; -webkit-text-stroke: .045em var(--fg); }
-/* four scissor silhouettes */
-.ransom__l--s0 { clip-path: polygon(0 4%, 96% 0, 100% 92%, 5% 100%); }
-.ransom__l--s1 { clip-path: polygon(4% 0, 100% 6%, 94% 100%, 0 95%); }
-.ransom__l--s2 { clip-path: polygon(0 0, 100% 3%, 97% 97%, 2% 100%); border-radius: 0 .12em 0 .12em; }
-.ransom__l--s3 { border-radius: 50%; padding: .12em .18em; }
+/* clip-path eats box-shadow, so the paste shadow goes on the unclipped wrapper */
+.strip { filter: drop-shadow(0 6px 7px rgba(28, 26, 23, .28)); }
+.strip--paper  { --strip-bg: var(--paper); --strip-fg: var(--brand); }
+.strip--ink    { --strip-bg: var(--news);  --strip-fg: var(--yellow); }
+.strip--red    { --strip-bg: var(--brand); --strip-fg: var(--paper); }
+.strip--yellow { --strip-bg: var(--yellow); --strip-fg: var(--news); }
+.strip__tape { position: absolute; top: -.18em; width: 1.5em; height: .42em; background: var(--tape); clip-path: var(--tape-cut); pointer-events: none; }
+.strip--tape-left .strip__tape  { left: -.35em; rotate: calc(var(--tape-rot) * -1); }
+.strip--tape-right .strip__tape { right: -.35em; rotate: var(--tape-rot); }
 @keyframes paste {
-  0% { opacity: 0; transform: translateY(calc(var(--dy) - .5em)) rotate(calc(var(--r) * -2.5)) scale(calc(var(--s) * 1.35)); }
+  0% { opacity: 0; transform: translateY(-.35em) scale(1.08) rotate(-4deg); }
   60% { opacity: 1; }
-  100% { transform: translateY(var(--dy)) rotate(var(--r)) scale(var(--s)); }
+  100% { transform: none; }
 }
-/* ransom inside a section title (Words "accent") */
-.w.accent .ransom { font-size: .86em; gap: .03em; }
+/* strip inside a section title (Words "accent") */
+.w.accent .strip { font-size: .9em; margin: 0 .08em; }
 .w.accent { font-family: var(--display) !important; letter-spacing: 0 !important; }
 
 /* ── 3 · doodles ────────────────────────────────────────────────────────── */
@@ -154,9 +150,8 @@ body::after {
 /* the sign: a torn strip of paper with the title cut out of magazines */
 .sign.sign--paper { background: none !important; padding: 0 !important; display: grid; justify-items: center; gap: 6px; }
 .sign--paper .hero__title { margin: 0; display: grid; justify-items: center; gap: 4px; }
-.sign__ransom { font-size: clamp(34px, 4.4vw, 64px); }
-.sign__ask { position: relative; font: 600 clamp(28px, 3.4vw, 46px)/1 var(--serif); color: var(--news); rotate: -3deg; padding: 0 .2em; }
-.sign__under { position: absolute; left: 0; right: 0; bottom: -.28em; width: 100%; height: .4em; color: var(--brand); }
+.sign__title { font-size: clamp(40px, 5.6vw, 84px); }
+.sign__ask { font-size: clamp(28px, 3.6vw, 52px); margin-top: -.12em; }
 .sign__winner { margin: 0; display: grid; justify-items: center; gap: 14px; }
 .sign__won { font-size: clamp(30px, 4vw, 54px); }
 .sign--paper .sign__go { position: static !important; translate: none; }
@@ -294,7 +289,7 @@ dialog::backdrop { background: rgba(22, 60, 58, .55) !important; backdrop-filter
 
 /* ── 13 · motion off ────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  body::after, .hero__sun, .hero__hermes, .portal__cloud, .portal__hermes, .ransom__l, .scribble path, .join__kit { animation: none !important; }
+  body::after, .hero__sun, .hero__hermes, .portal__cloud, .portal__hermes, .strip, .scribble path, .join__kit { animation: none !important; }
   .scribble path { stroke-dashoffset: 0; }
 }
 
@@ -325,7 +320,7 @@ dialog::backdrop { background: rgba(22, 60, 58, .55) !important; backdrop-filter
 .sign.sign--paper > * { grid-column: 1 !important; grid-row: auto !important; position: static !important; }
 .sign--paper .sign__winner:empty { display: none; }
 .hero__inner > .sign.sign--paper { container-type: normal !important; justify-self: center; width: max-content !important; max-width: min(92vw, 760px); margin-bottom: 0 !important; z-index: 2; }
-.sign--paper .ransom { justify-content: center; }
+
 
 .header[data-on] .header__nav a.on { background: var(--news) !important; color: var(--cream) !important; }
 .chapter > :not(.seam):first-of-type, .chapter > .seam + * { padding-top: 40px; }

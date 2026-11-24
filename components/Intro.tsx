@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-21
- * Version:     v3 — collage portal (paper window, cloud sky, Hermes flies through, zoom in);
+ * Version:     v3.1 — word on a paper strip (was ransom letters); v3 — collage portal (paper window, cloud sky, Hermes flies through, zoom in);
  *              was:     v2.0 — short: ~1.5 s, the mascot runs in eating dots and the name pops
  *              (v1 typed three lines — too long, "like a poem")
  * Description: The curtain before the site (refs: siglitos.com, 197historias…).
@@ -17,7 +17,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Ransom } from "./Ransom";
+import { Strip } from "./Strip";
 
 const WORD = "რა ვჭამოთ?";
 const SHOW_MS = 2100, LIFT_MS = 900;   // portal: Hermes flies through, then we zoom into the window
@@ -67,7 +67,7 @@ export function Intro() {
         <span className="portal__bar portal__bar--v" />
         <span className="portal__bar portal__bar--h" />
       </div>
-      <Ransom text={WORD} caps={0.6} className="intro__word" as="p" />
+      <Strip text={WORD} className="intro__word" as="p" />
       <button type="button" className="intro__skip" onClick={(e) => { e.stopPropagation(); finish(); }}>გამოტოვე</button>
     </div>
   );

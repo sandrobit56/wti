@@ -10,7 +10,7 @@
  *               - deckle:     an SVG path of a circle with a torn, uneven edge (paper plate)
  *               - tornEdge:   an SVG path of a torn horizontal paper edge (section seams)
  */
-import { hash, rng } from "./ransom.ts";
+import { hash, rng } from "./seed.ts";
 
 /** Rough polygon around a box, as a CSS `polygon(...)` in %. `cuts` = corners per side. */
 export function cutPolygon(seed: string, cuts = 3, jitter = 4): string {
