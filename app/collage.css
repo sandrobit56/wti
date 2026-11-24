@@ -19,19 +19,17 @@
   --paste-ease: cubic-bezier(.2, 1.6, .4, 1);
   /* ragged tape ends: a strip cut with fingers, not scissors */
   --tape-cut: polygon(2% 0, 98% 4%, 100% 22%, 97% 46%, 100% 72%, 98% 100%, 3% 96%, 0 74%, 3% 50%, 0 26%);
-  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  --fibres: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012 .09' numOctaves='2' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .3 0 0 0 0 .2 0 0 0 .18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
+  --paper-tex: url("/collage/paper.webp");   /* 1024² tileable paper, procedural (public/collage) */
+  --grain-tex: url("/collage/grain.webp");   /* 512² tileable film grain */
 }
 
-/* film grain over everything (wiro's photographic noise) */
+/* film grain over everything (wiro's photographic noise): fine, static, soft-light */
 body::after {
-  content: ""; position: fixed; inset: -50%; z-index: 9999; pointer-events: none;
-  background-image: var(--grain); opacity: .14; mix-blend-mode: multiply;
-  animation: grain-shift .9s steps(4) infinite;
+  content: ""; position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+  background: var(--grain-tex) 0 0 / 256px 256px; opacity: .22; mix-blend-mode: soft-light;
 }
-@keyframes grain-shift { 0% { translate: 0 0; } 25% { translate: -3% 2%; } 50% { translate: 2% -3%; } 75% { translate: -1% -2%; } 100% { translate: 0 0; } }
 /* every chapter is a sheet of paper: fibres on top of its colour */
-.hero, .chapter { background-image: var(--fibres); background-blend-mode: multiply; }
+.hero, .chapter { background-image: var(--paper-tex); background-size: 1024px 1024px; background-blend-mode: multiply; }
 
 /* ── 2 · ransom letters ─────────────────────────────────────────────────── */
 .ransom { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .04em; line-height: 1; vertical-align: middle; }
@@ -131,7 +129,7 @@ body::after {
 .wave { display: none !important; }
 
 /* ── 7 · hero ───────────────────────────────────────────────────────────── */
-.hero { position: relative; overflow: clip; background-color: var(--blush) !important; background-image: var(--fibres), radial-gradient(120% 70% at 50% 110%, rgba(241, 67, 94, .35), transparent 60%) !important; }
+.hero { position: relative; overflow: clip; background-color: var(--blush) !important; background-image: var(--paper-tex), radial-gradient(120% 70% at 50% 110%, rgba(241, 67, 94, .35), transparent 60%) !important; background-size: 1024px 1024px, auto !important; }
 .hero__collage { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
 .hero__sun { position: absolute; right: 9%; top: 14%; width: 280px; aspect-ratio: 1; border-radius: 50%;
   background: radial-gradient(circle, var(--mustard) 0 55%, transparent 56%), repeating-radial-gradient(circle, rgba(22, 60, 58, .2) 0 1.5px, transparent 1.5px 7px);
@@ -190,7 +188,7 @@ body::after {
 .wheel--paper .wheel__hub {
   position: absolute; left: 50%; top: 50%; width: 24%; aspect-ratio: 1; translate: -50% -50%; transform: none; border: 0; padding: 0; cursor: pointer;
   border-radius: 49% 51% 47% 53% / 52% 48% 52% 48%;
-  background: var(--brand) var(--grain); background-blend-mode: multiply; color: var(--cream);
+  background: var(--brand) var(--paper-tex); background-blend-mode: multiply; color: var(--cream);
   box-shadow: 0 0 0 5px var(--paper), 0 0 0 6.5px rgba(22, 60, 58, .2), 0 10px 20px -6px rgba(22, 60, 58, .55);
   font: 900 clamp(12px, 2.1cqw + 6px, 20px)/1 var(--display); font-stretch: 62.5%; letter-spacing: .04em;
   rotate: -4deg; transition: rotate .3s var(--spring), scale .3s var(--spring), background-color .2s; animation: none;
@@ -217,7 +215,7 @@ body::after {
 .group-note { background: var(--paper) !important; border-radius: 2px !important; box-shadow: var(--paste) !important; rotate: -1deg; }
 
 /* ── 9 · intro: the portal window ───────────────────────────────────────── */
-.intro--portal { background: var(--blush) var(--fibres) !important; display: grid; place-items: center; align-content: center; gap: 28px; }
+.intro--portal { background: var(--blush) var(--paper-tex) !important; display: grid; place-items: center; align-content: center; gap: 28px; }
 .intro--portal .portal {
   position: relative; width: min(46vw, 300px); aspect-ratio: 3 / 4.3; padding: 14px; background: #2f5b57;
   box-shadow: inset 0 0 0 4px #24504c, 0 30px 60px -20px rgba(22, 60, 58, .6);
@@ -261,16 +259,16 @@ body::after {
 .persona2__top::after { content: ""; position: absolute; left: 50%; top: -14px; width: 90px; height: 26px; translate: -50% 0; rotate: 3deg; background: var(--tape); z-index: 3; }
 /* critics */
 .join__kit { animation: badge-sway 6s ease-in-out infinite; }
-.join__form { background: var(--paper) var(--fibres) !important; border-radius: 3px !important; box-shadow: var(--paste) !important; rotate: -.6deg; }
+.join__form { background: var(--paper) var(--paper-tex) !important; border-radius: 3px !important; box-shadow: var(--paste) !important; rotate: -.6deg; }
 .join__form input, .join__form select { border-radius: 2px !important; border: 0 !important; border-bottom: 2.5px solid var(--news) !important; background: rgba(255, 255, 255, .6) !important; }
 .join__form input:focus, .join__form select:focus { outline: none; border-bottom-color: var(--brand) !important; background: #fff !important; }
 .footer { background: var(--news) !important; color: var(--cream) !important; }
 
 /* ── 11 · popups and sheets: paper cards taped to the screen ────────────── */
-.modal__card, .bs, .sheet__card { background: var(--paper) var(--fibres) !important; border-radius: 4px !important; box-shadow: 0 30px 70px -20px rgba(0, 0, 0, .55) !important; overflow: visible !important; }
+.modal__card, .bs, .sheet__card { background: var(--paper) var(--paper-tex) !important; border-radius: 4px !important; box-shadow: 0 30px 70px -20px rgba(0, 0, 0, .55) !important; overflow: visible !important; }
 .modal__card::before, .bs::before { content: ""; position: absolute; left: 50%; top: -14px; width: 130px; height: 30px; translate: -50% 0; rotate: -2deg; background: var(--tape); z-index: 4; pointer-events: none; }
 dialog::backdrop { background: rgba(22, 60, 58, .55) !important; backdrop-filter: grayscale(.6) !important; }
-.modal__hero { border-radius: 2px !important; background: var(--blush) var(--fibres) !important; }
+.modal__hero { border-radius: 2px !important; background: var(--blush) var(--paper-tex) !important; }
 .version, .row-card, .delivery { border-radius: 2px !important; box-shadow: var(--paste) !important; border: 0 !important; }
 .version:nth-child(odd) { rotate: -.6deg; }
 .version:nth-child(even) { rotate: .5deg; }

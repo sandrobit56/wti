@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-23
- * Version:     v9.0 — collage art direction: a flat paper wheel. Torn-edge paper plate,
+ * Version:     v9.1 — real paper texture (public/collage/paper.webp) instead of SVG noise;
+ *              v9.0 — collage art direction: a flat paper wheel. Torn-edge paper plate,
  *              paper slices with grain, real dish photos cut out with scissors (white paper
  *              border), a marker arrow as the pointer. No WebGL any more (−280 kB).
  *              v8 — three.js scene; v7 — CSS-tilted painted turntable.
@@ -90,10 +91,9 @@ function photoOf(slug: string): string {
 function Defs({ uid }: { uid: string }) {
   return (
     <defs>
-      <filter id={`grain${uid}`} x="0" y="0" width="100%" height="100%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" />
-        <feColorMatrix values="0 0 0 0 0.09  0 0 0 0 0.08  0 0 0 0 0.07  0 0 0 0.55 0" />
-      </filter>
+      <pattern id={`paper${uid}`} patternUnits="userSpaceOnUse" width="256" height="256">
+        <image href="/collage/paper.webp" width="256" height="256" />
+      </pattern>
       <filter id={`paste${uid}`} x="-20%" y="-20%" width="140%" height="140%">
         <feDropShadow dx="0" dy="3" stdDeviation="2.4" floodColor="#163C3A" floodOpacity="0.28" />
       </filter>
@@ -169,12 +169,13 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
         <Defs uid={uid} />
         {/* the paper plate, pasted on the page */}
         <path d={deckle("plate", PLATE, 3.2)} fill="#FFF1DC" filter={`url(#paste${uid})`} />
+        <path d={deckle("plate", PLATE, 3.2)} fill={`url(#paper${uid})`} style={{ mixBlendMode: "multiply" }} />
         <path d={deckle("plate-in", PLATE - 9, 1.6)} fill="none" stroke="#163C3A" strokeOpacity="0.35" strokeWidth="1.2" strokeDasharray="1 5" strokeLinecap="round" />
 
         {/* everything that turns */}
         <g className={discCls} style={discStyle} onTransitionEnd={(e) => { if (e.propertyName === "transform") onLanded(); }}>
           {dishes.map((d, i) => <path key={`s${d.slug}`} d={slicePath(i, n)} fill={SLICE[colorOf(i, n)]} />)}
-          <rect x={-R} y={-R} width={R * 2} height={R * 2} filter={`url(#grain${uid})`} clipPath={`url(#disc${uid})`} opacity="0.22" pointerEvents="none" />
+          <rect x={-R} y={-R} width={R * 2} height={R * 2} fill={`url(#paper${uid})`} clipPath={`url(#disc${uid})`} style={{ mixBlendMode: "multiply" }} pointerEvents="none" />
           {dishes.map((d, i) => {
             const mid = i * a + a / 2;
             const ci = colorOf(i, n);
