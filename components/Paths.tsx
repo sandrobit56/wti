@@ -2,8 +2,9 @@
  * File:        components/Paths.tsx
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
- * Date:        2026-11-22
- * Version:     v4.0 — one object, one choice, one button (Sandro's UX review: 4 boxes,
+ * Date:        2026-11-25
+ * Version:     v4.1 — collage: a marble hand offers the dish, the name is a paper strip;
+ *              v4.0 — one object, one choice, one button (Sandro's UX review: 4 boxes,
  *              5 buttons, 5 links and 6 moving illustrations slowed the decision down).
  *              (v3.0 — three cards: read / go / order)
  * Description: Section 2, "სად შეჭამ?". The dish the wheel picked lands on a plate in the
@@ -15,13 +16,12 @@
  */
 "use client";
 
-import { ArcText } from "./ArcText";
+import { Strip } from "./Strip";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { priceBand, type Dish } from "@/lib/catalog.ts";
 import { stickerSrc } from "@/lib/stickers.ts";
 import { typePhoto } from "@/lib/photos.ts";
-import { toMtavruli } from "@/lib/mtavruli.ts";
 import { Words } from "./Words";
 import { deliveryLinks, mapsDirectionsUrl, mapsSearchUrl, type RadiusKm, type VenueMatch } from "@/lib/places.ts";
 import { MY_LOCATION, type Place } from "./FilterPanel";
@@ -83,16 +83,17 @@ export function Paths({ dish, place, radius, group, onPickPlace, onSpin, onAgain
           <Words caps parts={["სად ", ["შეჭამ?", "accent"]]} />
         </h2>
 
-        <div className="paths2__plate" aria-hidden={!dish}>
-          <ArcText className="paths2__arc" text={dish ? "დღეს შენი სუფრაა" : "ჯერ არაფერია"} />
+        {/* collage v7.1: a marble hand offers today's dish (was a plate with arc text) */}
+        <div className="offer" aria-hidden={!dish}>
+          <Image className="offer__hand" src="/collage/palm.webp" alt="" width={1000} height={494} sizes="(max-width: 640px) 92vw, 560px" />
           {dish
-            ? <Image key={dish.slug} className="paths2__dish paths2__dish--photo" src={typePhoto(dish.slug)?.src ?? stickerSrc(dish.slug)} alt="" width={256} height={256} sizes="260px" />
-            : <button className="paths2__empty" onClick={onSpin}>{toMtavruli("ჯერ დაატრიალე")} ↑</button>}
+            ? <Image key={dish.slug} className="offer__dish paths2__dish" src={typePhoto(dish.slug)?.src ?? stickerSrc(dish.slug)} alt="" width={256} height={256} sizes="200px" />
+            : <button className="offer__empty btn" onClick={onSpin}>ჯერ დაატრიალე ↑</button>}
         </div>
 
         {dish && (
           <>
-            <p className="paths2__name">{dish.name}</p>
+            <p className="paths2__name"><Strip text={dish.name} tone="yellow" /></p>
             <p className="paths2__meta">
               ≈ {dish.priceGel[0]}–{dish.priceGel[1]} ₾ · {"₾".repeat(priceBand(dish))} · {dish.cuisine}
               {group && <> · <strong>{group.summary}</strong></>}

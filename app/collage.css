@@ -5,7 +5,7 @@
  * Date:        2026-11-23
  * Version:     v1.0
  * Description: Collage art direction (v7). Loaded after globals.css and overrides it: paper,
- *              grain, tape, paper strips, scissor-cut photos, marker doodles, torn seams,
+ *              grain, tape, paper strips, scissor-cut photos, marker doodles, collage bridges,
  *              and the motion that goes with them (things get "pasted" in). Layout and logic
  *              stay in globals.css / components; this file is the look.
  *              References: wiro.ae (surreal photo scene, portal window, tape labels, motion),
@@ -103,20 +103,24 @@ body::after {
 .tabbar { background: var(--paper) !important; border-top: 0 !important; box-shadow: 0 -8px 20px -12px rgba(22, 60, 58, .45) !important; }
 .tabbar a.on { color: var(--brand) !important; }
 
-/* ── 6 · seams between chapters: torn paper + printed tape ──────────────── */
-.chapter { position: relative; }
-.seam { position: absolute; left: 0; right: 0; top: -118px; z-index: 6; height: 118px; pointer-events: none; }
-.seam__tear { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 46px; fill: var(--paper-c, var(--cream)); filter: drop-shadow(0 -4px 3px rgba(22, 60, 58, .18)); }
-.seam__tape {
-  position: absolute; left: -4%; right: -4%; top: 18px; height: 48px; overflow: hidden; display: flex; align-items: center;
-  background: var(--news); color: var(--cream); clip-path: var(--tape-cut); rotate: -2.2deg;
-  box-shadow: 0 6px 14px -6px rgba(0, 0, 0, .4);
+/* ── 6 · bridges between chapters: one cut-out figure across the seam ──── */
+.chapter { position: relative; box-shadow: 0 -14px 28px -18px rgba(28, 26, 23, .35); }  /* stacked sheets, not a hard line */
+.bridge { position: absolute; z-index: 6; top: 0; pointer-events: none; translate: 0 -50%; }
+.bridge__img { display: block; width: 100%; height: auto; filter: drop-shadow(0 18px 22px rgba(28, 26, 23, .32)); }
+.bridge--left { left: max(2vw, 16px); }
+.bridge--right { right: max(2vw, 16px); }
+.bridge--khinkali-hand { width: clamp(150px, 19vw, 300px); translate: 0 -64%; rotate: -8deg; }
+.bridge--dionysus { width: clamp(170px, 22vw, 340px); rotate: 6deg; }
+.bridge--athena { width: clamp(170px, 22vw, 330px); rotate: -5deg; }
+.bridge--icarus { width: clamp(240px, 32vw, 500px); rotate: -10deg; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .bridge__img { animation: bridge-drift linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+    .bridge--icarus .bridge__img { animation-name: bridge-fly; }
+  }
 }
-.seam--b .seam__tape { rotate: 1.8deg; }
-.seam--mustard .seam__tape { background: var(--mustard); color: var(--news); }
-.seam--brand .seam__tape { background: var(--brand); color: var(--cream); }
-.seam--cream .seam__tape { background: var(--cream); color: var(--news); }
-.seam__line { white-space: nowrap; font: 900 24px/1 var(--display); font-stretch: 62.5%; letter-spacing: .04em; will-change: transform; }
+@keyframes bridge-drift { from { translate: 0 12%; rotate: -3deg; } to { translate: 0 -12%; rotate: 3deg; } }
+@keyframes bridge-fly { from { translate: -25% 15%; } to { translate: 25% -15%; } }
 .chapter--cream { --paper-c: var(--cream); }
 .chapter--wine { --paper-c: var(--wine); }
 .chapter--mustard { --paper-c: var(--mustard); }
@@ -135,10 +139,6 @@ body::after {
   filter: drop-shadow(0 18px 18px rgba(22, 60, 58, .35)); animation: hermes-in 1.1s .2s var(--paste-ease) both, hermes-float 6s 1.4s ease-in-out infinite; }
 @keyframes hermes-in { from { translate: 30vw -20vh; rotate: 30deg; opacity: 0; } }
 @keyframes hermes-float { 50% { translate: 0 -14px; rotate: 6deg; } }
-.hero__spark { position: absolute; color: var(--news); width: 44px; }
-.hero__spark--a { left: 12%; top: 18%; }
-.hero__spark--b { right: 30%; top: 64%; width: 56px; color: var(--brand); }
-.hero__loop { position: absolute; left: 6%; bottom: 14%; width: 220px; color: var(--mustard); }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
     .hero__hermes { animation: hermes-in 1.1s .2s var(--paste-ease) both, hermes-scroll linear both; animation-timeline: auto, scroll(root); animation-range: normal, 0 100vh; }
@@ -238,9 +238,6 @@ body::after {
 /* ── 10 · chapters ──────────────────────────────────────────────────────── */
 .display { letter-spacing: -.005em; }
 /* section 2: the result plate is a paper plate, the dish a scissor cut-out */
-.paths2__plate { background: var(--paper) !important; box-shadow: var(--paste), 0 0 0 10px rgba(255, 250, 242, .6) !important; border-radius: 50% !important; }
-.paths2__plate img { border-radius: 0 !important; clip-path: polygon(3% 6%, 30% 0, 62% 4%, 97% 1%, 100% 34%, 96% 66%, 99% 97%, 64% 100%, 33% 95%, 2% 99%, 5% 63%, 0 30%); filter: drop-shadow(0 6px 6px rgba(22, 60, 58, .3)); }
-.paths2__arc text, .arc-text text { fill: var(--news); }
 .switch, .segmented { border-radius: 2px !important; }
 /* game: the stage is a photo print, taped to the board */
 .game2__stage { border-radius: 4px !important; box-shadow: 0 0 0 10px var(--paper), 0 24px 40px -18px rgba(0, 0, 0, .55) !important; rotate: -.6deg; overflow: visible !important; }
@@ -280,7 +277,7 @@ dialog::backdrop { background: rgba(22, 60, 58, .55) !important; backdrop-filter
 /* ── 12 · things get pasted in as you scroll ────────────────────────────── */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .paths2__plate, .game2__stage, .persona2__deck, .join__kit, .join__form {
+    .offer, .game2__stage, .persona2__deck, .join__kit, .join__form {
       animation: paste-in linear both; animation-timeline: view(); animation-range: entry 0% entry 70%;
     }
     @keyframes paste-in { from { opacity: 0; scale: 1.25; rotate: -6deg; translate: 0 40px; } }
@@ -297,10 +294,7 @@ dialog::backdrop { background: rgba(22, 60, 58, .55) !important; backdrop-filter
 @media (max-width: 1023px) {
   .hero__hermes { width: 34vw; right: -6%; top: 2%; opacity: .95; }
   .hero__sun { width: 180px; right: -4%; top: 6%; }
-  .hero__loop, .hero__spark--b { display: none; }
-  .seam { height: 96px; top: -96px; }
-  .seam__tape { height: 40px; top: 18px; }
-  .seam__line { font-size: 19px; }
+  .bridge--khinkali-hand { width: 26vw; } .bridge--dionysus, .bridge--athena { width: 28vw; } .bridge--icarus { width: 46vw; }
 }
 @media (max-width: 640px) {
   .hero__hermes { width: 30vw; top: 1%; right: -8%; }
@@ -323,9 +317,8 @@ dialog::backdrop { background: rgba(22, 60, 58, .55) !important; backdrop-filter
 
 
 .header[data-on] .header__nav a.on { background: var(--news) !important; color: var(--cream) !important; }
-.chapter > :not(.seam):first-of-type, .chapter > .seam + * { padding-top: 40px; }
+.chapter > .bridge + * { padding-top: 40px; }
 /* section 2: the dish is a real photo, cut out square-ish and pasted crooked on the paper plate */
-.paths2__dish--photo { width: 72% !important; height: 72% !important; object-fit: cover; rotate: -4deg; outline: 7px solid var(--paper); outline-offset: -1px; }
 /* the header is newsprint on every chapter now (no per-chapter colour); the sliding pill is replaced by the tape label */
 .nav-live a::before, .nav-live__pill { display: none !important; }
 .header[data-on] .header__user img { filter: none !important; }
@@ -336,3 +329,14 @@ dialog::backdrop { background: rgba(22, 60, 58, .55) !important; backdrop-filter
   .hero__stage { width: min(70vw, 50svh) !important; }
   .wheel--paper .wheel__hub { font-size: 11px !important; letter-spacing: 0; }
 }
+
+/* ── 12 · section 2: a marble hand offers today's dish (v7.1) ──────────── */
+.offer { position: relative; width: min(640px, 94vw); margin: 8px 0 4px; }
+.offer__hand { display: block; width: 100%; height: auto; filter: drop-shadow(0 16px 18px rgba(28, 26, 23, .25)); }
+/* the dish sits in the cupped palm (palm centre ≈ 78% / 44% of the image) */
+.offer__dish { position: absolute; left: 62%; bottom: 44%; width: 33%; height: auto; aspect-ratio: 1; object-fit: cover;
+  rotate: -5deg; outline: 6px solid var(--paper); clip-path: polygon(3% 6%, 30% 0, 62% 4%, 97% 1%, 100% 34%, 96% 66%, 99% 97%, 64% 100%, 33% 95%, 2% 99%, 5% 63%, 0 30%);
+  filter: drop-shadow(0 8px 8px rgba(28, 26, 23, .3)); }
+.offer__empty { position: absolute; right: 2%; bottom: 66%; white-space: nowrap; }
+.paths2__name { margin-top: 4px; }
+.paths2__name .strip { font-size: clamp(30px, 4vw, 48px); }

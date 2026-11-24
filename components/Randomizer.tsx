@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v3.2 — flick-to-spin: a fast drag on the plate spins it (strength → turns and
+ * Version:     v3.3 — collage bridges between chapters (was torn seams), hero doodles removed;
+ *              v3.2 — flick-to-spin: a fast drag on the plate spins it (strength → turns and
  *              duration, direction follows the flick); v3.1 — mood chips, past winners, "never" list
  * Description: Page state: filters, place, radius → available dishes → wheel →
  *              spin → three paths. Logic lives in lib/spin.ts.
@@ -30,8 +31,7 @@ import { FilterTokens } from "./FilterTokens";
 import { Sheet } from "./Sheet";
 import Image from "next/image";
 import { HeroTitle } from "./HeroTitle";
-import { Scribble } from "./Scribble";
-import { WaveBand } from "./WaveBand";
+import { Bridge } from "./Bridge";
 import { JoinCritics } from "./JoinCritics";
 import { mapsSearchUrl } from "@/lib/places.ts";
 import { MAX_DINERS, fillSeats, seatAngles, seatsFor, sharedVenue, sliceAt, venueLabel } from "@/lib/seats.ts";
@@ -324,9 +324,6 @@ export function Randomizer() {
         <div className="hero__collage" aria-hidden="true">
           <span className="hero__sun" />
           <Image className="hero__hermes" src="/collage/hermes.webp" alt="" width={888} height={1519} priority sizes="(max-width: 1023px) 40vw, 360px" />
-          <Scribble kind="sparkle" className="hero__spark hero__spark--a" />
-          <Scribble kind="star" className="hero__spark hero__spark--b" />
-          <Scribble kind="loop" className="hero__loop" />
         </div>
         <div className="hero__inner container">
           <HeroTitle winner={spun?.landed ? dish?.name ?? null : null} onOpen={() => pathsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })} />
@@ -409,7 +406,7 @@ export function Randomizer() {
       {quizOpen && <Quiz onClose={() => setQuizOpen(false)} onApply={applyPersona} onDish={(slug) => { setQuizOpen(false); openDish(slug); }} />}
 
       <div className="chapter chapter--cream">
-      <WaveBand tone="wine" text="ბედმა აირჩია — ახლა შენი ჯერია" />
+      <Bridge figure="khinkali-hand" side="left" />
       <div ref={pathsRef} className="paths-anchor">
         <Paths
           dish={dish} place={place} radius={radius} onPickPlace={pickPlace}
@@ -424,16 +421,16 @@ export function Randomizer() {
       </div>
       </div>
       <div className="chapter chapter--wine">
-        <WaveBand tone="mustard" curve="b" text="მშიერი კაცი ბორბალს არ ეკამათება" />
+        <Bridge figure="dionysus" side="right" />
         <SupraFlyer onDish={openDish} />
       </div>
       <div className="chapter chapter--mustard">
-        <WaveBand tone="brand" text="სუფრასთან ყველა ვიღაცაა" />
+        <Bridge figure="athena" side="left" />
         <PersonaSection persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />
       {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} onDish={(slug) => { setGalleryOpen(false); openDish(slug); }} />}
       </div>
       <div className="chapter chapter--blush">
-        <WaveBand tone="wine" curve="b" text="გემოზე არ დავობთ — ვაფასებთ" />
+        <Bridge figure="icarus" side="right" />
         <JoinCritics />
       </div>
     </>
