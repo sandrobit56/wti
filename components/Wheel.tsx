@@ -2,8 +2,11 @@
  * File:        components/Wheel.tsx
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
- * Date:        2026-11-23
- * Version:     v9.1 — real paper texture (public/collage/paper.webp) instead of SVG noise;
+ * Date:        2026-11-25
+ * Version:     v10 — simpler, photo-first: each slice IS the dish photo (full wedge, no
+ *              crooked mini cut-outs), names on one cream rim band, thin paper dividers,
+ *              plain round plate (no torn edge, dashed ring or tape). Winner's band turns coral.
+ *              v9.1 — real paper texture (public/collage/paper.webp) instead of SVG noise;
  *              v9.0 — collage art direction: a flat paper wheel. Torn-edge paper plate,
  *              paper slices with grain, real dish photos cut out with scissors (white paper
  *              border), a marker arrow as the pointer. No WebGL any more (−280 kB).
@@ -22,7 +25,6 @@
 import Image from "next/image";
 import { useEffect, useId, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import type { Dish } from "@/lib/catalog.ts";
-import { cutPoints, deckle } from "@/lib/cutout.ts";
 import { toMtavruli } from "@/lib/mtavruli.ts";
 import { typePhoto } from "@/lib/photos.ts";
 import { MAX_DINERS, seatAngles } from "@/lib/seats.ts";
@@ -31,12 +33,11 @@ import { Scribble } from "./Scribble";
 
 export const FLING_MIN = 0.35;   // deg/ms
 const HALF = 210;                // viewBox is (−HALF … HALF)²
-const PLATE = 182, R = 160;      // torn paper plate, slices
-const PHOTO_R = 96, PHOTO = 70;  // where the cut-out photo sits, its size
-const LABEL_R = 138, LABEL_MAX = 11;
+const PLATE = 176, R = 166;      // plate rim, slices
+const BAND = 28;                 // cream name band at the rim
+const HUB_R = 44;                // photos start just outside the hub
+const LABEL_R = R - BAND / 2 - 4, LABEL_MAX = 11;
 const SEAT_R = 0.53;             // diner distance from the centre, in box widths
-const SLICE = ["#163C3A", "#FFC93C", "#F8B4C0", "#FFFAF2"];
-const INK = ["#FFF1DC", "#163C3A", "#163C3A", "#D92F4C"];
 const BOX: CSSProperties = { aspectRatio: "1" };
 
 type Props = {
@@ -63,14 +64,13 @@ type Props = {
 
 const rad = (d: number) => (d * Math.PI) / 180;
 const pt = (deg: number, r: number) => [Math.sin(rad(deg)) * r, -Math.cos(rad(deg)) * r] as const;
-/** the last slice must not share a colour with the first */
-const colorOf = (i: number, n: number) => (i === n - 1 && n % SLICE.length === 1 ? 2 : i % SLICE.length);
-
-function slicePath(i: number, n: number): string {
-  const a = 360 / n, gap = 0.9;
-  const [x0, y0] = pt(i * a + gap, R), [x1, y1] = pt((i + 1) * a - gap, R);
-  const [cx, cy] = pt(i * a + a / 2, 4);
-  return `M${cx.toFixed(2)} ${cy.toFixed(2)}L${x0.toFixed(2)} ${y0.toFixed(2)}A${R} ${R} 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)}Z`;
+const f = (v: number) => v.toFixed(2);
+/** ring segment between radii r0 < r1, centred on 12 o'clock, a degrees wide (local coords) */
+function ringSeg(a: number, r0: number, r1: number): string {
+  const h = a / 2;
+  const [ax, ay] = pt(-h, r1), [bx, by] = pt(h, r1), [cx, cy] = pt(h, r0), [dx, dy] = pt(-h, r0);
+  const big = a > 180 ? 1 : 0;
+  return `M${f(ax)} ${f(ay)}A${r1} ${r1} 0 ${big} 1 ${f(bx)} ${f(by)}L${f(cx)} ${f(cy)}A${r0} ${r0} 0 ${big} 0 ${f(dx)} ${f(dy)}Z`;
 }
 /** label arc across the slice at LABEL_R, read left→right; flipped when the slice is at the bottom */
 function labelArc(n: number, flip: boolean): string {
@@ -84,8 +84,8 @@ const isBottom = (deg: number) => { const d = ((deg % 360) + 360) % 360; return 
 
 function photoOf(slug: string): string {
   const p = typePhoto(slug);
-  // the optimiser keeps each cut-out at ~256 px instead of a full-size Commons photo
-  return p ? `/_next/image?url=${encodeURIComponent(p.src)}&w=256&q=75` : stickerSrc(slug);
+  // the optimiser keeps each wedge photo at ~384 px instead of a full-size Commons photo
+  return p ? `/_next/image?url=${encodeURIComponent(p.src)}&w=384&q=75` : stickerSrc(slug);
 }
 
 function Defs({ uid }: { uid: string }) {
@@ -167,35 +167,29 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
         aria-label={`ბორბალი: ${dishes.map((d) => d.name).join(", ")}. გადაატარე თითი ან დააჭირე ღილაკს.`}
         onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
         <Defs uid={uid} />
-        {/* the paper plate, pasted on the page */}
-        <path d={deckle("plate", PLATE, 3.2)} fill="#FFF1DC" filter={`url(#paste${uid})`} />
-        <path d={deckle("plate", PLATE, 3.2)} fill={`url(#paper${uid})`} style={{ mixBlendMode: "multiply" }} />
-        <path d={deckle("plate-in", PLATE - 9, 1.6)} fill="none" stroke="#163C3A" strokeOpacity="0.35" strokeWidth="1.2" strokeDasharray="1 5" strokeLinecap="round" />
+        {/* plain round paper plate */}
+        <circle r={PLATE} fill="#FFFAF2" filter={`url(#paste${uid})`} />
+        <circle r={PLATE} fill={`url(#paper${uid})`} style={{ mixBlendMode: "multiply" }} />
 
         {/* everything that turns */}
         <g className={discCls} style={discStyle} onTransitionEnd={(e) => { if (e.propertyName === "transform") onLanded(); }}>
-          {dishes.map((d, i) => <path key={`s${d.slug}`} d={slicePath(i, n)} fill={SLICE[colorOf(i, n)]} />)}
-          <rect x={-R} y={-R} width={R * 2} height={R * 2} fill={`url(#paper${uid})`} clipPath={`url(#disc${uid})`} style={{ mixBlendMode: "multiply" }} pointerEvents="none" />
           {dishes.map((d, i) => {
             const mid = i * a + a / 2;
-            const ci = colorOf(i, n);
             const flip = isBottom(mid + turn);
             const arcId = `wl${uid}-${i}`;
-            const tilt = ((i * 37) % 11) - 5;   // each cut-out pasted a little crooked
-            const poly = cutPoints(d.slug, PHOTO, PHOTO);
-            const inner = cutPoints(`${d.slug}-in`, PHOTO - 8, PHOTO - 8, 3, 0.05);
             const won = !spinning && winnerIndex === i;
+            // photo box: the wedge's bounding box, from the hub out to the name band
+            const w = 2 * (R - BAND) * Math.sin(rad(Math.min(a, 120) / 2)) + 8;
+            const top = -(R - BAND), h = R - BAND - HUB_R + 6;
             return (
-              <g key={d.slug} transform={`rotate(${mid})`}>
-                <g transform={`translate(0 ${-PHOTO_R}) rotate(${(flip ? 180 : 0) + tilt})`} className={won ? "wheel__cut wheel__cut--won" : "wheel__cut"}>
-                  <polygon points={poly} fill="#FFFAF2" filter={`url(#paste${uid})`} />
-                  <clipPath id={`c${uid}-${i}`}><polygon points={inner} /></clipPath>
-                  <image href={photoOf(d.slug)} x={-(PHOTO - 8) / 2} y={-(PHOTO - 8) / 2} width={PHOTO - 8} height={PHOTO - 8} preserveAspectRatio="xMidYMid slice" clipPath={`url(#c${uid}-${i})`} />
-                </g>
+              <g key={d.slug} transform={`rotate(${mid})`} className={won ? "wheel__slice wheel__slice--won" : "wheel__slice"}>
+                <clipPath id={`c${uid}-${i}`}><path d={ringSeg(a, HUB_R - 6, R - BAND)} /></clipPath>
+                <image href={photoOf(d.slug)} x={-w / 2} y={top} width={w} height={h} preserveAspectRatio="xMidYMid slice" clipPath={`url(#c${uid}-${i})`} />
+                <path className="wheel__band" d={ringSeg(a, R - BAND, R)} />
                 {d.name.length <= LABEL_MAX && (
                   <>
                     <path id={arcId} d={labelArc(n, flip)} fill="none" />
-                    <text className={won ? "wheel__label wheel__label--won" : "wheel__label"} style={{ fill: INK[ci] }} dy={flip ? "0.75em" : "0"}>
+                    <text className="wheel__label" dy={flip ? "0.7em" : "0.3em"}>
                       <textPath href={`#${arcId}`} startOffset="50%" textAnchor="middle">{toMtavruli(d.name)}</textPath>
                     </text>
                   </>
@@ -203,10 +197,10 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
               </g>
             );
           })}
+          {/* thin paper dividers between slices */}
+          {dishes.map((d, i) => { const [x, y] = pt(i * a, R); return <line key={`d${d.slug}`} className="wheel__divider" x1="0" y1="0" x2={f(x)} y2={f(y)} />; })}
+          <circle r={R} fill="none" className="wheel__rim" />
         </g>
-        {/* tape holding the plate (static, over the slices) */}
-        <rect className="wheel__tape" x="-34" y={-PLATE - 12} width="68" height="22" transform="rotate(-38)" />
-        <rect className="wheel__tape" x="-30" y={-PLATE - 10} width="60" height="20" transform="rotate(142)" />
       </svg>
 
       {diners === 1 && <Scribble kind="arrowDown" className="wheel__arrow" width={4} />}
@@ -236,7 +230,7 @@ export function WheelShell() {
   return (
     <div className="wheel wheel--paper wheel--skeleton" aria-label="იტვირთება" style={BOX}>
       <svg className="wheel__svg" viewBox={`${-HALF} ${-HALF} ${HALF * 2} ${HALF * 2}`} aria-hidden="true">
-        <path d={deckle("plate", PLATE, 3.2)} fill="#FFF1DC" />
+        <circle r={PLATE} fill="#FFF1DC" />
       </svg>
     </div>
   );

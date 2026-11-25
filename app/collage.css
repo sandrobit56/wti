@@ -443,3 +443,25 @@ img[src*="/stickers/"] { filter: none !important; }
 /* the old wave seams needed a tall bottom pad; stacked sheets don't */
 .chapter.chapter { padding-bottom: 96px !important; }
 @media (max-width: 640px) { .chapter.chapter { padding-bottom: 64px !important; } }
+
+/* ── 16 · wheel v10: photo-first, quiet (2026-11-25) ───────────────────── */
+.wheel--paper .wheel__band { fill: var(--paper); }
+.wheel--paper .wheel__label { fill: var(--news); font: 800 13.5px/1 var(--display); font-stretch: 70%; letter-spacing: .04em; }
+.wheel--paper .wheel__slice--won .wheel__band { fill: var(--brand); }
+.wheel--paper .wheel__slice--won .wheel__label { fill: var(--paper); stroke: none; }
+.wheel--paper .wheel__slice image { transition: filter .3s; }
+/* after landing, the other photos step back so the winner reads at a glance */
+.wheel--paper .wheel__disc:has(.wheel__slice--won) .wheel__slice:not(.wheel__slice--won) image { filter: saturate(.35) brightness(.82); }
+.wheel--paper .wheel__divider { stroke: var(--paper); stroke-width: 3; }
+.wheel--paper .wheel__rim { stroke: var(--paper); stroke-width: 2; }
+/* hub: a plain round coral button, centred exactly over the photo hole */
+.wheel--paper .wheel__hub.wheel__hub {
+  left: 50% !important; top: 50% !important; translate: -50% -50% !important; width: 21.5% !important; height: 21.5% !important;
+  border-radius: 50%; rotate: 0deg; background: var(--brand) var(--paper-tex) 0 0 / 300px; background-blend-mode: multiply;
+  box-shadow: 0 0 0 4px var(--paper), 0 8px 16px -6px rgba(28, 26, 23, .5);
+  font-size: clamp(10px, 1.1vw, 15px) !important; letter-spacing: .02em;
+}
+@media (max-width: 640px) { .wheel--paper .wheel__hub.wheel__hub { font-size: 10px !important; } .wheel--paper .wheel__label { font-size: 15px; } }
+.wheel--paper .wheel__hub.wheel__hub:hover:not(:disabled) { rotate: 0deg; scale: 1.05; }
+@media (max-width: 640px) { .hero__stage { width: min(90vw, 56svh) !important; } .hero__sun { width: 200px; } }
+@media (max-width: 640px) { .hero__inner { align-content: start !important; padding-top: 28px !important; } }
