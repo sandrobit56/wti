@@ -44,7 +44,8 @@ body::after {
 .strip--ink    { --strip-bg: var(--news);  --strip-fg: var(--yellow); }
 .strip--red    { --strip-bg: var(--brand); --strip-fg: var(--paper); }
 .strip--yellow { --strip-bg: var(--yellow); --strip-fg: var(--news); }
-.strip__tape { position: absolute; top: -.18em; width: 1.5em; height: .42em; background: var(--tape); clip-path: var(--tape-cut); pointer-events: none; }
+.strip__tape { display: none; }
+.strip--taped .strip__tape { display: block; position: absolute; top: -.18em; width: 1.5em; height: .42em; background: var(--tape); clip-path: var(--tape-cut); pointer-events: none; }
 .strip--tape-left .strip__tape  { left: -.35em; rotate: calc(var(--tape-rot) * -1); }
 .strip--tape-right .strip__tape { right: -.35em; rotate: var(--tape-rot); }
 @keyframes paste {
@@ -61,29 +62,33 @@ body::after {
 .scribble path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw .9s .3s ease-out forwards; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 
-/* ── 4 · buttons: labels made of tape ───────────────────────────────────── */
+/* ── 4 · buttons (standard B1–B3, see claude/art-direction.md) ──────────
+   B1 primary: deep-coral pill (#D92F4C, 4.5:1 with paper text), darker base. One per view.
+   B2 secondary: ink outline pill. B3 text link: coral underline.
+   Buttons never tilt, never carry tape, never use ragged clip-paths:
+   the collage lives in the pictures, the controls stay obvious.
+   (Keeps Sandro's 2026-11-22 rule "one coral pill everywhere", darkened for contrast.) */
 .btn, .pill--dark {
-  position: relative; border: 0; border-radius: 2px; padding: 12px 26px 13px; cursor: pointer;
-  background: var(--news); color: var(--cream); font-weight: 800; letter-spacing: .02em;
-  clip-path: var(--tape-cut); box-shadow: none; filter: drop-shadow(0 3px 0 rgba(22, 60, 58, .22));
-  rotate: -1.5deg; transition: rotate .25s var(--spring), translate .2s var(--spring), background-color .2s, filter .2s;
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; border: 0; border-radius: 999px; padding: 12px 24px; cursor: pointer; text-decoration: none;
+  background: var(--brand-ink); color: var(--paper); font: 800 15px/1.1 var(--font); letter-spacing: .01em;
+  clip-path: none; box-shadow: 0 3px 0 #a8253b; filter: none; rotate: 0deg;
+  transition: background-color .18s, translate .18s, box-shadow .18s;
 }
-.btn::before, .pill--dark::before {   /* a strip of clear tape across the label */
-  content: ""; position: absolute; left: 38%; top: -10px; width: 26%; height: 18px; background: var(--tape); rotate: -4deg; pointer-events: none;
+.btn::before, .pill--dark::before { content: none !important; }
+.btn:hover, .pill--dark:hover { background: var(--news); translate: 0 -1px; box-shadow: 0 4px 0 #000; }
+.btn:active, .pill--dark:active { translate: 0 2px; box-shadow: 0 1px 0 #a8253b; }
+.btn:focus-visible, .pill--dark:focus-visible { outline: 3px solid var(--news); outline-offset: 3px; }
+.btn:disabled { opacity: .45; translate: none; cursor: not-allowed; box-shadow: none; }
+.btn--lg { min-height: 52px; padding: 14px 30px; font-size: 17px; }
+.pill--outline, .pill--white {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 22px !important;
+  border-radius: 999px !important; border: 2px solid var(--news) !important; background: transparent !important; color: var(--news) !important;
+  box-shadow: none !important; font-weight: 800; cursor: pointer; transition: background-color .18s, color .18s;
 }
-.btn:hover, .pill--dark:hover { rotate: .5deg; translate: 0 -2px; background: var(--brand); filter: drop-shadow(0 6px 0 rgba(22, 60, 58, .22)); }
-.btn:active, .pill--dark:active { translate: 0 2px; filter: drop-shadow(0 1px 0 rgba(22, 60, 58, .22)); }
-.btn:focus-visible, .pill--dark:focus-visible { outline: 3px dashed var(--brand); outline-offset: 4px; }
-.btn:disabled { opacity: .55; rotate: -1.5deg; translate: none; background: var(--news); }
-.btn--lg { padding: 15px 32px 16px; font-size: 18px; }
-/* secondary: marker-underlined words */
-.pill--outline, .pill--white, .link {
-  background: none !important; border: 0 !important; box-shadow: none !important; color: inherit;
-  text-decoration: none; background-image: linear-gradient(var(--brand), var(--brand)) !important;
-  background-size: 100% 3px !important; background-repeat: no-repeat !important; background-position: 0 100% !important;
-  padding: 2px 2px 4px !important; transition: background-size .25s ease, color .2s;
-}
-.pill--outline:hover, .pill--white:hover, .link:hover { background-size: 100% 42% !important; color: var(--news); }
+.pill--outline:hover, .pill--white:hover { background: var(--news) !important; color: var(--paper) !important; }
+.link { color: var(--news); font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; text-decoration-color: var(--brand); background: none !important; border: 0 !important; padding: 2px 0 !important; cursor: pointer; }
+.link:hover { color: var(--brand); }
 
 /* ── 5 · header: a torn strip of newsprint ──────────────────────────────── */
 .header, .header--scrolled, .header[data-on] {
@@ -96,10 +101,10 @@ body::after {
 .header--scrolled { height: 70px; }
 .header::before, .header::after { display: none !important; }   /* old scallop */
 .header__nav a, .header__nav span { color: var(--news) !important; position: relative; padding: 6px 10px !important; border-radius: 0 !important; background: none !important; transition: rotate .2s var(--spring); }
-.header__nav a:hover { text-decoration: none; rotate: -2deg; }
+.header__nav a:hover { text-decoration: none; }
 .header__nav a:hover::after { content: ""; position: absolute; inset: auto 6px 0; height: 3px; background: var(--brand); border-radius: 2px; }
-.header__nav a.on { background: var(--news) !important; color: var(--cream) !important; clip-path: var(--tape-cut); rotate: -2deg; }
-.header__nav a.on:nth-child(even) { rotate: 1.5deg; }
+.header__nav a.on { background: var(--news) !important; color: var(--paper) !important; border-radius: 999px !important; }
+.header__nav a.on:hover::after { content: none; }
 .tabbar { background: var(--paper) !important; border-top: 0 !important; box-shadow: 0 -8px 20px -12px rgba(22, 60, 58, .45) !important; }
 .tabbar a.on { color: var(--brand) !important; }
 
@@ -158,12 +163,9 @@ body::after {
 .sign--paper .sign__go:hover { translate: 0 -2px !important; }
 .sign--paper .sign__go:active { translate: 0 2px !important; }
 
-/* filter tokens: paper labels taped to the page */
-.token { background: var(--paper) !important; border-radius: 3px !important; box-shadow: var(--paste) !important; border: 0 !important; clip-path: none; position: relative; }
-.token:nth-child(odd) { rotate: -2deg; }
-.token:nth-child(even) { rotate: 1.5deg; }
-.token::after { content: ""; position: absolute; left: 50%; top: -8px; width: 34px; height: 14px; translate: -50% 0; background: var(--tape); rotate: -6deg; }
-.token:hover { rotate: 0deg !important; translate: 0 -3px; }
+/* filter tokens (standard C1): white chip, thin ink border, no tilt, no tape */
+.token { background: var(--paper) !important; border-radius: 999px !important; border: 1.5px solid rgba(28, 26, 23, .18) !important; box-shadow: none !important; clip-path: none; rotate: 0deg; min-height: 40px; transition: border-color .15s, translate .15s; }
+.token:hover { border-color: var(--news) !important; translate: 0 -1px; }
 .hero__status { background: var(--news) !important; color: var(--cream) !important; border-radius: 0 !important; clip-path: var(--tape-cut); rotate: 1deg; }
 
 /* ── 8 · the paper wheel ────────────────────────────────────────────────── */
@@ -203,11 +205,11 @@ body::after {
 .seat--paper.seat--r .seat__who img { scale: -1 1; }
 .seat--paper .seat__x { position: absolute; right: 4%; top: 2%; }
 .seat--paper .seat-card { position: static; translate: none; margin-top: -8px; animation: card-in .45s .1s var(--spring) both; }
-.seat-card { background: var(--paper) !important; color: var(--news) !important; border-radius: 2px !important; clip-path: var(--tape-cut); box-shadow: none !important; filter: drop-shadow(0 2px 0 rgba(22, 60, 58, .25)); rotate: -2deg; }
-.seat-card:hover { background: var(--mustard) !important; rotate: 1deg; }
-.wheel__add { border-radius: 2px !important; clip-path: var(--tape-cut); background: var(--news) !important; box-shadow: none !important; rotate: 3deg; }
-.wheel__add:hover { background: var(--brand) !important; rotate: -1deg; }
-.group-note { background: var(--paper) !important; border-radius: 2px !important; box-shadow: var(--paste) !important; rotate: -1deg; }
+.seat-card { background: var(--paper) !important; color: var(--news) !important; border-radius: 999px !important; clip-path: none; border: 1.5px solid rgba(28, 26, 23, .18) !important; box-shadow: 0 4px 10px -6px rgba(28, 26, 23, .4) !important; filter: none; rotate: 0deg; }
+.seat-card:hover { border-color: var(--news) !important; }
+.wheel__add { border-radius: 999px !important; clip-path: none; background: var(--news) !important; box-shadow: none !important; rotate: 0deg; }
+.wheel__add:hover { background: var(--brand) !important; }
+.group-note { background: var(--paper) !important; border-radius: 12px !important; box-shadow: var(--paste) !important; }
 
 /* ── 9 · intro: the portal window ───────────────────────────────────────── */
 .intro--portal { background: var(--blush) var(--paper-tex) !important; display: grid; place-items: center; align-content: center; gap: 28px; }
@@ -230,7 +232,7 @@ body::after {
 @keyframes portal-in { from { scale: .7; rotate: -6deg; opacity: 0; } }
 .intro--portal .intro__word { font-size: clamp(34px, 7vw, 64px); margin: 0; }
 .intro--portal .intro__skip { position: absolute; top: 24px; bottom: auto; width: auto; height: auto; left: 50%; translate: -50% 0; border: 0; padding: 8px 18px; background: var(--news); color: var(--cream);
-  font: 800 13px/1 var(--font); letter-spacing: .12em; clip-path: var(--tape-cut); rotate: -2deg; cursor: pointer; }
+  font: 800 13px/1 var(--font); letter-spacing: .08em; border-radius: 999px; cursor: pointer; }
 .intro--portal.intro--lift { animation: none; transition: opacity .5s .4s ease; opacity: 0; }
 .intro--portal.intro--lift .portal { transition: scale .9s cubic-bezier(.6, 0, .4, 1); scale: 9; }
 .intro--portal.intro--lift .intro__word, .intro--portal.intro--lift .intro__skip { opacity: 0; transition: opacity .25s; }
@@ -240,37 +242,30 @@ body::after {
 /* section 2: the result plate is a paper plate, the dish a scissor cut-out */
 .switch, .segmented { border-radius: 2px !important; }
 /* game: the stage is a photo print, taped to the board */
-.game2__stage { border-radius: 4px !important; box-shadow: 0 0 0 10px var(--paper), 0 24px 40px -18px rgba(0, 0, 0, .55) !important; rotate: -.6deg; overflow: visible !important; }
-.game2__stage::before, .game2__stage::after { content: ""; position: absolute; z-index: 5; width: 110px; height: 28px; background: var(--tape); pointer-events: none; }
-.game2__stage::before { left: -30px; top: 10px; rotate: -38deg; }
-.game2__stage::after { right: -30px; top: 10px; rotate: 38deg; }
-.game2__steps li, .game2 .course { border-radius: 2px !important; clip-path: var(--tape-cut); }
+.game2__stage { border-radius: 6px !important; box-shadow: 0 0 0 8px var(--paper), 0 24px 40px -18px rgba(0, 0, 0, .55) !important; overflow: visible !important; }
+.game2__steps li, .game2 .course { border-radius: 999px !important; }
 /* persona deck: cards taped at the corners */
 .persona2__top, .persona2__under, .tarot { border-radius: 4px !important; }
-.persona2__top { box-shadow: 0 0 0 8px var(--paper), 0 22px 30px -14px rgba(22, 60, 58, .5) !important; }
-.persona2__top::after { content: ""; position: absolute; left: 50%; top: -14px; width: 90px; height: 26px; translate: -50% 0; rotate: 3deg; background: var(--tape); z-index: 3; }
+/* the card itself carries the paper frame; the wrapper only sizes it */
+.persona2__top { box-shadow: none !important; }
+.persona2__deck .tarot { width: 100% !important; }
 /* critics */
 .join__kit { animation: badge-sway 6s ease-in-out infinite; }
-.join__form { background: var(--paper) var(--paper-tex) !important; border-radius: 3px !important; box-shadow: var(--paste) !important; rotate: -.6deg; }
+.join__form { background: var(--paper) var(--paper-tex) !important; border-radius: 16px !important; box-shadow: var(--paste) !important; }
 .join__form input, .join__form select { border-radius: 2px !important; border: 0 !important; border-bottom: 2.5px solid var(--news) !important; background: rgba(255, 255, 255, .6) !important; }
 .join__form input:focus, .join__form select:focus { outline: none; border-bottom-color: var(--brand) !important; background: #fff !important; }
 .footer { background: var(--news) !important; color: var(--cream) !important; }
 
 /* ── 11 · popups and sheets: paper cards taped to the screen ────────────── */
-.modal__card, .bs, .sheet__card { background: var(--paper) var(--paper-tex) !important; border-radius: 4px !important; box-shadow: 0 30px 70px -20px rgba(0, 0, 0, .55) !important; overflow: visible !important; }
-.modal__card::before, .bs::before { content: ""; position: absolute; left: 50%; top: -14px; width: 130px; height: 30px; translate: -50% 0; rotate: -2deg; background: var(--tape); z-index: 4; pointer-events: none; }
+.modal__card, .bs, .sheet__card { background: var(--paper) var(--paper-tex) !important; border-radius: 16px !important; box-shadow: 0 30px 70px -20px rgba(0, 0, 0, .55) !important; overflow: visible !important; }
 dialog::backdrop { background: rgba(22, 60, 58, .55) !important; backdrop-filter: grayscale(.6) !important; }
 .modal__hero { border-radius: 2px !important; background: var(--blush) var(--paper-tex) !important; }
-.version, .row-card, .delivery { border-radius: 2px !important; box-shadow: var(--paste) !important; border: 0 !important; }
-.version:nth-child(odd) { rotate: -.6deg; }
-.version:nth-child(even) { rotate: .5deg; }
-.version__img, .version__icon { border-radius: 0 !important; clip-path: polygon(4% 2%, 98% 0, 100% 96%, 0 100%); }
-.bs__close { border-radius: 2px !important; background: var(--news) !important; color: var(--cream) !important; clip-path: var(--tape-cut); }
+.version, .row-card, .delivery { border-radius: 12px !important; box-shadow: var(--paste) !important; border: 0 !important; }
+.version__img, .version__icon { border-radius: 8px !important; clip-path: none; }
+.bs__close { border-radius: 999px !important; background: var(--news) !important; color: var(--paper) !important; clip-path: none; }
 .bs__close svg path { stroke: var(--cream) !important; }
-.quiz__a { border-radius: 2px !important; box-shadow: var(--paste) !important; border: 0 !important; transition: rotate .2s var(--spring), translate .2s var(--spring), background-color .2s; }
-.quiz__a:nth-of-type(odd) { rotate: -.8deg; }
-.quiz__a:nth-of-type(even) { rotate: .6deg; }
-.quiz__a:hover { rotate: 0deg; translate: 0 -3px; background: var(--mustard) !important; }
+.quiz__a { border-radius: 12px !important; box-shadow: none !important; border: 1.5px solid rgba(28, 26, 23, .18) !important; transition: border-color .15s, background-color .15s; }
+.quiz__a:hover { border-color: var(--news) !important; background: #fff !important; }
 .quiz__letter { border-radius: 50% 46% 52% 48% !important; background: var(--news) !important; color: var(--cream) !important; }
 .quiz__bar { border-radius: 0 !important; }
 
@@ -385,7 +380,7 @@ dialog::backdrop { background: rgba(22, 60, 58, .55) !important; backdrop-filter
 .tarot__banner .strip__paper { white-space: normal; text-align: center; line-height: 1.05; }
 .tarot--sm .tarot__banner.strip { font-size: 12px; }
 .tarot--lg .tarot__banner.strip { font-size: 18px; }
-.tarot__me { background: var(--news) !important; color: var(--yellow) !important; border-radius: 2px !important; rotate: 6deg; top: 4% !important; right: 4% !important; padding: 4px 10px !important; }
+.tarot__me { background: var(--news) !important; color: var(--yellow) !important; border-radius: 999px !important; rotate: 0deg; top: 4% !important; right: 4% !important; padding: 4px 10px !important; }
 .tarot__turn { background: var(--news) !important; box-shadow: none !important; border-radius: 2px !important; }
 /* back: Hermes on newsprint */
 .tarot__cover { background: var(--news) var(--paper-tex) 0 0 / 400px !important; background-blend-mode: multiply !important; box-shadow: inset 0 0 0 7px var(--paper), inset 0 0 0 9px var(--news) !important; border-radius: 4px !important; gap: 0 !important; }
@@ -426,7 +421,8 @@ img[src*="/stickers/"] { filter: none !important; }
   @media (prefers-reduced-motion: no-preference) {
     .chapter.chapter:not(.chapter--cream) { animation: sheet-in linear both !important; animation-timeline: view() !important; animation-range: entry 0% entry 60% !important; }
     /* content arrives a beat after its sheet */
-    .chapter .section-title, .chapter .container > p, .chapter .offer, .chapter .game2__stage, .chapter .persona2__deck, .chapter .join__kit {
+    /* only titles rise: moving several stacked blocks at different speeds made them overlap */
+    .chapter .section-title {
       animation: rise linear both; animation-timeline: view(); animation-range: entry 10% cover 30%; }
   }
 }
@@ -465,3 +461,21 @@ img[src*="/stickers/"] { filter: none !important; }
 .wheel--paper .wheel__hub.wheel__hub:hover:not(:disabled) { rotate: 0deg; scale: 1.05; }
 @media (max-width: 640px) { .hero__stage { width: min(90vw, 56svh) !important; } .hero__sun { width: 200px; } }
 @media (max-width: 640px) { .hero__inner { align-content: start !important; padding-top: 28px !important; } }
+
+/* ── 17 · standards enforcement (v8 audit, 2026-11-25) ─────────────────── */
+/* B1 must look the same in sheets and popups too (old globals painted some of them green) */
+.btn, .pill.pill--dark, .modal__actions .pill--dark { background-color: var(--brand-ink) !important; color: var(--paper) !important; border: 0 !important; box-shadow: 0 3px 0 #a8253b !important; transform: none !important; }
+.btn:hover, .pill.pill--dark:hover, .modal__actions .pill--dark:hover { background-color: var(--news) !important; box-shadow: 0 4px 0 #000 !important; }
+/* the quiz hint in the filter sheet: one clear card, not a dashed warning box */
+button.panel__hint { border: 1.5px solid rgba(28, 26, 23, .18) !important; background: #fff !important; border-radius: 12px !important; }
+button.panel__hint:hover { border-color: var(--news) !important; }
+@media (max-width: 640px) {
+  /* section 2: the "spin first" button sits under the hand, not on it */
+  .offer__empty { position: static !important; display: flex; margin: 10px auto 0; }
+  .paths__churchkhela { display: none; }
+  /* persona: the card stack must not cover the line under it */
+  .persona2__deck { margin-bottom: 28px !important; }
+  .join__kit.join__mosaic { width: 56vw; }
+}
+/* standard E1: no torn edges in the UI — the header gets a clean edge and a soft shadow */
+.header, .header--scrolled, .header[data-on] { -webkit-mask: none !important; mask: none !important; box-shadow: 0 1px 0 rgba(28, 26, 23, .08), 0 8px 20px -14px rgba(28, 26, 23, .45) !important; }

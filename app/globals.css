@@ -1896,20 +1896,7 @@ main, .page { overflow-x: clip; }
 @media (max-width: 640px) { .persona2__title { white-space: normal; font-size: 40px; } .persona2__deck { width: 180px; } }
 @media (prefers-reduced-motion: reduce) { .persona2__under, .persona2__top { transition: none; } }
 
-/* ── One button language (2026-11-22, Sandro: one style everywhere) ──────────
-   Primary = coral pill with a darker coral base. Secondary = underlined text link.
-   Old .pill--dark (sheets, popups) is mapped onto the same look. */
-.btn, .pill--dark {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; border: 0;
-  background: var(--brand) !important; color: var(--cream) !important; text-decoration: none;
-  font: 800 16px/1 var(--font); padding: 15px 26px; border-radius: 999px;
-  box-shadow: 0 4px 0 var(--brand-ink) !important; transition: translate .15s, box-shadow .15s;
-}
-.btn:hover, .pill--dark:hover { translate: 0 -2px; box-shadow: 0 6px 0 var(--brand-ink) !important; }
-.btn:active, .pill--dark:active { translate: 0 2px; box-shadow: 0 2px 0 var(--brand-ink) !important; }
-.btn:disabled { opacity: .6; cursor: default; translate: none; }
-.btn:focus-visible, .pill--dark:focus-visible { outline: 3px solid var(--wine); outline-offset: 3px; }
-.btn--lg { font-size: 18px; padding: 18px 32px; }
+/* buttons: defined once, in app/collage.css section 4 (standard B1–B3) */
 .pill--outline, .pill--white { background: transparent !important; color: inherit !important; box-shadow: none !important;
   text-decoration: underline; text-underline-offset: 4px; font-weight: 800; }
 .link { color: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 4px; }

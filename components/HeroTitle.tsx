@@ -22,7 +22,7 @@ export function HeroTitle({ winner = null, onOpen }: Props) {
     <div className="sign sign--paper">
       <h1 className="hero__title">
         <span className="sr-only">რა ვჭამოთ დღეს?</span>
-        <Strip text="რა ვჭამოთ" decorative className="sign__title" />
+        <Strip text="რა ვჭამოთ" decorative tape className="sign__title" />
         {!winner && <Strip text="დღეს?" tone="ink" decorative className="sign__ask" />}
       </h1>
       <p className="sign__winner" aria-live="polite">
