@@ -225,7 +225,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
 
           {(screen === "won" || screen === "lost") && (
             <div className="game2__screen game2__screen--over" role="status">
-              <p className="game2__verdict">{screen === "won" ? "სუფრა დაასრულე!" : `${course.name}-ზე წიწაკამ გაჯობა`}</p>
+              <p className="game2__verdict">{screen === "won" ? "სუფრა დაასრულე!" : `წიწაკამ გაჯობა · ${course.name}`}</p>
               {persona && (
                 <div className="game2__reveal">
                   <TarotCard id={persona} size="sm" tilt={false} />
