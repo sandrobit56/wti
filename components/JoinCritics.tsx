@@ -51,7 +51,7 @@ export function JoinCritics() {
         </p>
 
         {status.kind === "closed" && (
-          <button className="btn btn--lg" onClick={() => setStatus({ kind: "open", error: null, field: null })}>მინდა შეფასება ✦</button>
+          <button className="btn btn--lg" onClick={() => setStatus({ kind: "open", error: null, field: null })}>მინდა შეფასება</button>
         )}
 
         {(status.kind === "open" || status.kind === "sending") && (
@@ -76,7 +76,7 @@ export function JoinCritics() {
         )}
 
         {status.kind === "done" && (
-          <p className="join__done" role="status">{status.already ? "უკვე სიაში ხარ — დაგიკავშირდებით." : "მადლობა! როცა პირველ შეფასებას დავგეგმავთ, მოგწერთ."} 🍴</p>
+          <p className="join__done" role="status">{status.already ? "უკვე სიაში ხარ — დაგიკავშირდებით." : "მადლობა! როცა პირველ შეფასებას დავგეგმავთ, მოგწერთ."}</p>
         )}
         {status.kind === "down" && <p className="join__done" role="status">ფორმა ჯერ არ არის ჩართული — ცოტა ხანში დაბრუნდი.</p>}
       </div>

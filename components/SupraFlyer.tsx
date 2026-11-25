@@ -4,7 +4,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-22
- * Version:     v1.0 — replaces "კუჭის ჩელენჯი" (no story arc, per Sandro's review)
+ * Version:     v7.4 collage chili + toast art, no emoji; v1.0 — replaces "კუჭის ჩელენჯი" (no story arc, per Sandro's review)
  * Description: "სუფრის მფრინავი". The mascot flies over the same turning table as the hero.
  *              Four courses = a story line (stepper above the stage); the tamada's toast is the
  *              break between them; the end reveals your stomach's persona (tarot card).
@@ -57,7 +57,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
   useEffect(() => {
     const load = (key: string, src: string) => { const im = new window.Image(); im.src = src; imgs.current[key] = im; };
     for (const c of COURSES) for (const s of c.dishes) load(s, stickerSrc(s));
-    load("chili", "/illustrations/creatures/chili.webp");
+    load("chili", "/collage/chili.webp");   // collage cut-out (v7.4)
     load("mascot", "/icons/flyer.svg");   // the logo's chomper with a wing, no crumb
     load("table", "/illustrations/hero/plate.webp");
   }, []);
@@ -217,7 +217,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
 
           {screen === "toast" && (
             <div className="game2__toast" role="status">
-              <span className="game2__glass" aria-hidden="true">🥂</span>
+              <Image className="game2__glass" src="/collage/khinkali-hand.webp" alt="" aria-hidden="true" width={605} height={1000} sizes="84px" />
               <p>{toMtavruli(course.toast)}</p>
               <small>შემდეგი: {COURSES[hud.course + 1]?.name}</small>
             </div>

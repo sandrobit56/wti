@@ -2,10 +2,11 @@
  * File:        components/TarotCard.tsx
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
- * Date:        2026-11-21
- * Version:     v1.0
- * Description: A persona as a tarot card (illustrations: public/illustrations/personas,
- *   drawn in Figma, file "WTI — ვიზუალური ენა v4").
+ * Date:        2026-11-25
+ * Version:     v2.0 — collage: marble-statue art on coloured paper, white card margin,
+ *              name on a paper strip, Hermes on the back; v1.0
+ * Description: A persona as a tarot card (art: public/illustrations/personas, AI collage of
+ *   Greek statues with food, generated in Figma file QuVaHjL1USyC3CQgBpkIXZ).
  *   - FRONT: the archetype illustration + name on a ribbon banner.
  *   - BACK: whatever the caller passes (persona details, dish tags) — or, by
  *     default, the decorative card back (used for the quiz reveal).
@@ -19,6 +20,7 @@ import Image from "next/image";
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
 import type { PointerEvent, ReactNode } from "react";
 import { PERSONAS } from "@/lib/personas.ts";
+import { Strip } from "./Strip";
 import type { PersonaId } from "@/lib/quiz.ts";
 
 type Props = {
@@ -38,8 +40,8 @@ const WIDTH = { sm: 150, md: 220, lg: 280 } as const;
 export function CardBack() {
   return (
     <div className="tarot__cover" aria-hidden="true">
-      <Image src="/icons/mascot.svg" alt="" width={72} height={74} />
-      <span className="tarot__cover-title">რა ვჭამოთ?</span>
+      <Image className="tarot__cover-art" src="/collage/hermes-sm.webp" alt="" width={300} height={513} />
+      <Strip text="რა ვჭამოთ?" tone="ink" decorative className="tarot__cover-title" />
     </div>
   );
 }
@@ -72,8 +74,8 @@ export function TarotCard({ id, flipped = false, onFlip, back, size = "md", me =
       <div className="tarot__inner">
         <div className="tarot__face tarot__front" inert={flipped}>
           <Image src={`/illustrations/personas/${id}.webp`} alt={p.name} width={450} height={600} sizes={`${WIDTH[size]}px`} />
-          <span className="tarot__banner">{p.name}</span>
-          {me && <span className="tarot__me">შენ ✓</span>}
+          <Strip text={p.name} tone="paper" decorative className="tarot__banner" />
+          {me && <span className="tarot__me">შენ</span>}
           {onFlip && <button type="button" className="tarot__hit" onClick={onFlip} aria-label={`${p.name} — დეტალები`} />}
           <span className="tarot__shine" aria-hidden="true" />
         </div>

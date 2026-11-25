@@ -4,7 +4,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-22
- * Version:     v1.0 — replaces PersonaTeaser (title + text + 2 buttons + a fan of 3 cards
+ * Version:     no emoji; v1.0 — replaces PersonaTeaser (title + text + 2 buttons + a fan of 3 cards
  *              competed for attention, per Sandro's review)
  * Description: Section "პერსონა" with one object: the fate deck. Before the quiz the top card
  *              lies face down ("ბედმა იცის, შენ — ჯერ არა"); tapping the deck or the one button
@@ -44,7 +44,7 @@ export function PersonaSection({ persona, onStart, onGallery }: Props) {
         <p className="persona2__line">
           {persona ? persona.line : "7 კითხვა, ერთი წუთი — და ბორბალი შენს კუჭზე მოირგება."}
         </p>
-        <button className="btn" onClick={onStart}>{persona ? "ტესტი თავიდან" : "გაიარე ტესტი ✦"}</button>
+        <button className="btn" onClick={onStart}>{persona ? "ტესტი თავიდან" : "გაიარე ტესტი"}</button>
         <button className="link persona2__all" onClick={onGallery}>ნახე 12-ვე პერსონა →</button>
       </div>
     </section>

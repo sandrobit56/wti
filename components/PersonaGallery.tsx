@@ -60,7 +60,7 @@ export function PersonaGallery({ current, onClose, onStart, onDish }: { current:
       className="gallery"
       labelledBy="gallery-title"
       onClose={onClose}
-      footer={<button className="pill pill--dark pill--block" onClick={onStart}>{current ? "ტესტი თავიდან" : "გაიარე ტესტი — 1 წუთი"}</button>}
+      footer={<button className="btn" onClick={onStart}>{current ? "ტესტი თავიდან" : "გაიარე ტესტი — 1 წუთი"}</button>}
     >
       <header>
         <p className="caps">12 პერსონა</p>

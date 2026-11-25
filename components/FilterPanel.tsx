@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-17
- * Version:     v3.1 — "მეტი ფილტრი": collapsed <details> with cuisine / dish type / meal
+ * Version:     no emoji in place select; v3.1 — "მეტი ფილტრი": collapsed <details> with cuisine / dish type / meal
  *              time (compact text chips, count badge, opens itself when something is set)
  *              v3.0 — stylized: sticker chips with food icons, hover lift,
  *              press-down click, sliding segmented thumb, icon pop on select
@@ -114,7 +114,7 @@ export function FilterPanel(p: Props) {
             }}
           >
             <option value="">მთელი თბილისი</option>
-            <option value={GEO}>📍 {MY_LOCATION}</option>
+            <option value={GEO}>{MY_LOCATION} (GPS)</option>
             {p.place?.label === MY_LOCATION && <option value={MY_LOCATION}>{MY_LOCATION}</option>}
             {NEIGHBORHOODS.map((n) => <option key={n.name} value={n.name}>{n.name}</option>)}
           </select>

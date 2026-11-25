@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-16
- * Version:     v3.1 — actions pinned in the Sheet footer; 3 versions; hint lines removed;
+ * Version:     no emoji in version meta; v3.1 — actions pinned in the Sheet footer; 3 versions; hint lines removed;
  *              v3.0 — shared Sheet: bottom sheet with drag-to-close on mobile, card-draw on desktop;
  *              v2.1 — live Google map + on-tap Google Places nearby;
  *              v2.0 — 4–5 real versions of the dish (photo + credit, description,
@@ -134,7 +134,7 @@ export function ResultModal({ dish, place, radius, onClose, onAgain, onNotToday,
                     <span className="version__desc">{v.desc}</span>
                     <span className="version__meta">
                       ≈ {v.priceGel[0]}–{v.priceGel[1]} ₾
-                      {v.spicy === 2 ? " · 🌶🌶" : v.spicy ? " · 🌶" : ""}
+                      {v.spicy === 2 ? " · ძალიან ცხარე" : v.spicy ? " · ცხარე" : ""}
                       {v.vegan ? " · ვეგანური" : v.vegetarian ? " · ვეგეტარიანული" : ""}
                       {v.healthy ? " · ჯანსაღი" : ""}
                     </span>

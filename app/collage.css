@@ -372,3 +372,25 @@ dialog::backdrop { background: rgba(22, 60, 58, .55) !important; backdrop-filter
   .paths__churchkhela { right: 6%; top: 12%; }
   .persona__tarragon { right: 2%; top: 8%; width: 70px; }
 }
+
+/* ── 14 · tarot cards as collage prints (v7.4) ─────────────────────────── */
+.tarot__face { border-radius: 4px !important; background: var(--paper) var(--paper-tex) 0 0 / 400px !important; background-blend-mode: multiply !important;
+  box-shadow: 0 1px 0 rgba(28, 26, 23, .08), 0 16px 26px -10px rgba(28, 26, 23, .45) !important; }
+/* white printed margin around the art, like a photo print */
+.tarot__front { padding: 7%; padding-bottom: 7%; }
+.tarot__front img { border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .06); }
+.tarot--me .tarot__face { box-shadow: 0 0 0 3px var(--brand), 0 16px 26px -10px rgba(28, 26, 23, .45) !important; }
+.tarot__banner.strip { position: absolute; left: 50%; bottom: 3%; translate: -50% 0; max-width: 92%; font-size: 15px; z-index: 2;
+  background: none !important; clip-path: none !important; padding: 0 !important; color: inherit; }
+.tarot__banner .strip__paper { white-space: normal; text-align: center; line-height: 1.05; }
+.tarot--sm .tarot__banner.strip { font-size: 12px; }
+.tarot--lg .tarot__banner.strip { font-size: 18px; }
+.tarot__me { background: var(--news) !important; color: var(--yellow) !important; border-radius: 2px !important; rotate: 6deg; top: 4% !important; right: 4% !important; padding: 4px 10px !important; }
+.tarot__turn { background: var(--news) !important; box-shadow: none !important; border-radius: 2px !important; }
+/* back: Hermes on newsprint */
+.tarot__cover { background: var(--news) var(--paper-tex) 0 0 / 400px !important; background-blend-mode: multiply !important; box-shadow: inset 0 0 0 7px var(--paper), inset 0 0 0 9px var(--news) !important; border-radius: 4px !important; gap: 0 !important; }
+.tarot__cover-art { width: 56%; height: auto; rotate: -6deg; filter: drop-shadow(0 10px 10px rgba(0, 0, 0, .4)); }
+.tarot__cover-title { font-size: 17px; margin-top: -10px; }
+/* food stickers are paper cut-outs now (scripts/paper-stickers.py) — no extra shadows */
+img[src*="/stickers/"] { filter: none !important; }
+.game2__glass { display: block; width: 84px; height: auto; margin: 0 auto 6px; rotate: -10deg; filter: drop-shadow(0 8px 8px rgba(28, 26, 23, .3)); }
