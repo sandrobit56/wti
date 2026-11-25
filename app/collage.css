@@ -394,3 +394,52 @@ dialog::backdrop { background: rgba(22, 60, 58, .55) !important; backdrop-filter
 /* food stickers are paper cut-outs now (scripts/paper-stickers.py) — no extra shadows */
 img[src*="/stickers/"] { filter: none !important; }
 .game2__glass { display: block; width: 84px; height: auto; margin: 0 auto 6px; rotate: -10deg; filter: drop-shadow(0 8px 8px rgba(28, 26, 23, .3)); }
+
+/* ── 15 · v7.5: a calm hero + refined chapter transitions ──────────────── */
+/* HERO: one centred column — title, wheel, one row of filters. Hermes + sun sit to the right,
+   behind everything, as the only decoration. Before: three competing columns. */
+.hero__inner { display: grid !important; grid-template-columns: minmax(0, 1fr) !important; grid-template-areas: "title" "wheel" "controls" !important;
+  justify-items: center !important; align-content: center; row-gap: 14px !important; min-height: calc(100svh - 72px); padding-block: 18px 28px; }
+.hero__inner > .sign { grid-area: title; }
+.hero__stage { grid-area: wheel; width: min(44vw, calc(100svh - 72px - 360px), 580px) !important; margin-top: 4px !important; }
+.hero__controls { grid-area: controls; justify-self: center !important; width: 100% !important; align-items: center !important; align-self: auto !important; gap: 6px !important; margin: 0 !important; position: static !important; }
+.hero__controls .tokens { flex-direction: row !important; align-items: center !important; justify-content: center !important; flex-wrap: wrap !important; max-width: 760px !important; }
+/* the dish count is a quiet caption, not another black label */
+.hero__status { background: none !important; color: var(--news) !important; clip-path: none !important; rotate: 0deg !important; padding: 0 !important; font-size: 13px !important; opacity: .7; }
+.hero__sun { right: 7%; top: 18%; width: 300px; opacity: .9; }
+.hero__hermes { right: 5%; top: 9%; width: min(22vw, 320px); }
+@media (max-width: 1023px) {
+  .hero__stage { width: min(80vw, 52svh) !important; }
+}
+
+/* TRANSITIONS: chapters are sheets of paper stacked on each other. Each sheet has softly
+   rounded top corners, overlaps the one above by 40px and casts a soft shadow, and slides
+   up into place as it enters the screen. The collage figure sits on the overlap. */
+.chapter.chapter { margin-top: -40px !important; border-radius: 34px 34px 0 0 !important; box-shadow: 0 -18px 40px -22px rgba(28, 26, 23, .45) !important; z-index: 1; }
+.chapter ~ .chapter { z-index: 2; }
+.chapter ~ .chapter ~ .chapter { z-index: 3; }
+.chapter ~ .chapter ~ .chapter ~ .chapter { z-index: 4; }
+.chapter ~ .chapter ~ .chapter ~ .chapter ~ .chapter { z-index: 5; }
+/* first sheet hides under the clouds instead */
+.chapter.chapter--cream { margin-top: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .chapter.chapter:not(.chapter--cream) { animation: sheet-in linear both !important; animation-timeline: view() !important; animation-range: entry 0% entry 60% !important; }
+    /* content arrives a beat after its sheet */
+    .chapter .section-title, .chapter .container > p, .chapter .offer, .chapter .game2__stage, .chapter .persona2__deck, .chapter .join__kit {
+      animation: rise linear both; animation-timeline: view(); animation-range: entry 10% cover 30%; }
+  }
+}
+@keyframes sheet-in { from { translate: 0 90px; rotate: 1.2deg; } to { translate: 0 0; rotate: 0deg; } }
+/* globals.css resets chapter animation with !important; this rule must out-rank it */
+@keyframes rise { from { opacity: 0; translate: 0 40px; } to { opacity: 1; translate: 0 0; } }
+/* figures sit exactly on the overlap line */
+.bridge { top: 20px; }
+@media (max-width: 640px) {
+  .chapter.chapter { margin-top: -24px !important; border-radius: 22px 22px 0 0 !important; }
+  .chapter.chapter--cream { margin-top: 0 !important; border-radius: 0 !important; }
+}
+@media (min-width: 641px) { .hero__controls .tokens { flex-wrap: nowrap !important; width: auto !important; max-width: none !important; } }
+/* the old wave seams needed a tall bottom pad; stacked sheets don't */
+.chapter.chapter { padding-bottom: 96px !important; }
+@media (max-width: 640px) { .chapter.chapter { padding-bottom: 64px !important; } }

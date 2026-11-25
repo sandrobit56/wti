@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v3.4 — clouds over the first seam, floating food cut-outs;
+ * Version:     v3.5 — hero calmed down (no chili, one centred column);
+ *              v3.4 — clouds over the first seam, floating food cut-outs;
  *              v3.3 — collage bridges between chapters (was torn seams), hero doodles removed;
  *              v3.2 — flick-to-spin: a fast drag on the plate spins it (strength → turns and
  *              duration, direction follows the flick); v3.1 — mood chips, past winners, "never" list
@@ -326,7 +327,6 @@ export function Randomizer() {
         <div className="hero__collage" aria-hidden="true">
           <span className="hero__sun" />
           <Image className="hero__hermes" src="/collage/hermes.webp" alt="" width={888} height={1519} priority sizes="(max-width: 1023px) 40vw, 360px" />
-          <Float item="chili" className="hero__chili" />
         </div>
         <div className="hero__inner container">
           <HeroTitle winner={spun?.landed ? dish?.name ?? null : null} onOpen={() => pathsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })} />
