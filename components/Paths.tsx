@@ -3,7 +3,9 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-25
- * Version:     v4.1 — collage: a marble hand offers the dish, the name is a paper strip;
+ * Version:     v5.0 — one result card: dish photo + name on the left, way / main action /
+ *              places on the right; clear empty state. (v4 stacked 9 centred blocks.)
+ *              v4.1 — collage: a marble hand offers the dish, the name is a paper strip;
  *              v4.0 — one object, one choice, one button (Sandro's UX review: 4 boxes,
  *              5 buttons, 5 links and 6 moving illustrations slowed the decision down).
  *              (v3.0 — three cards: read / go / order)
@@ -16,10 +18,9 @@
  */
 "use client";
 
-import { Strip } from "./Strip";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { priceBand, type Dish } from "@/lib/catalog.ts";
+import type { Dish } from "@/lib/catalog.ts";
 import { stickerSrc } from "@/lib/stickers.ts";
 import { typePhoto } from "@/lib/photos.ts";
 import { Words } from "./Words";
@@ -83,50 +84,51 @@ export function Paths({ dish, place, radius, group, onPickPlace, onSpin, onAgain
           <Words caps parts={["სად ", ["შეჭამ?", "accent"]]} />
         </h2>
 
-        {/* collage v7.1: a marble hand offers today's dish (was a plate with arc text) */}
-        <div className="offer" aria-hidden={!dish}>
-          <Image className="offer__hand" src="/collage/palm.webp" alt="" width={1000} height={494} sizes="(max-width: 640px) 92vw, 560px" />
-          {dish
-            ? <Image key={dish.slug} className="offer__dish paths2__dish" src={typePhoto(dish.slug)?.src ?? stickerSrc(dish.slug)} alt="" width={256} height={256} sizes="200px" />
-            : <button className="offer__empty btn" onClick={onSpin}>ჯერ დაატრიალე ↑</button>}
-        </div>
+        {!dish ? (
+          /* empty state: one picture, one sentence, one button */
+          <div className="result result--empty">
+            <Image className="result__hand" src="/collage/palm.webp" alt="" width={1000} height={494} sizes="(max-width: 640px) 80vw, 420px" />
+            <p className="result__hint">ბორბალი ჯერ არ დაგიტრიალებია. ჯერ კერძი ამოიღე, მერე აქ გაჩვენებ, სად შეჭამ.</p>
+            <button className="btn" onClick={onSpin}>დაატრიალე ბორბალი ↑</button>
+          </div>
+        ) : (
+          /* v5: one result card — left: the dish, right: how to get it */
+          <div className="result">
+            <figure className="result__dish">
+              <Image key={dish.slug} className="result__photo paths2__dish" src={typePhoto(dish.slug)?.src ?? stickerSrc(dish.slug)} alt={dish.name} width={640} height={640} sizes="(max-width: 640px) 90vw, 420px" />
+              <figcaption>
+                <h3 className="result__name">{dish.name}</h3>
+                <p className="result__meta">≈ {dish.priceGel[0]}–{dish.priceGel[1]} ₾ · {dish.cuisine}</p>
+                {group && <p className="result__group"><strong>{group.summary}</strong><br />{group.dishes.join(" · ")}</p>}
+              </figcaption>
+            </figure>
 
-        {dish && (
-          <>
-            <p className="paths2__name"><Strip text={dish.name} tone="yellow" /></p>
-            <p className="paths2__meta">
-              ≈ {dish.priceGel[0]}–{dish.priceGel[1]} ₾ · {"₾".repeat(priceBand(dish))} · {dish.cuisine}
-              {group && <> · <strong>{group.summary}</strong></>}
-            </p>
-            {group && <p className="paths2__group">{group.dishes.join(" · ")}</p>}
+            <div className="result__how">
+              <div className="seg" role="radiogroup" aria-label="როგორ">
+                <button role="radio" aria-checked={way === "go"} className={way === "go" ? "on" : ""} onClick={() => setWay("go")}>მივალ</button>
+                <button role="radio" aria-checked={way === "order"} className={way === "order" ? "on" : ""} onClick={() => setWay("order")}>შევუკვეთავ</button>
+              </div>
 
-            <div className="paths2__switch" role="radiogroup" aria-label="როგორ">
-              <button role="radio" aria-checked={way === "go"} className={way === "go" ? "on" : ""} onClick={() => setWay("go")}>მიდი</button>
-              <button role="radio" aria-checked={way === "order"} className={way === "order" ? "on" : ""} onClick={() => setWay("order")}>გამოიძახე</button>
+              {main && <a className="btn btn--lg result__main" href={main.href} target="_blank" rel="noreferrer">{main.label} ↗</a>}
+
+              <ul className="result__list">
+                {way === "go" && venues.kind === "no-place" && (
+                  <li className="result__note"><button className="link" onClick={onPickPlace}>აირჩიე უბანი</button> — და ახლომახლო ადგილებს გაჩვენებ.</li>
+                )}
+                {way === "go" && venues.kind === "loading" && <li className="result__note">ვეძებ ახლოს…</li>}
+                {way === "go" && venues.kind === "error" && <li className="result__note">ადგილები ვერ ჩაიტვირთა ({venues.message})</li>}
+                {way === "go" && venues.kind === "ready" && near.length === 0 && <li className="result__note">{radius} კმ-ში ვერ ვიპოვე — სცადე რუკაზე.</li>}
+                {way === "go" && near.slice(group ? 0 : 1).map((v) => (
+                  <li key={v.id}><a className="row" href={mapsDirectionsUrl(v)} target="_blank" rel="noreferrer"><span>{v.name}</span><span>{km(v.distanceKm)} ↗</span></a></li>
+                ))}
+                {way === "order" && delivery.slice(1).map((d) => (
+                  <li key={d.id}><a className="row" href={d.url} target="_blank" rel="noreferrer"><span><i style={{ background: d.dot }} />{d.name}</span><span>↗</span></a></li>
+                ))}
+              </ul>
+
+              <button className="pill pill--outline result__again" onClick={onAgain}>კიდევ დაატრიალე</button>
             </div>
-
-            {main && <a className="btn" href={main.href} target="_blank" rel="noreferrer">{main.label} ↗</a>}
-
-            <ul className="paths2__rows">
-              {way === "go" && venues.kind === "no-place" && (
-                <li><button className="link" onClick={onPickPlace}>აირჩიე უბანი — ახლომახლო ადგილებს გაჩვენებ →</button></li>
-              )}
-              {way === "go" && venues.kind === "loading" && <li className="muted">ვეძებ ახლოს…</li>}
-              {way === "go" && venues.kind === "error" && <li className="muted">ადგილები ვერ ჩაიტვირთა ({venues.message})</li>}
-              {way === "go" && venues.kind === "ready" && near.length === 0 && <li className="muted">{radius} კმ-ში ვერ ვიპოვე — სცადე რუკაზე.</li>}
-              {way === "go" && near.slice(group ? 0 : 1).map((v) => (
-                <li key={v.id}><a href={mapsDirectionsUrl(v)} target="_blank" rel="noreferrer"><span>{v.name}</span><span>{km(v.distanceKm)}</span></a></li>
-              ))}
-              {way === "order" && delivery.slice(1).map((d) => (
-                <li key={d.id}><a href={d.url} target="_blank" rel="noreferrer"><span><i style={{ background: d.dot }} />{d.name}</span><span>↗</span></a></li>
-              ))}
-            </ul>
-
-            <p className="paths2__foot">
-              <button className="link" onClick={onAgain}>კიდევ დაატრიალე</button>
-              <span>ბლოგები და შეფასებები — მალე</span>
-            </p>
-          </>
+          </div>
         )}
       </div>
     </section>

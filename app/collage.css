@@ -479,3 +479,69 @@ button.panel__hint:hover { border-color: var(--news) !important; }
 }
 /* standard E1: no torn edges in the UI — the header gets a clean edge and a soft shadow */
 .header, .header--scrolled, .header[data-on] { -webkit-mask: none !important; mask: none !important; box-shadow: 0 1px 0 rgba(28, 26, 23, .08), 0 8px 20px -14px rgba(28, 26, 23, .45) !important; }
+
+/* ── 18 · design tokens v1 (standard F1 shapes, K1 colours) ─────────────
+   Every new rule uses these — no new hex values or radii in components. */
+:root {
+  /* K1 colours: 4 surfaces + ink + 1 action colour */
+  --c-ink: #1c1a17;        /* text, outlines, B2 */
+  --c-paper: #fffaf2;      /* cards, chips, sheets */
+  --c-action: #d92f4c;     /* B1, selected states, winner — the ONLY "press me" colour */
+  --c-action-base: #a8253b;
+  --c-muted: rgba(28, 26, 23, .62);
+  --c-line: rgba(28, 26, 23, .16);
+  /* section surfaces (backgrounds only, never on controls) */
+  --s-pink: #f8b4c0; --s-cream: #fff1dc; --s-green: #163c3a; --s-yellow: #ffc93c;
+  /* F1 shapes: exactly three radii */
+  --r-pill: 999px;   /* buttons, chips, segmented control */
+  --r-card: 16px;    /* cards, sheets, popups, result card */
+  --r-inner: 10px;   /* rows and photos inside a card */
+  --line: 1.5px solid var(--c-line);
+  --lift: 0 12px 28px -16px rgba(28, 26, 23, .45);
+}
+
+/* ── 19 · section 2 v5: one result card ─────────────────────────────── */
+.paths2__inner { display: grid; justify-items: center; gap: 28px; }
+.result { width: min(980px, 100%); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px; align-items: start;
+  background: var(--c-paper); border-radius: var(--r-card); box-shadow: var(--lift); padding: 28px; text-align: left; }
+.result__dish { margin: 0; display: grid; gap: 14px; }
+.result__photo { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--r-inner); display: block; }
+.result__name { margin: 0; font: 800 clamp(26px, 3vw, 36px)/1.05 var(--display); color: var(--c-ink); }
+.result__meta { margin: 4px 0 0; color: var(--c-muted); font-size: 15px; }
+.result__group { margin: 8px 0 0; font-size: 14px; color: var(--c-ink); }
+.result__how { display: grid; gap: 16px; align-content: start; }
+.result__main { width: 100%; }
+.result__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.result__list .row { display: flex; justify-content: space-between; gap: 12px; padding: 12px 14px; border: var(--line); border-radius: var(--r-inner); color: var(--c-ink); text-decoration: none; font-weight: 600; }
+.result__list .row:hover { border-color: var(--c-ink); }
+.result__list .row i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; }
+.result__note { color: var(--c-muted); font-size: 14px; }
+.result__again { justify-self: start; }
+/* segmented control (C2): two options in one pill */
+.seg { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border: var(--line); border-radius: var(--r-pill); background: #fff; }
+.seg button { min-height: 40px; border: 0; border-radius: var(--r-pill); background: none; font: 700 15px/1 var(--font); color: var(--c-ink); cursor: pointer; }
+.seg button.on { background: var(--c-ink); color: var(--c-paper); }
+/* empty state */
+.result--empty { grid-template-columns: 1fr; justify-items: center; text-align: center; max-width: 560px; gap: 16px; }
+.result__hand { width: min(420px, 80%); height: auto; }
+.result__hint { margin: 0; color: var(--c-muted); max-width: 40ch; }
+/* section 2 keeps only its title + the bridge hand from the clouds; the palm lives in the empty state */
+.paths__churchkhela { display: none !important; }
+@media (max-width: 760px) {
+  .result { grid-template-columns: 1fr; padding: 18px; gap: 20px; }
+}
+
+/* ── 20 · diners v2: marble busts, one clear add button ─────────────── */
+.seat--paper { width: 19%; }
+.seat--paper .seat__who { filter: drop-shadow(0 8px 8px rgba(28, 26, 23, .3)); }
+.seat--paper.seat--r .seat__who img { scale: 1 1; }   /* busts aren't mirrored */
+.seat--paper .seat__x { width: 22px; height: 22px; border-radius: var(--r-pill); background: var(--c-ink); color: var(--c-paper); border: 0; font-size: 14px; line-height: 22px; }
+.seat-card { font-size: 12px !important; padding: 6px 10px !important; white-space: nowrap; }
+.wheel__add.wheel__add { min-height: 40px; padding: 0 16px !important; gap: 8px; font: 700 14px/1 var(--font) !important; color: var(--c-paper) !important; background: var(--c-ink) !important; border-radius: var(--r-pill) !important; }
+.wheel__add span { opacity: .6; font-weight: 600; }
+.wheel__add:hover { background: var(--c-action) !important; }
+/* group note had grid-area "note", which the v7.5 hero template lacks → it created an extra column and pushed the hero left */
+.hero__inner > .group-note { grid-area: auto !important; grid-column: 1 !important; justify-self: center; border-radius: var(--r-pill) !important; border: var(--line); box-shadow: none !important; padding: 8px 16px; }
+.paths2__inner { max-width: none !important; }
+/* with guests at the table the wheel steps back so every bust stays on screen */
+@media (max-width: 640px) { .hero__stage:has(.seat ~ .seat) { width: 72vw !important; } .seat--paper { width: 22%; } }

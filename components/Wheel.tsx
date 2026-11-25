@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-25
- * Version:     v10 — simpler, photo-first: each slice IS the dish photo (full wedge, no
+ * Version:     v10.1 — diners are marble busts; add button reads "+ სტუმარი";
+ *              v10 — simpler, photo-first: each slice IS the dish photo (full wedge, no
  *              crooked mini cut-outs), names on one cream rim band, thin paper dividers,
  *              plain round plate (no torn edge, dashed ring or tape). Winner's band turns coral.
  *              v9.1 — real paper texture (public/collage/paper.webp) instead of SVG noise;
@@ -219,7 +220,7 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
         </div>
       ))}
       {diners < MAX_DINERS && !spinning && (
-        <button className="wheel__add" onClick={onAddDiner} aria-label="დაამატე ადამიანი">+ <span>{diners}/{MAX_DINERS}</span></button>
+        <button className="wheel__add" onClick={onAddDiner} aria-label={`დაამატე სტუმარი (${diners} / ${MAX_DINERS})`}>+ სტუმარი <span>{diners}/{MAX_DINERS}</span></button>
       )}
     </div>
   );
