@@ -3,9 +3,11 @@
  * File:        components/SupraFlyer.tsx
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
- * Date:        2026-11-22
- * Version:     v7.4 collage chili + toast art, no emoji; v1.0 — replaces "კუჭის ჩელენჯი" (no story arc, per Sandro's review)
- * Description: "სუფრის მფრინავი". The mascot flies over the same turning table as the hero.
+ * Date:        2026-11-25
+ * Version:     v8 — surreal sky: Hermes flies over a supra floating on pink clouds
+ *              with marble ruins (parallax, mirrored tiles); start screen explains the goal;
+ *              v7.4 collage chili + toast art, no emoji; v1.0 — replaces "კუჭის ჩელენჯი" (no story arc, per Sandro's review)
+ * Description: "სუფრის მფრინავი". Hermes flies over a supra floating in a pink sky.
  *              Four courses = a story line (stepper above the stage); the tamada's toast is the
  *              break between them; the end reveals your stomach's persona (tarot card).
  *              Rules live in lib/flyer.ts (tested); this file only draws and reads input.
@@ -58,8 +60,9 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
     const load = (key: string, src: string) => { const im = new window.Image(); im.src = src; imgs.current[key] = im; };
     for (const c of COURSES) for (const s of c.dishes) load(s, stickerSrc(s));
     load("chili", "/collage/chili.webp");   // collage cut-out (v7.4)
-    load("mascot", "/icons/flyer.svg");   // the logo's chomper with a wing, no crumb
-    load("table", "/illustrations/hero/plate.webp");
+    load("mascot", "/collage/hermes-sm.webp");   // v8: Hermes, god of delivery, flies the supra
+    load("supra", "/collage/supra-clouds.webp");  // feast table on pink clouds with marble ruins
+    load("clouds", "/collage/clouds-soft.webp");   // bottom faded, no hard edge in the sky
   }, []);
 
   const finish = useCallback((s: State) => {
@@ -136,18 +139,21 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
       ctx.clearRect(0, 0, W, H);
       ctx.save();
       if (c.shake > 0) ctx.translate((Math.random() - 0.5) * 10 * c.shake, (Math.random() - 0.5) * 10 * c.shake);
-      // steam puffs drifting by
-      ctx.fillStyle = "rgba(255, 241, 220, .08)";
-      for (let i = 0; i < 6; i++) {
-        const x = ((i * 260 - (c.spin * 900) % (W + 300)) + W + 300) % (W + 300) - 150;
-        ctx.beginPath(); ctx.ellipse(x, H * (0.15 + (i % 3) * 0.16), 90, 30, 0, 0, Math.PI * 2); ctx.fill();
-      }
-      // the turning supra (same table as the hero), huge, under the horizon
-      const table = imgs.current.table, R = Math.min(W * 0.62, 760);
-      if (table?.complete) {
-        ctx.save(); ctx.translate(W / 2, H * 0.68 + R * 0.86); ctx.rotate(c.spin); // only the top cap shows: a horizon
-        ctx.drawImage(table, -R, -R, R * 2, R * 2); ctx.restore();
-      }
+      // v8 surreal sky: far clouds (slow) and the floating supra (faster), mirrored tiles so the seam never shows
+      const tile = (im: HTMLImageElement | undefined, h: number, y: number, rate: number, alpha: number) => {
+        if (!im?.complete || !im.naturalWidth) return;
+        const w = h * (im.naturalWidth / im.naturalHeight);
+        const off = (c.spin * rate) % (w * 2);
+        ctx.globalAlpha = alpha;
+        for (let x = -off; x < W + w; x += w * 2) {
+          ctx.drawImage(im, x, y, w, h);
+          ctx.save(); ctx.translate(x + w * 2, y); ctx.scale(-1, 1); ctx.drawImage(im, 0, 0, w, h); ctx.restore();
+        }
+        ctx.globalAlpha = 1;
+      };
+      tile(imgs.current.clouds, H * 0.34, H * 0.06, 260, 0.55);
+      const groundH = Math.min(H * 0.36, W * 0.62);   // phones are tall and narrow: size by width there
+      tile(imgs.current.supra, groundH, H - groundH * 0.82, 700, 1);
       // dishes & chili
       for (const it of items.current) {
         const im = imgs.current[it.what.kind === "chili" ? "chili" : it.what.slug];
@@ -158,10 +164,10 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
       const mascot = imgs.current.mascot;
       if (mascot?.complete) {
         ctx.save(); ctx.translate(m.x, m.y); ctx.rotate(Math.max(-0.5, Math.min(0.5, m.vy * 0.0012)));
-        const s = MASCOT_R * 2.5; ctx.drawImage(mascot, -s / 2, -s / 2, s, s); ctx.restore();
+        const h = MASCOT_R * 3.6, w = h * (444 / 759); ctx.drawImage(mascot, -w / 2, -h * 0.55, w, h); ctx.restore();
       }
       ctx.font = "900 22px 'Google Sans Variable', sans-serif"; ctx.textAlign = "center";
-      for (const p of pops.current) { ctx.globalAlpha = 1 - p.t / 0.8; ctx.fillStyle = p.bad ? "#F1435E" : "#FFC93C"; ctx.fillText(p.text, p.x, p.y); }
+      for (const p of pops.current) { ctx.globalAlpha = 1 - p.t / 0.8; ctx.fillStyle = p.bad ? "#D92F4C" : "#1C1A17"; ctx.fillText(p.text, p.x, p.y); }
       ctx.globalAlpha = 1; ctx.restore();
       raf = requestAnimationFrame(frame);
     };
@@ -209,8 +215,9 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
 
           {screen === "idle" && (
             <div className="game2__screen">
-              <Image src="/icons/flyer.svg" alt="" width={84} height={84} />
-              <p>4 რიგი · 3 სიცოცხლე · წიწაკა = −♥</p>
+              <Image className="game2__hero" src="/collage/hermes-sm.webp" alt="" width={444} height={759} sizes="120px" />
+              <p className="game2__how"><b>ჰერმესს შია.</b> თითით ან მაუსით ატარე სუფრაზე, შეჭამე კერძები, აარიდე წიწაკას.</p>
+              <p className="game2__rules">4 რიგი · 3 სიცოცხლე</p>
               <button className="btn" onClick={start}>▶ აფრენა</button>
             </div>
           )}

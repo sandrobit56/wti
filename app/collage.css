@@ -574,3 +574,30 @@ button.panel__hint:hover { border-color: var(--news) !important; }
   .bridge--dionysus { width: 24vw !important; }
 }
 .game2__reveal .tarot__banner { display: none !important; }   /* the name is printed right next to the card */
+
+/* ── 22 · game v8: a window into a surreal sky ──────────────────────────
+   The dark green section is the wall; the stage is a window onto a pink sky where
+   Hermes flies over a supra floating on clouds. Light sky = stickers and chili read clearly. */
+.game2__stage { background:
+    radial-gradient(circle at 82% 18%, #ffd45a 0 46px, rgba(255, 201, 60, .35) 47px 70px, transparent 71px),
+    linear-gradient(180deg, #f7a3b4 0%, #f8b4c0 38%, #ffd9cf 72%, #fff1dc 100%) !important; }
+.game2__stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: var(--grain-tex) 0 0 / 256px; opacity: .25; mix-blend-mode: soft-light; }
+.game2__course { background: var(--c-paper) !important; color: var(--c-ink) !important; box-shadow: var(--lift); }
+.game2__lives { color: var(--c-action) !important; text-shadow: 0 1px 0 var(--c-paper); }
+.game2__lives i { color: rgba(28, 26, 23, .22) !important; }
+/* start, toast and end screens: a paper card on the sky, ink text */
+.game2__screen { color: var(--c-ink) !important; }
+.game2__screen:not(.game2__screen--over) { gap: 10px !important; }
+.game2__hero { width: clamp(80px, 9vw, 120px); height: auto; rotate: -8deg; filter: drop-shadow(0 12px 12px rgba(28, 26, 23, .3)); animation: float-bob 5s ease-in-out infinite; }
+.game2__how { max-width: 34ch; font-size: 16px; line-height: 1.4; background: var(--c-paper); padding: 12px 18px; border-radius: var(--r-card); box-shadow: var(--lift); }
+.game2__how b { display: block; font: 800 20px/1.2 var(--display); }
+.game2__rules { font-size: 13px; color: var(--c-muted); }
+.game2__screen--over { background: rgba(255, 250, 242, .9); }
+.game2__verdict { color: var(--c-action) !important; }
+.game2__reveal b { color: var(--c-ink) !important; }
+.game2__toast::before { background: var(--c-paper) !important; border-radius: var(--r-card) !important; box-shadow: var(--lift) !important; }
+.game2__toast p { color: var(--c-action) !important; }
+.game2__toast small { color: var(--c-ink) !important; }
+@media (prefers-reduced-motion: reduce) { .game2__hero { animation: none; } }
+/* the sky shows through the start screen (old globals painted a dark veil over it) */
+.game2__screen:not(.game2__screen--over) { background: none !important; backdrop-filter: none !important; }
