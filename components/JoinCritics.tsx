@@ -12,7 +12,6 @@
  *              consent box linked to /privacy. Same validator as the server (lib/critics.ts).
  *              Honeypot field "website" is hidden from people and screen readers.
  */
-import Image from "next/image";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { checkSignup, DISTRICTS, LIMITS } from "@/lib/critics.ts";
@@ -39,33 +38,19 @@ export function JoinCritics() {
   const bad = (name: string) => (status.kind === "open" && status.field === name ? true : undefined);
 
   return (
-    <section className="join sect" id="join" aria-labelledby="join-title">
-      <div className="container join__inner">
-        {/* a pomegranate pieced together from thousands of paper scraps — dish names and critic words */}
-        <Image className="join__kit join__mosaic" src="/collage/mosaic-pomegranate.webp" alt="" width={906} height={1000} sizes="(max-width: 640px) 70vw, 380px" />
-        <h2 id="join-title" className="section-title display join__title">გახდი კრიტიკოსი</h2>
-        <p className="join__lead">
-          ჭამ, აკვირდები, გული გწყდება ცუდ ხინკალზე? ვეძებთ ადამიანებს, ვინც რესტორნებს შეამოწმებს და
-          გულწრფელად დაწერს.
-        </p>
-        {/* how it works — three steps, each a collage card (vision: a community that checks venues and writes honestly) */}
-        <ol className="steps3">
-          <li className="steps3__item">
-            <Image className="steps3__img" src="/illustrations/people/diner-3.webp" alt="" width={288} height={288} sizes="120px" />
-            <b>შემოგვიერთდი</b><span>ორი წუთი: სახელი, ელფოსტა და რა გიყვარს.</span>
-          </li>
-          <li className="steps3__item">
-            <Image className="steps3__img" src="/collage/khinkali-hand.webp" alt="" width={605} height={1000} sizes="80px" />
-            <b>გასინჯე</b><span>მიდი როგორც ჩვეულებრივი სტუმარი: ჭამე, დააკვირდი, დაიმახსოვრე.</span>
-          </li>
-          <li className="steps3__item">
-            <Image className="steps3__img" src="/collage/pomegranate.webp" alt="" width={384} height={425} sizes="100px" />
-            <b>დაწერე პირდაპირ</b><span>რა იყო კარგი, რა — არა. გულწრფელად, რეკლამის გარეშე.</span>
-          </li>
+    <section className="join9 sect" id="join" aria-labelledby="join-title">
+      <div className="join9__inner">
+        <h2 id="join-title" className="title9 title9--center">გახდი კრიტიკოსი</h2>
+        <p className="lead9">ჭამ, აკვირდები, გული გწყდება ცუდ ხინკალზე? ვეძებთ ადამიანებს, ვინც რესტორნებს შეამოწმებს და გულწრფელად დაწერს.</p>
+        {/* how it works: three plain steps — number, verb, one line */}
+        <ol className="steps9">
+          <li><b>შემოგვიერთდი</b><span>ორი წუთი: სახელი, ელფოსტა და რა გიყვარს.</span></li>
+          <li><b>გასინჯე</b><span>მიდი როგორც ჩვეულებრივი სტუმარი: ჭამე, დააკვირდი.</span></li>
+          <li><b>დაწერე პირდაპირ</b><span>რა იყო კარგი, რა — არა. რეკლამის გარეშე.</span></li>
         </ol>
 
         {status.kind === "closed" && (
-          <button className="btn btn--lg" onClick={() => setStatus({ kind: "open", error: null, field: null })}>მინდა შეფასება</button>
+          <button className="btn9" onClick={() => setStatus({ kind: "open", error: null, field: null })}>მინდა შეფასება</button>
         )}
 
         {(status.kind === "open" || status.kind === "sending") && (

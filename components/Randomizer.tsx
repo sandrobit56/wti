@@ -33,9 +33,6 @@ import { FilterTokens } from "./FilterTokens";
 import { Sheet } from "./Sheet";
 import Image from "next/image";
 import { HeroTitle } from "./HeroTitle";
-import { Bridge } from "./Bridge";
-import { Float } from "./Float";
-import { FigmaFill } from "./FigmaShaders";
 import { JoinCritics } from "./JoinCritics";
 import { mapsSearchUrl } from "@/lib/places.ts";
 import { MAX_DINERS, fillSeats, seatAngles, seatsFor, sharedVenue, sliceAt, venueLabel } from "@/lib/seats.ts";
@@ -424,24 +421,14 @@ export function Randomizer() {
         />
       </div>
       </div>
-      <div className="chapter chapter--wine">
-        {/* the same cloud band at every boundary: one sky running through the page */}
-        <div className="seam-clouds" aria-hidden="true"><Image src="/collage/clouds-soft.webp" alt="" width={1600} height={406} sizes="100vw" /></div>
-        <Bridge figure="icarus" side="right" />
+      <div className="chapter chapter--plain chapter--dots">
         <SupraFlyer onDish={openDish} />
       </div>
-      <div className="chapter chapter--mustard">
-        {/* the same cloud band at every boundary: one sky running through the page */}
-        <div className="seam-clouds seam-clouds--flip" aria-hidden="true"><Image src="/collage/clouds-soft.webp" alt="" width={1600} height={406} sizes="100vw" /></div>
-        <FigmaFill name="personaPaper" className="fx--paper" />
-        <Image className="persona__athena" src="/collage/athena.webp" alt="" aria-hidden="true" width={645} height={1000} sizes="250px" />
-        <Float item="tarragon" className="persona__tarragon" />
+      <div className="chapter chapter--plain">
         <PersonaSection persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />
       {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} onDish={(slug) => { setGalleryOpen(false); openDish(slug); }} />}
       </div>
-      <div className="chapter chapter--blush">
-        {/* the same cloud band at every boundary: one sky running through the page */}
-        <div className="seam-clouds" aria-hidden="true"><Image src="/collage/clouds-soft.webp" alt="" width={1600} height={406} sizes="100vw" /></div>
+      <div className="chapter chapter--plain chapter--dots">
         <JoinCritics />
       </div>
     </>

@@ -144,3 +144,151 @@
 .hero9__stage .wheel, .hero9__stage .wheel__svg { filter: none !important; box-shadow: none !important; }
 .paths9 { place-items: start center; padding-top: 234px; padding-bottom: 235px; }
 @media (max-width: 760px) { .paths9 { padding-top: 72px; padding-bottom: 140px; } }
+
+/* ════ v9.1 (2026-11-27): bigger wheel, calm chips, one paper for every section ════ */
+
+/* bigger wheel: 420 → 540 (content readable); the hero grows by the same 120px */
+.hero__inner.hero__inner { height: 1300px; }
+.hero9__stage.hero__stage { width: 540px !important; }
+.hero9__stage .wheel__hub { font-size: 15px !important; }
+/* "+ 1/5" keeps its Figma spot relative to the wheel (88% / 88%) */
+.hero9__stage .add-guest { left: 88.2%; top: 88%; }
+.hero9__clouds { top: 982px; }
+.hero9__hermes { top: 616px; }
+.hero.hero { background-size: 1440px 1179px !important; }
+
+/* filter chips: one line each, centred row; quiet → hover → chosen */
+.hero__controls .tokens { width: auto !important; max-width: 640px; flex-wrap: wrap !important; justify-content: center !important; gap: 8px !important; }
+.token.token { white-space: nowrap; padding: 10px 16px !important; background: #fff !important; border: 1.5px solid #ece7e1 !important; color: var(--c-ink) !important;
+  box-shadow: none !important; transform: none !important; rotate: 0deg !important; animation: none !important;
+  transition: border-color .15s, background-color .15s, translate .15s; cursor: pointer; }
+.token.token:hover { border-color: rgba(28, 26, 23, .45) !important; translate: 0 -1px; }
+.token.token.on { background: var(--c9-cream) !important; border-color: var(--c-ink) !important; font-weight: 700 !important; }
+.token.token:focus-visible { outline: 2px solid var(--c-action); outline-offset: 2px; }
+.token--more svg { display: none !important; }
+
+/* every section after the hero: the same white paper, no cloud seams, no statues */
+.chapter.chapter--plain { background: #fffefd !important; }
+.chapter.chapter--dots { background: #fffefe url("/fig/halftone.webp") center top / 1440px 1179px repeat !important; }
+.chapter--plain .seam-clouds, .chapter--plain .bridge, .chapter--plain .persona__athena, .chapter--plain .persona__tarragon, .chapter--plain .fx { display: none !important; }
+.title9--center { text-align: center; }
+.lead9 { margin: 0; max-width: 56ch; text-align: center; font: 400 18px/1.5 var(--font); color: rgba(28, 26, 23, .8); }
+.lead9--left { text-align: left; }
+.link9 { align-self: flex-start; border: 0; padding: 0; background: none; cursor: pointer; font: 700 15px/normal var(--font); color: var(--c-ink);
+  text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1.5px; }
+.link9:hover { color: var(--c-action); }
+.card9 { background: #fff; border: 1px solid rgba(28, 26, 23, .08); border-radius: 20px; box-shadow: 0 18px 40px -24px rgba(28, 26, 23, .35); }
+
+/* ── game ── */
+.game9 { padding: 140px 16px; }
+.game9__inner { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+.game9__stage { position: relative; width: 100%; height: 560px; margin-top: 16px; overflow: hidden; border-radius: 24px; outline: none; touch-action: none;
+  background: linear-gradient(180deg, #ffe3e8 0%, #fff3f5 55%, #fffefd 100%); border: 1px solid rgba(28, 26, 23, .08); }
+.game9__stage:focus-visible { box-shadow: 0 0 0 3px var(--c-action); }
+.game9__stage--play { cursor: none; }
+.game9__stage .game2__canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.game9__scene { position: absolute; inset: auto 0 0; pointer-events: none; }
+.game9__supra { display: block; width: 100%; height: auto; }
+.game9__card { position: absolute; z-index: 3; left: 50%; top: 50%; translate: -50% -56%; width: min(440px, calc(100% - 32px)); padding: 24px;
+  display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
+.game9__hermes { height: 96px !important; width: auto !important; }
+.game9__rules { list-style: none; margin: 0; padding: 0; width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.game9__rules li { display: grid; grid-template-columns: 64px 1fr; gap: 12px; align-items: center; text-align: left; padding: 10px 12px; border-radius: 12px; background: #fbf8f5; }
+.game9__rules b { font: 800 16px/1 var(--font); color: var(--c-action); text-align: center; }
+.game9__rules span { font: 400 14px/1.4 var(--font); color: var(--c-ink); }
+.game9__best { margin: 0; font: 600 14px/normal var(--font); opacity: .75; }
+.game9__toast { position: absolute; z-index: 3; left: 50%; top: 22%; translate: -50% 0; padding: 18px 28px; text-align: center; animation: pop9 .35s ease-out; }
+.game9__toast p { margin: 0 0 4px; font: 400 30px/1.3 var(--title9); color: var(--c9-coral); letter-spacing: 1px; }
+.game9__toast small { font: 600 13px/normal var(--font); opacity: .7; }
+.game9__verdict { margin: 0; font: 400 32px/1.3 var(--title9); color: var(--c-ink); letter-spacing: 1px; }
+.game9__final { margin: 0; font: 600 16px/normal var(--font); }
+.game9__final b { font: 400 44px/1 var(--title9); color: var(--c9-coral); margin-right: 6px; }
+.game9__record { display: inline-block; margin-left: 10px; padding: 4px 10px; border-radius: 999px; background: var(--c-ink); color: var(--c-paper); font: 700 12px/normal var(--font); vertical-align: middle; animation: pop9 .4s ease-out; }
+.game9__persona { margin: 0; font: 400 15px/1.4 var(--font); }
+.game9__ate { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.game9__ate button { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px 4px 4px; border: 1.5px solid #ece7e1; border-radius: 999px; background: #fff; cursor: pointer; font: 600 14px/normal var(--font); }
+.game9__ate button:hover { border-color: var(--c-ink); }
+.game9__ate img { width: 32px !important; height: 32px !important; object-fit: contain; }
+/* HUD in three fixed places */
+.hud9 { position: absolute; z-index: 2; top: 16px; left: 16px; right: 16px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; pointer-events: none; }
+.hud9__course { display: flex; align-items: center; gap: 10px; padding: 8px 14px; justify-self: start; border-radius: 999px; background: rgba(255, 255, 255, .85); font: 700 14px/normal var(--font); }
+.hud9__bar { position: relative; width: 120px; height: 8px; border-radius: 999px; background: rgba(28, 26, 23, .1); overflow: hidden; }
+.hud9__bar i { position: absolute; inset: 0 auto 0 0; border-radius: 999px; background: var(--c-action); transition: width .25s ease-out; }
+.hud9__course small { font: 600 13px/normal var(--font); opacity: .7; }
+.hud9__score { display: flex; align-items: center; gap: 8px; }
+.hud9__score b { font: 400 40px/1 var(--title9); color: var(--c-ink); }
+.hud9__combo { padding: 4px 10px; border-radius: 999px; background: var(--c-action); color: #fff; font: 800 14px/normal var(--font); animation: pop9 .3s ease-out; }
+.hud9__lives { justify-self: end; padding: 8px 14px; border-radius: 999px; background: rgba(255, 255, 255, .85); color: var(--c-action); font: 800 18px/1 var(--font); letter-spacing: 2px; }
+.hud9__lives i { font-style: normal; opacity: .22; }
+@keyframes pop9 { from { scale: .7; opacity: 0; } 60% { scale: 1.08; opacity: 1; } to { scale: 1; } }
+@media (prefers-reduced-motion: reduce) { .hud9__combo, .game9__toast, .game9__record { animation: none; } }
+
+/* ── persona: same two columns as "სად შეჭამ?" ── */
+.persona9 { padding: 160px 16px; display: grid; place-items: center; }
+.persona9__card { width: 1073px; max-width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 48px; }
+.persona9__text { width: 546px; display: flex; flex-direction: column; gap: 28px; align-items: flex-start; }
+.persona9__text .btn9 { width: 320px; }
+.persona9__tarot { width: 300px; border: 0; padding: 0; background: none; cursor: pointer; rotate: 3deg; transition: rotate .25s ease, translate .25s ease; }
+.persona9__tarot:hover { rotate: 0deg; translate: 0 -6px; }
+.persona9__tarot .tarot { width: 100% !important; }
+
+/* ── critic: title, one line, three plain steps, one button ── */
+.join9 { padding: 160px 16px 180px; }
+.join9__inner { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 32px; }
+.steps9 { list-style: none; margin: 8px 0 0; padding: 0; width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; counter-reset: s9; }
+.steps9 li { counter-increment: s9; display: flex; flex-direction: column; gap: 8px; padding: 24px; background: #fff; border: 1px solid rgba(28, 26, 23, .08); border-radius: 16px; }
+.steps9 li::before { content: "0" counter(s9); font: 400 40px/1 var(--title9); color: var(--c9-coral); letter-spacing: 1px; }
+.steps9 b { font: 800 18px/1.3 var(--font); color: var(--c-ink); }
+.steps9 span { font: 400 15px/1.45 var(--font); color: rgba(28, 26, 23, .8); }
+.join9 .btn9 { width: 320px; }
+.join9 .join__form { width: 100%; max-width: 520px; background: #fff !important; box-shadow: none !important; border: 1px solid rgba(28, 26, 23, .1); }
+
+@media (max-width: 1023px) {
+  .persona9__card { flex-direction: column-reverse; text-align: center; }
+  .persona9__text { width: 100%; align-items: center; }
+  .persona9__text .lead9--left { text-align: center; }
+  .link9 { align-self: center; }
+}
+@media (max-width: 760px) {
+  .hero9__stage.hero__stage { width: min(94vw, 400px) !important; }
+  .hero9__stage .add-guest { left: auto; right: -2px; top: auto; bottom: 0; }
+  .hero__inner.hero__inner { height: auto; }
+  .hero9__clouds { top: auto; }
+  .hero9__hermes { top: auto; }
+  .game9, .persona9 { padding: 88px 16px; }
+  .join9 { padding: 88px 16px 120px; }
+  .lead9 { font-size: 16px; }
+  .game9__stage { height: 520px; }
+  .hud9 { top: 10px; left: 10px; right: 10px; }
+  .hud9__bar { width: 56px; }
+  .hud9__course { padding: 6px 10px; font-size: 13px; }
+  .hud9__score b { font-size: 30px; }
+  .hud9__lives { padding: 6px 10px; font-size: 15px; }
+  .game9__rules li { grid-template-columns: 52px 1fr; }
+  .persona9__tarot { width: 240px; }
+  .persona9__text .btn9, .join9 .btn9 { width: 100%; }
+  .steps9 { grid-template-columns: 1fr; }
+  .steps9 li { display: grid; grid-template-columns: 56px 1fr; grid-template-rows: auto auto; column-gap: 12px; row-gap: 2px; padding: 16px 18px; }
+  .steps9 li::before { grid-row: 1 / 3; align-self: center; font-size: 32px; }
+}
+/* one continuous paper: no stacked-sheet edges between sections */
+.chapter.chapter--plain { border-radius: 0 !important; box-shadow: none !important; margin: 0 !important; transform: none !important; rotate: 0deg !important; translate: none !important; clip-path: none !important; }
+.chapter.chapter--plain::before, .chapter.chapter--plain::after { display: none !important; }
+.hero__controls.hero__controls { width: min(640px, 100%) !important; max-width: none !important; }
+/* BPG SF DG's digits read as rings ("0" ≈ ◯) — numbers use the body face, heavy */
+.hud9__score b, .game9__final b { font-family: var(--font) !important; font-weight: 800 !important; letter-spacing: 0; }
+.hud9__score b { font-size: 32px; }
+.steps9 li::before { font-family: var(--font); font-weight: 800; font-size: 28px; letter-spacing: 0; }
+/* the old scroll-driven "sheet-in" animation (collage.css) tilts each section in — off for the one-paper page */
+.chapter.chapter.chapter--plain { animation: none !important; rotate: 0deg !important; translate: none !important; }
+/* grid tracks sized by content let a 1073px card push past the phone width — pin the track */
+.persona9, .paths9 { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 1023px) { .persona9__text .title9 { text-align: center; } }
+@media (max-width: 760px) {
+  .hud9__course small { display: none; }
+  .hud9__bar { width: 48px; }
+  .hud9 { grid-template-columns: auto 1fr auto; gap: 8px; }
+  .hud9__score { justify-content: center; }
+  .game9__rules b { font-size: 14px; white-space: nowrap; }
+  .game9__rules li { grid-template-columns: 60px 1fr; }
+}

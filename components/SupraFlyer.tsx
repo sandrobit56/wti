@@ -3,8 +3,11 @@
  * File:        components/SupraFlyer.tsx
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
- * Date:        2026-11-25
- * Version:     v8.1 one-strip title; v8 — surreal sky: Hermes flies over a supra floating on pink clouds
+ * Date:        2026-11-27
+ * Version:     v9 — one style with the page (white paper, BPG title, light sky stage); HUD in
+ *              three fixed places (course progress bar · score + combo · lives); score, ×5 combo and
+ *              a best score in this browser; clean start/over cards; no stepper, no toast art.
+ *              v8.1 one-strip title; v8 — surreal sky: Hermes flies over a supra floating on pink clouds
  *              with marble ruins (parallax, mirrored tiles); start screen explains the goal;
  *              v7.4 collage chili + toast art, no emoji; v1.0 — replaces "კუჭის ჩელენჯი" (no story arc, per Sandro's review)
  * Description: "სუფრის მფრინავი". Hermes flies over a supra floating in a pink sky.
@@ -16,22 +19,26 @@
  *              ↑ ↓ work when the stage is focused.
  */
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { COURSES, START, gapOf, hits, nextCourse, onCatch, spawn, speedOf, type Spawn, type State } from "@/lib/flyer.ts";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { COURSES, POINTS, START, gapOf, hits, nextCourse, onCatch, spawn, speedOf, type Spawn, type State } from "@/lib/flyer.ts";
 import { stomachPersona } from "@/lib/game.ts";
 import { PERSONAS } from "@/lib/personas.ts";
 import { DISHES } from "@/lib/catalog.ts";
 import { stickerSrc } from "@/lib/stickers.ts";
-import { toMtavruli } from "@/lib/mtavruli.ts";
 import type { PersonaId } from "@/lib/quiz.ts";
-import { TarotCard } from "./TarotCard";
 
 type Item = { x: number; y: number; bob: number; what: Spawn };
 type Pop = { x: number; y: number; t: number; text: string; bad: boolean };
 type Screen = "idle" | "play" | "toast" | "won" | "lost";
 
-const MASCOT_R = 30, ITEM_R = 26, TOAST_MS = 1900;
+const MASCOT_R = 34, ITEM_R = 28, TOAST_MS = 1900;
 const NAME = new Map(DISHES.map((d) => [d.slug, d.name]));
+
+/** Best score lives in this browser only (no account yet). Storage can throw (private mode) → 0. */
+const BEST_KEY = "wti.flyer.best";
+const noop = () => () => {};
+function readBest(): number { try { return Number(localStorage.getItem(BEST_KEY)) || 0; } catch { return 0; } }
+function writeBest(n: number) { try { localStorage.setItem(BEST_KEY, String(n)); } catch { /* storage blocked: best is just not kept */ } }
 
 function topThree(eaten: string[]): string[] {
   const n = new Map<string, number>();
@@ -64,8 +71,13 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
     load("clouds", "/collage/clouds-soft.webp");   // bottom faded, no hard edge in the sky
   }, []);
 
+  const storedBest = useSyncExternalStore(noop, readBest, () => 0);
+  const [best, setBest] = useState<{ score: number; record: boolean } | null>(null);
   const finish = useCallback((s: State) => {
     setPersona(stomachPersona(s.eaten));
+    const prev = readBest();
+    if (s.score > prev) writeBest(s.score);
+    setBest({ score: Math.max(prev, s.score), record: s.score > prev && s.score > 0 });
     setScreen(s.phase === "won" ? "won" : "lost");
   }, []);
 
@@ -124,7 +136,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
           game.current = s; setHud(s);
           const bad = it.what.kind === "chili";
           if (bad) c.shake = 0.35;
-          pops.current.push({ x: m.x, y: m.y - 30, t: 0, bad, text: bad ? "−♥" : "+1" });
+          pops.current.push({ x: m.x, y: m.y - 30, t: 0, bad, text: bad ? "−♥  ×0" : s.combo > 1 ? `+${POINTS * s.combo}  ×${s.combo}` : `+${POINTS}` });
           if (s.phase === "toast") { items.current = []; setScreen("toast"); }
           if (s.phase === "won" || s.phase === "lost") { finish(s); return; }
         }
@@ -163,9 +175,9 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
       const mascot = imgs.current.mascot;
       if (mascot?.complete) {
         ctx.save(); ctx.translate(m.x, m.y); ctx.rotate(Math.max(-0.5, Math.min(0.5, m.vy * 0.0012)));
-        const h = MASCOT_R * 3.6, w = h * (444 / 759); ctx.drawImage(mascot, -w / 2, -h * 0.55, w, h); ctx.restore();
+        const h = MASCOT_R * 4, w = h * (444 / 759); ctx.drawImage(mascot, -w / 2, -h * 0.55, w, h); ctx.restore();
       }
-      ctx.font = "900 22px 'Google Sans Variable', sans-serif"; ctx.textAlign = "center";
+      ctx.font = "800 22px 'Noto Sans Georgian Variable', sans-serif"; ctx.textAlign = "center";
       for (const p of pops.current) { ctx.globalAlpha = 1 - p.t / 0.8; ctx.fillStyle = p.bad ? "#D92F4C" : "#1C1A17"; ctx.fillText(p.text, p.x, p.y); }
       ctx.globalAlpha = 1; ctx.restore();
       raf = requestAnimationFrame(frame);
@@ -186,75 +198,75 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
   };
 
   const course = COURSES[hud.course];
+  const playing = screen === "play" || screen === "toast";
   return (
-    <section className="game2 sect" id="game" aria-labelledby="game-title">
-      <div className="container game2__inner">
-        <h2 id="game-title" className="section-title display game2__title">სუფრის მფრინავი</h2>
-        <p className="game2__sub">გაიფრინე სუფრაზე: შეჭამე ყველა კერძი, აარიდე წიწაკას. თამადა ელოდება.</p>
-
-        <ol className="game2__steps" aria-label="სუფრის რიგი">
-          {COURSES.map((c, i) => (
-            <li key={c.name} className={i < hud.course || screen === "won" ? "done" : i === hud.course && screen !== "idle" ? "on" : ""}>{c.name}</li>
-          ))}
-        </ol>
+    <section className="game9 sect" id="game" aria-labelledby="game-title">
+      <div className="game9__inner">
+        <h2 id="game-title" className="title9 title9--center">სუფრის მფრინავი</h2>
+        <p className="lead9">ჰერმესს შია. გაატარე სუფრაზე, შეჭამე ოთხივე რიგი და აარიდე წიწაკას.</p>
 
         <div
-          ref={stageRef} className={`game2__stage game2__stage--${screen}`} tabIndex={0}
+          ref={stageRef} className={`game9__stage game9__stage--${screen}`} tabIndex={0}
           onPointerMove={steer} onPointerDown={steer} onKeyDown={keys}
           aria-label="თამაშის ველი: მაუსით ან თითით მართე, ან ისრებით ↑ ↓"
         >
           <canvas ref={canvasRef} className="game2__canvas" />
 
-          {(screen === "play" || screen === "toast") && (
-            <div className="game2__hud" aria-live="polite">
-              <span className="game2__course">{course.name} · {hud.got}/{course.need}</span>
-              <span className="game2__lives" aria-label={`სიცოცხლე ${hud.lives}`}>{"♥".repeat(hud.lives)}<i>{"♥".repeat(3 - hud.lives)}</i></span>
+          {/* HUD: where you are in the supra · score and combo · lives — always in the same three places */}
+          {playing && (
+            <div className="hud9" aria-live="polite">
+              <div className="hud9__course">
+                <b>{course.name}</b>
+                <span className="hud9__bar" aria-label={`${hud.got} / ${course.need}`}><i style={{ width: `${(hud.got / course.need) * 100}%` }} /></span>
+                <small>{hud.got}/{course.need}</small>
+              </div>
+              <div className="hud9__score"><b>{hud.score}</b>{hud.combo > 1 && <span className="hud9__combo" key={hud.combo}>×{hud.combo}</span>}</div>
+              <div className="hud9__lives" aria-label={`სიცოცხლე ${hud.lives}`}>{"♥".repeat(hud.lives)}<i>{"♥".repeat(3 - hud.lives)}</i></div>
             </div>
           )}
 
           {screen === "idle" && (
-            /* Figma v8 start frame: soft clouds (55%) and the supra on clouds, drawn as still images until play starts */
-            <div className="game2__scene" aria-hidden="true">
-              <Image className="game2__scene-clouds" src="/collage/clouds-soft.webp" alt="" width={1600} height={406} sizes="1040px" />
-              <Image className="game2__scene-supra" src="/collage/supra-clouds.webp" alt="" width={1600} height={571} sizes="1040px" />
+            <div className="game9__scene" aria-hidden="true">
+              <Image className="game9__supra" src="/collage/supra-clouds.webp" alt="" width={1600} height={571} sizes="1040px" />
             </div>
           )}
           {screen === "idle" && (
-            <div className="game2__screen">
-              <Image className="game2__hero" src="/collage/hermes-sm.webp" alt="" width={444} height={759} sizes="120px" />
-              <p className="game2__how"><b>ჰერმესს შია.</b> თითით ან მაუსით ატარე სუფრაზე, შეჭამე კერძები, აარიდე წიწაკას.</p>
-              <p className="game2__rules">4 რიგი · 3 სიცოცხლე</p>
-              <button className="btn" onClick={start}>აფრენა</button>
+            <div className="card9 game9__card">
+              <Image className="game9__hermes" src="/collage/hermes-sm.webp" alt="" width={444} height={759} sizes="72px" />
+              <ul className="game9__rules">
+                <li><b>4 რიგი</b><span>სალათები → ცხელი → მწვადი → ტკბილეული</span></li>
+                <li><b>×5</b><span>კერძები ზედიზედ = მეტი ქულა</span></li>
+                <li><b>♥♥♥</b><span>წიწაკა სიცოცხლეს და კომბოს გართმევს</span></li>
+              </ul>
+              {storedBest > 0 && <p className="game9__best">შენი რეკორდი: <b>{storedBest}</b></p>}
+              <button className="btn9" onClick={start}>აფრენა</button>
             </div>
           )}
 
           {screen === "toast" && (
-            <div className="game2__toast" role="status">
-              <Image className="game2__glass" src="/collage/khinkali-hand.webp" alt="" aria-hidden="true" width={605} height={1000} sizes="84px" />
-              <p>{toMtavruli(course.toast)}</p>
-              <small>შემდეგი: {COURSES[hud.course + 1]?.name}</small>
+            <div className="card9 game9__toast" role="status">
+              <p>{course.toast}</p>
+              <small>შემდეგი რიგი: {COURSES[hud.course + 1]?.name}</small>
             </div>
           )}
 
           {(screen === "won" || screen === "lost") && (
-            <div className="game2__screen game2__screen--over" role="status">
-              <p className="game2__verdict">{screen === "won" ? "სუფრა დაასრულე!" : `წიწაკამ გაჯობა · ${course.name}`}</p>
+            <div className="card9 game9__card game9__card--over" role="status">
+              <p className="game9__verdict">{screen === "won" ? "სუფრა დაასრულე!" : `წიწაკამ გაჯობა · ${course.name}`}</p>
+              <p className="game9__final"><b>{hud.score}</b> ქულა{best?.record ? <span className="game9__record">ახალი რეკორდი</span> : best ? <small> · რეკორდი {best.score}</small> : null}</p>
               {persona && (
-                <div className="game2__reveal">
-                  <TarotCard id={persona} size="sm" tilt={false} />
-                  <span>შენმა კუჭმა გამოავლინა: <b>{PERSONAS[persona].name}</b></span>
-                </div>
+                <p className="game9__persona">შენმა კუჭმა გამოავლინა: <b>{PERSONAS[persona].name}</b></p>
               )}
               {hud.eaten.length > 0 && (
-                <div className="game2__ate">
+                <div className="game9__ate">
                   {topThree(hud.eaten).map((s) => (
                     <button key={s} onClick={() => onDish(s)} aria-label={`ნახე ${NAME.get(s)}`}>
-                      <Image src={stickerSrc(s)} alt="" width={48} height={48} />{NAME.get(s)}
+                      <Image src={stickerSrc(s)} alt="" width={40} height={40} />{NAME.get(s)}
                     </button>
                   ))}
                 </div>
               )}
-              <button className="btn" onClick={start}>↻ თავიდან</button>
+              <button className="btn9" onClick={start}>↻ თავიდან</button>
             </div>
           )}
         </div>

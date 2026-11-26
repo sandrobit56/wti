@@ -2,8 +2,10 @@
  * File:        lib/flyer.ts
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
- * Date:        2026-11-22
- * Version:     v1.0
+ * Date:        2026-11-27
+ * Version:     v2.0 — score + combo: dishes in a row multiply the points (×1…×5), chili breaks
+ *              the chain (and costs a life). Gives a reason to replay: beat your best.
+ *              v1.0
  * Description: "სუფრის მფრინავი" — game rules, no React, no canvas.
  *              The mascot flies over a turning supra. A supra has courses (salads → hot dishes →
  *              grill → sweets); each course floats its own dishes in, and the tamada raises a
@@ -36,20 +38,23 @@ export function spawn(course: number, rng: Rng): Spawn {
   return { kind: "dish", slug: c.dishes[Math.floor(rng() * c.dishes.length)] };
 }
 
-export type State = { course: number; got: number; lives: number; eaten: string[]; phase: "play" | "toast" | "won" | "lost" };
-export const START: State = { course: 0, got: 0, lives: LIVES, eaten: [], phase: "play" };
+export type State = { course: number; got: number; lives: number; eaten: string[]; score: number; combo: number; phase: "play" | "toast" | "won" | "lost" };
+export const START: State = { course: 0, got: 0, lives: LIVES, eaten: [], score: 0, combo: 0, phase: "play" };
+export const POINTS = 10, COMBO_MAX = 5;
 
 /** Apply one catch. Finishing a course → "toast" (or "won" after the last); last life → "lost". */
 export function onCatch(s: State, item: Spawn): State {
   if (s.phase !== "play") return s;
   if (item.kind === "chili") {
     const lives = s.lives - 1;
-    return { ...s, lives, phase: lives <= 0 ? "lost" : "play" };
+    return { ...s, lives, combo: 0, phase: lives <= 0 ? "lost" : "play" };
   }
   const got = s.got + 1;
   const eaten = [...s.eaten, item.slug];
-  if (got < COURSES[s.course].need) return { ...s, got, eaten };
-  return { ...s, got, eaten, phase: s.course === COURSES.length - 1 ? "won" : "toast" };
+  const combo = Math.min(COMBO_MAX, s.combo + 1);
+  const score = s.score + POINTS * combo;
+  if (got < COURSES[s.course].need) return { ...s, got, eaten, combo, score };
+  return { ...s, got, eaten, combo, score, phase: s.course === COURSES.length - 1 ? "won" : "toast" };
 }
 
 /** After the toast: next course, counter reset. */
