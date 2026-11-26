@@ -601,3 +601,64 @@ button.panel__hint:hover { border-color: var(--news) !important; }
 @media (prefers-reduced-motion: reduce) { .game2__hero { animation: none; } }
 /* the sky shows through the start screen (old globals painted a dark veil over it) */
 .game2__screen:not(.game2__screen--over) { background: none !important; backdrop-filter: none !important; }
+
+/* ── 23 · Figma v8 (Sandro's edit, 2026-11-26, node 174:148) ────────────
+   hero + section 2 share one misty light-pink sky; titles are ONE straight paper strip;
+   khinkali hand in a coral sun; game on deep plum with Icarus; Athena + tarragon inside
+   the persona sheet; critic sheet keeps its rounded top. */
+.hero, .chapter.chapter--cream {
+  background-color: #f6dbe0 !important;
+  background-image:
+    radial-gradient(60% 40% at 20% 30%, rgba(255, 255, 255, .55), transparent 70%),
+    radial-gradient(50% 35% at 80% 70%, rgba(255, 255, 255, .45), transparent 70%),
+    radial-gradient(70% 45% at 50% 100%, rgba(241, 67, 94, .16), transparent 70%),
+    var(--paper-tex) !important;
+  background-size: auto, auto, auto, 1024px 1024px !important;
+  background-blend-mode: normal, normal, normal, multiply !important;
+}
+.chapter.chapter--cream { background-image:
+    radial-gradient(60% 40% at 15% 20%, rgba(255, 255, 255, .5), transparent 70%),
+    linear-gradient(180deg, transparent 40%, rgba(217, 47, 75, .12) 100%),
+    var(--paper-tex) !important; background-size: auto, auto, 1024px 1024px !important; }
+/* titles: one straight strip, coral; sections 2–3 use the action coral */
+.section-title .title-strip { font-size: clamp(40px, 4.8vw, 68px); }
+.section-title .title-strip .strip__paper { padding: .14em .5em .22em; }
+.title-strip--action { --strip-fg: var(--c-action); }
+.section-title, .game2__title { color: inherit; }
+/* section 2: coral sun with the khinkali hand, sitting on the result card's top-right corner */
+.paths__sun { position: absolute; z-index: 3; top: 150px; left: calc(50% + 250px); width: 220px; aspect-ratio: 1; border-radius: 50%;
+  background: var(--brand); box-shadow: 0 0 0 24px var(--pink); display: grid; place-items: center; pointer-events: none; }
+.paths__sun img { width: 78%; height: auto; rotate: -8deg; filter: drop-shadow(0 14px 14px rgba(28, 26, 23, .35)); }
+.chapter--cream .clouds { z-index: 2; }
+.result { background: #fff !important; box-shadow: none !important; position: relative; z-index: 4; }
+.result__title { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.result__main { margin-top: 4px; }
+/* game: deep plum wall */
+.chapter.chapter--wine, .game2 { background: radial-gradient(140% 120% at 50% 50%, #5a4d52 0%, #4d4146 70%, #3a3135 100%) !important; }
+.chapter.chapter--wine, .chapter.chapter--mustard { border-radius: 0 !important; box-shadow: none !important; margin-top: 0 !important; }
+.chapter--wine .bridge--icarus { top: 60px; translate: none; rotate: -10deg; width: clamp(200px, 21vw, 300px); }
+.game2__sub { color: rgba(255, 241, 220, .82) !important; }
+/* persona: Athena and tarragon live inside the sheet */
+.persona__athena { position: absolute; z-index: 2; left: 7%; top: 170px; width: clamp(150px, 17vw, 250px); height: auto; rotate: -5deg; pointer-events: none; filter: drop-shadow(0 18px 18px rgba(28, 26, 23, .3)); }
+.persona__tarragon { right: 11% !important; top: 274px !important; width: clamp(140px, 18vw, 262px) !important; }
+@media (max-width: 640px) {
+  .paths__sun { width: 120px; top: 110px; left: auto; right: 10px; box-shadow: 0 0 0 12px var(--pink); }
+  .section-title .title-strip { font-size: 34px; }
+  .persona__athena { width: 74px; top: 30px; left: 6px; }
+  .persona__tarragon { top: 40px !important; width: 80px !important; right: 4px !important; }
+  .chapter--wine .bridge--icarus { width: 120px; top: 10px; right: 0; }
+}
+/* Figma strips are clean rectangles: no scissor wobble on straight titles */
+.title-strip .strip__paper, .sign__title .strip__paper { clip-path: none !important; }
+/* clouds-soft already fades out; no extra mask, softer white blobs so section 2 stays pink */
+.clouds__img { -webkit-mask-image: none !important; mask-image: none !important; }
+.chapter.chapter--cream { background-image:
+    radial-gradient(70% 45% at 50% 100%, rgba(241, 67, 94, .14), transparent 70%),
+    var(--paper-tex) !important; background-size: auto, 1024px 1024px !important; background-blend-mode: normal, multiply !important; }
+@media (max-width: 640px) {
+  .paths__sun { top: auto; bottom: auto; top: 205px; width: 92px; right: 4px; box-shadow: 0 0 0 8px var(--pink); }
+  .persona__athena { display: none; }   /* phones: one decoration per section — tarragon stays */
+}
+/* Figma v8: game and persona are flat bands (no sliding sheet) — the slide left a cream gap */
+.chapter.chapter--wine, .chapter.chapter--mustard { animation: none !important; translate: none !important; rotate: 0deg !important; }
+@media (max-width: 640px) { .paths__sun { z-index: 5; top: 168px; width: 84px; right: 10px; } }

@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-25
- * Version:     v5.0 — one result card: dish photo + name on the left, way / main action /
+ * Version:     v5.1 one-strip title; v5.0 — one result card: dish photo + name on the left, way / main action /
  *              places on the right; clear empty state. (v4 stacked 9 centred blocks.)
  *              v4.1 — collage: a marble hand offers the dish, the name is a paper strip;
  *              v4.0 — one object, one choice, one button (Sandro's UX review: 4 boxes,
@@ -23,7 +23,7 @@ import { useEffect, useState } from "react";
 import type { Dish } from "@/lib/catalog.ts";
 import { stickerSrc } from "@/lib/stickers.ts";
 import { typePhoto } from "@/lib/photos.ts";
-import { Words } from "./Words";
+import { Strip } from "./Strip";
 import { deliveryLinks, mapsDirectionsUrl, mapsSearchUrl, type RadiusKm, type VenueMatch } from "@/lib/places.ts";
 import { MY_LOCATION, type Place } from "./FilterPanel";
 
@@ -38,7 +38,7 @@ type Way = "go" | "order";
 /** Group mode summary from the wheel: everyone's dishes and the venue type they share. */
 export type GroupPick = { dishes: string[]; summary: string; searchTerm: string | null };
 
-type Props = { dish: Dish | null; place: Place | null; radius: RadiusKm; group: GroupPick | null; onPickPlace: () => void; onSpin: () => void; onAgain: () => void };
+type Props = { dish: Dish | null; place: Place | null; radius: RadiusKm; group: GroupPick | null; onPickPlace: () => void; onSpin: () => void };
 
 
 /** Nearby venues for a dish (≤6). Network subscription: setState only in callbacks. */
@@ -63,7 +63,7 @@ export function useNearbyVenues(dish: Dish | null, place: Place | null, radius: 
 
 export const km = (d: number) => (d < 1 ? `${Math.round(d * 1000)} მ` : `${d.toFixed(1)} კმ`);
 
-export function Paths({ dish, place, radius, group, onPickPlace, onSpin, onAgain }: Props) {
+export function Paths({ dish, place, radius, group, onPickPlace, onSpin }: Props) {
   const [way, setWay] = useState<Way>("go");
   const venues = useNearbyVenues(dish, place, radius);
   const nearArea = place && place.label !== MY_LOCATION ? place.label : null;
@@ -81,7 +81,7 @@ export function Paths({ dish, place, radius, group, onPickPlace, onSpin, onAgain
     <section className="paths2 sect" id="paths" aria-labelledby="paths-title">
       <div className="container paths2__inner">
         <h2 id="paths-title" className="section-title display paths2__title">
-          <Words caps parts={["სად ", ["შეჭამ?", "accent"]]} />
+          <Strip text="სად შეჭამ?" straight className="title-strip title-strip--action" />
         </h2>
 
         {!dish ? (
@@ -97,8 +97,7 @@ export function Paths({ dish, place, radius, group, onPickPlace, onSpin, onAgain
             <figure className="result__dish">
               <Image key={dish.slug} className="result__photo paths2__dish" src={typePhoto(dish.slug)?.src ?? stickerSrc(dish.slug)} alt={dish.name} width={640} height={640} sizes="(max-width: 640px) 90vw, 420px" />
               <figcaption>
-                <h3 className="result__name">{dish.name}</h3>
-                <p className="result__meta">≈ {dish.priceGel[0]}–{dish.priceGel[1]} ₾ · {dish.cuisine}</p>
+                <div className="result__title"><h3 className="result__name">{dish.name}</h3><p className="result__meta">{dish.priceGel[0]}–{dish.priceGel[1]} ₾ · {dish.cuisine}</p></div>
                 {group && <p className="result__group"><strong>{group.summary}</strong><br />{group.dishes.join(" · ")}</p>}
               </figcaption>
             </figure>
@@ -108,8 +107,6 @@ export function Paths({ dish, place, radius, group, onPickPlace, onSpin, onAgain
                 <button role="radio" aria-checked={way === "go"} className={way === "go" ? "on" : ""} onClick={() => setWay("go")}>მივალ</button>
                 <button role="radio" aria-checked={way === "order"} className={way === "order" ? "on" : ""} onClick={() => setWay("order")}>შევუკვეთავ</button>
               </div>
-
-              {main && <a className="btn btn--lg result__main" href={main.href} target="_blank" rel="noreferrer">{main.label} ↗</a>}
 
               <ul className="result__list">
                 {way === "go" && venues.kind === "no-place" && (
@@ -126,7 +123,7 @@ export function Paths({ dish, place, radius, group, onPickPlace, onSpin, onAgain
                 ))}
               </ul>
 
-              <button className="pill pill--outline result__again" onClick={onAgain}>კიდევ დაატრიალე</button>
+              {main && <a className="btn btn--lg result__main" href={main.href} target="_blank" rel="noreferrer">{main.label} ↗</a>}
             </div>
           </div>
         )}

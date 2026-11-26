@@ -4,7 +4,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-25
- * Version:     v8 — surreal sky: Hermes flies over a supra floating on pink clouds
+ * Version:     v8.1 one-strip title; v8 — surreal sky: Hermes flies over a supra floating on pink clouds
  *              with marble ruins (parallax, mirrored tiles); start screen explains the goal;
  *              v7.4 collage chili + toast art, no emoji; v1.0 — replaces "კუჭის ჩელენჯი" (no story arc, per Sandro's review)
  * Description: "სუფრის მფრინავი". Hermes flies over a supra floating in a pink sky.
@@ -25,7 +25,7 @@ import { stickerSrc } from "@/lib/stickers.ts";
 import { toMtavruli } from "@/lib/mtavruli.ts";
 import type { PersonaId } from "@/lib/quiz.ts";
 import { TarotCard } from "./TarotCard";
-import { Words } from "./Words";
+import { Strip } from "./Strip";
 
 type Item = { x: number; y: number; bob: number; what: Spawn };
 type Pop = { x: number; y: number; t: number; text: string; bad: boolean };
@@ -190,7 +190,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
   return (
     <section className="game2 sect" id="game" aria-labelledby="game-title">
       <div className="container game2__inner">
-        <h2 id="game-title" className="section-title display game2__title"><Words caps parts={["სუფრის ", ["მფრინავი", "accent"]]} /></h2>
+        <h2 id="game-title" className="section-title display game2__title"><Strip text="სუფრის მფრინავი" straight className="title-strip title-strip--action" /></h2>
         <p className="game2__sub">გაიფრინე სუფრაზე: შეჭამე ყველა კერძი, აარიდე წიწაკას. თამადა ელოდება.</p>
 
         <ol className="game2__steps" aria-label="სუფრის რიგი">

@@ -4,7 +4,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-22
- * Version:     no emoji; v1.0 — replaces PersonaTeaser (title + text + 2 buttons + a fan of 3 cards
+ * Version:     one-strip title; no emoji; v1.0 — replaces PersonaTeaser (title + text + 2 buttons + a fan of 3 cards
  *              competed for attention, per Sandro's review)
  * Description: Section "პერსონა" with one object: the fate deck. Before the quiz the top card
  *              lies face down ("ბედმა იცის, შენ — ჯერ არა"); tapping the deck or the one button
@@ -14,7 +14,7 @@
 import type { Persona } from "@/lib/personas.ts";
 import type { PersonaId } from "@/lib/quiz.ts";
 import { TarotCard } from "./TarotCard";
-import { Words } from "./Words";
+import { Strip } from "./Strip";
 
 type Props = { persona: Persona | null; onStart: () => void; onGallery: () => void };
 
@@ -26,7 +26,7 @@ export function PersonaSection({ persona, onStart, onGallery }: Props) {
     <section className="persona2 sect" id="persona" aria-labelledby="persona-title">
       <div className="container persona2__inner">
         <h2 id="persona-title" className="section-title display persona2__title">
-          <Words caps parts={persona ? ["შენ ხარ ", ["ეს", "accent"]] : ["გაიგე შენი ", ["პერსონა", "accent"]]} />
+          <Strip text={persona ? "შენ ხარ ეს" : "გაიგე შენი პერსონა"} straight className="title-strip" />
         </h2>
 
         <button type="button" className="persona2__deck" onClick={persona ? onGallery : onStart}
