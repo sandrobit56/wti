@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-25
- * Version:     v5.1 one-strip title; v5.0 — one result card: dish photo + name on the left, way / main action /
+ * Version:     chapter label, lead line, three ways; v5.1 one-strip title; v5.0 — one result card: dish photo + name on the left, way / main action /
  *              places on the right; clear empty state. (v4 stacked 9 centred blocks.)
  *              v4.1 — collage: a marble hand offers the dish, the name is a paper strip;
  *              v4.0 — one object, one choice, one button (Sandro's UX review: 4 boxes,
@@ -81,9 +81,11 @@ export function Paths({ dish, place, radius, group, onPickPlace, onSpin }: Props
   return (
     <section className="paths2 sect" id="paths" aria-labelledby="paths-title">
       <div className="container paths2__inner">
+        <p className="chap-no"><span>02</span> ადგილი</p>
         <h2 id="paths-title" className="section-title display paths2__title">
           <Strip text={toMtavruli("სად შეჭამ?")} straight className="title-strip title-strip--action" />
         </h2>
+        <p className="sect-lead">ბორბალმა თავისი თქვა. დანარჩენი შენზეა: წახვალ, თუ მოგიტანენ?</p>
 
         {!dish ? (
           /* empty state: one picture, one sentence, one button */
@@ -128,6 +130,24 @@ export function Paths({ dish, place, radius, group, onPickPlace, onSpin }: Props
             </div>
           </div>
         )}
+        {/* three ways the result can go — the same three switches the card has */}
+        <ul className="ways" aria-label="როგორ შეიძლება">
+          <li className="ways__item">
+            <Image className="ways__img" src="/collage/hermes-sm.webp" alt="" width={444} height={759} sizes="90px" />
+            <b>მივალ</b><span>ახლოს რა არის, გაჩვენებ რუკაზე, მანძილით.</span>
+          </li>
+          <li className="ways__item">
+            <Image className="ways__img ways__img--wide" src="/collage/courier.webp" alt="" width={900} height={897} sizes="110px" />
+            <b>შევუკვეთავ</b><span>Wolt, Bolt Food ან Glovo — პირდაპირ კერძის გვერდზე.</span>
+          </li>
+          <li className="ways__item">
+            <span className="ways__busts" aria-hidden="true">
+              <Image src="/illustrations/people/diner-1.webp" alt="" width={288} height={288} sizes="64px" />
+              <Image src="/illustrations/people/diner-3.webp" alt="" width={288} height={288} sizes="64px" />
+            </span>
+            <b>ერთად</b><span>„+ სტუმარი“ — და ერთ ადგილს ვეძებ, სადაც ყველას რაღაც ხვდება.</span>
+          </li>
+        </ul>
       </div>
     </section>
   );

@@ -190,6 +190,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
   return (
     <section className="game2 sect" id="game" aria-labelledby="game-title">
       <div className="container game2__inner">
+        <p className="chap-no chap-no--light"><span>03</span> თამაში</p>
         <h2 id="game-title" className="section-title display game2__title"><Strip text={toMtavruli("სუფრის მფრინავი")} straight className="title-strip title-strip--action" /></h2>
         <p className="game2__sub">გაიფრინე სუფრაზე: შეჭამე ყველა კერძი, აარიდე წიწაკას. თამადა ელოდება.</p>
 

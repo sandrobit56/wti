@@ -4,13 +4,15 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-26
- * Version:     v1.0
+ * Version:     v1.1 — no-WebGPU fallback: <html class="no-webgpu"> swaps in the same frames
+ *              baked from Figma (public/fig/*.webp), so Safari/Firefox see the identical look
  * Description: The three shader fills Sandro authored in Figma (file WTI, frame "Desktop 1440 · v8"),
  *              run with Figma's own runtime (@figma/expressive-components). The shader modules in
  *              lib/custom-effects/ are exported from Figma verbatim — do not edit them by hand.
- *              WebGPU only: where the browser lacks it, ShaderFill renders nothing and the CSS
- *              colour underneath (same as Figma's base fill) is what people see.
+ *              WebGPU only. Without it we never mount the shader; app/v8.css then paints the
+ *              Figma-rendered still of the same layer instead.
  */
+import { useEffect, useSyncExternalStore } from "react";
 import { ShaderFill, type Shader } from "@figma/expressive-components";
 import * as clouds from "@/lib/custom-effects/CodeComponentId_d56ec91cd4391861fc67e6ba0236e8768d38a728_8340";
 import * as water from "@/lib/custom-effects/CodeComponentId_40f03f78407c1c973fc891fbca9ff3d0387485e6_8370";
@@ -44,6 +46,15 @@ const PERSONA_PAPER: Shader = {
 
 const SHADERS = { heroClouds: HERO_CLOUDS, section2Water: SECTION2_WATER, personaPaper: PERSONA_PAPER } as const;
 
+const noop = () => () => {};
+/** false on the server and in browsers without WebGPU */
+function useWebGPU(): boolean {
+  const has = useSyncExternalStore(noop, () => "gpu" in navigator, () => false);
+  useEffect(() => { document.documentElement.classList.toggle("no-webgpu", !("gpu" in navigator)); }, []);
+  return has;
+}
+
 export function FigmaFill({ name, className }: { name: keyof typeof SHADERS; className: string }) {
-  return <div className={`fx ${className}`} aria-hidden="true"><ShaderFill className="fx__canvas" shader={SHADERS[name]} /></div>;
+  const gpu = useWebGPU();
+  return <div className={`fx ${className}`} aria-hidden="true">{gpu && <ShaderFill className="fx__canvas" shader={SHADERS[name]} />}</div>;
 }

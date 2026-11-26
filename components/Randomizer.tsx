@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v3.7 Figma shader fills; v3.6 Figma v8 layout (Sandro 2026-11-26); v3.5 — hero calmed down (no chili, one centred column);
+ * Version:     courier in the coral sun (hand did not fit section 2, Sandro); v3.7 Figma shader fills; v3.6 Figma v8 layout (Sandro 2026-11-26); v3.5 — hero calmed down (no chili, one centred column);
  *              v3.4 — clouds over the first seam, floating food cut-outs;
  *              v3.3 — collage bridges between chapters (was torn seams), hero doodles removed;
  *              v3.2 — flick-to-spin: a fast drag on the plate spins it (strength → turns and
@@ -424,7 +424,7 @@ export function Randomizer() {
       {/* pink cotton-candy clouds hide the seam between the hero and section 2 */}
       <div className="clouds" aria-hidden="true"><Image className="clouds__img" src="/collage/clouds-soft.webp" alt="" width={1600} height={406} sizes="100vw" /></div>
       {/* Figma v8: the khinkali hand sits inside a coral sun, top-right of the result card */}
-      <div className="paths__sun" aria-hidden="true"><Image src="/collage/khinkali-hand.webp" alt="" width={605} height={1000} sizes="200px" /></div>
+      <div className="paths__sun" aria-hidden="true"><Image src="/collage/courier.webp" alt="" width={900} height={897} sizes="300px" /></div>
       <div ref={pathsRef} className="paths-anchor">
         <Paths
           dish={dish} place={place} radius={radius} onPickPlace={pickPlace}
@@ -438,10 +438,14 @@ export function Randomizer() {
       </div>
       </div>
       <div className="chapter chapter--wine">
+        {/* the same cloud band at every boundary: one sky running through the page */}
+        <div className="seam-clouds" aria-hidden="true"><Image src="/collage/clouds-soft.webp" alt="" width={1600} height={406} sizes="100vw" /></div>
         <Bridge figure="icarus" side="right" />
         <SupraFlyer onDish={openDish} />
       </div>
       <div className="chapter chapter--mustard">
+        {/* the same cloud band at every boundary: one sky running through the page */}
+        <div className="seam-clouds seam-clouds--flip" aria-hidden="true"><Image src="/collage/clouds-soft.webp" alt="" width={1600} height={406} sizes="100vw" /></div>
         <FigmaFill name="personaPaper" className="fx--paper" />
         <Image className="persona__athena" src="/collage/athena.webp" alt="" aria-hidden="true" width={645} height={1000} sizes="250px" />
         <Float item="tarragon" className="persona__tarragon" />
@@ -449,6 +453,8 @@ export function Randomizer() {
       {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} onDish={(slug) => { setGalleryOpen(false); openDish(slug); }} />}
       </div>
       <div className="chapter chapter--blush">
+        {/* the same cloud band at every boundary: one sky running through the page */}
+        <div className="seam-clouds" aria-hidden="true"><Image src="/collage/clouds-soft.webp" alt="" width={1600} height={406} sizes="100vw" /></div>
         <JoinCritics />
       </div>
     </>

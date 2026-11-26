@@ -25,6 +25,7 @@ export function PersonaSection({ persona, onStart, onGallery }: Props) {
   return (
     <section className="persona2 sect" id="persona" aria-labelledby="persona-title">
       <div className="container persona2__inner">
+        <p className="chap-no"><span>04</span> პერსონა</p>
         <h2 id="persona-title" className="section-title display persona2__title">
           <Strip text={persona ? "შენ ხარ ეს" : "გაიგე შენი პერსონა"} straight className="title-strip" />
         </h2>

@@ -252,3 +252,78 @@ body { font-family: var(--font); }
   .game2__scene-clouds { width: 180%; left: -40%; height: auto; }
   .persona2__deck.persona2__deck { margin: 0 0 -40px !important; transform-origin: top center; }
 }
+
+/* ── v8.1 (2026-11-26): rendering everywhere, one connecting thread, fuller sections 2 + 5 ─────── */
+/* no WebGPU (Safari, Firefox, older phones): Figma's own rendered still of the same layers */
+.no-webgpu .hero { background: url("/fig/hero-bg.webp") center top / 1440px 1000px no-repeat, #ecdfe5 !important; }
+.no-webgpu .chapter.chapter--cream { background: url("/fig/s2-bg.webp") center top / 1440px 1211px no-repeat, #eee2e7 !important; }
+.no-webgpu .sky-veil, .no-webgpu .fx { display: none; }
+.no-webgpu .s2-water { background: url("/fig/s2-water.webp") center top / 100% 100% no-repeat; }
+@media (max-width: 1023px) {
+  .no-webgpu .hero, .no-webgpu .chapter.chapter--cream { background-size: cover, auto !important; }
+}
+
+/* chapter label: the same small marker above every title — 02 ადგილი, 03 თამაში … */
+.chap-no { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px !important; font: 700 13px/1 var(--font); letter-spacing: .08em; color: var(--c-ink); }
+.chap-no span { display: grid; place-items: center; min-width: 30px; height: 30px; padding: 0 8px; border-radius: 999px; background: var(--c-ink); color: var(--c-paper); font-weight: 800; letter-spacing: 0; }
+.chap-no--light { color: var(--s-cream); }
+.chap-no--light span { background: var(--s-cream); color: var(--c-ink); }
+.paths2__inner .chap-no { margin-bottom: -75px !important; }   /* keeps the Figma 89px title→card rhythm */
+.game2 .chap-no { margin-bottom: 14px !important; }
+
+/* cloud band at the top of every following section */
+.seam-clouds { position: absolute; z-index: 4; left: 50%; top: 0; width: 1600px; translate: -50% -58%; pointer-events: none; }
+.seam-clouds img { display: block; width: 100%; height: auto; }
+.seam-clouds--flip img { transform: scaleX(-1); }
+@supports (animation-timeline: view()) { @media (prefers-reduced-motion: no-preference) {
+  .seam-clouds img { animation: seam-drift linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+} }
+@keyframes seam-drift { from { translate: -4% 0; } to { translate: 4% 0; } }
+.chapter.chapter--wine, .chapter.chapter--mustard { overflow: visible !important; }
+.chapter--wine, .chapter--mustard, .chapter--blush { isolation: isolate; }
+.chapter--blush .seam-clouds { translate: -50% -66%; z-index: 0; }
+
+/* section 2: lead line + three ways */
+.sect-lead { margin: -60px 0 0 !important; max-width: 46ch; text-align: center; font: 400 18px/1.45 var(--font); color: var(--c-ink); }
+.paths2__inner .result { margin-top: -40px; }
+.ways { list-style: none; margin: -20px 0 0; padding: 0; width: 980px; max-width: calc(100% - 32px); display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.ways__item { position: relative; display: grid; grid-template-rows: 96px auto 1fr; justify-items: start; gap: 6px; padding: 20px 22px 22px; border-radius: 16px; background: rgba(255, 250, 242, .72); border: 1px solid rgba(28, 26, 23, .08); }
+.ways__item b { font: 800 24px/1.2 var(--display); font-stretch: 75%; color: var(--c-action); }
+.ways__item span { font: 400 15px/1.45 var(--font); color: var(--c-ink); }
+.ways__img { height: 96px !important; width: auto !important; filter: drop-shadow(0 8px 10px rgba(28, 26, 23, .25)); }
+.ways__busts { display: flex; align-items: flex-end; height: 96px; }
+.ways__busts img { width: 76px !important; height: 76px !important; }
+.ways__busts img + img { margin-left: -18px; }
+/* courier in the sun */
+.paths__sun img { left: 18px !important; top: 26px !important; height: auto !important; width: 270px !important; rotate: -6deg !important; }
+
+/* section 5: how-it-works steps */
+.join.join { padding-bottom: 96px !important; }
+.steps3 { list-style: none; margin: 8px 0 40px; padding: 0; width: 900px; max-width: calc(100% - 32px); display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: st; }
+.steps3__item { counter-increment: st; position: relative; display: grid; grid-template-rows: 110px auto 1fr; justify-items: center; text-align: center; gap: 6px;
+  padding: 22px 20px 24px; border-radius: 16px; background: var(--c-paper); box-shadow: 0 12px 28px -16px rgba(28, 26, 23, .45); }
+.steps3__item::before { content: counter(st); position: absolute; top: 14px; left: 14px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--c-ink); color: var(--c-paper); font: 800 13px/1 var(--font); }
+.steps3__img { height: 110px !important; width: auto !important; filter: drop-shadow(0 8px 10px rgba(28, 26, 23, .25)); }
+.steps3__item b { font: 800 22px/1.2 var(--display); font-stretch: 75%; color: var(--brand); }
+.steps3__item span { font: 400 15px/1.45 var(--font); color: var(--c-ink); }
+.join__lead.join__lead { margin-bottom: 28px !important; }
+
+@media (max-width: 760px) {
+  .ways, .steps3 { grid-template-columns: 1fr; gap: 12px; }
+  .ways__item { grid-template-columns: 84px 1fr; grid-template-rows: auto auto; column-gap: 14px; padding: 14px 16px; }
+  .ways__item > :first-child { grid-row: 1 / 3; align-self: center; height: 72px !important; }
+  .ways__busts { height: 72px; } .ways__busts img { width: 54px !important; height: 54px !important; }
+  .steps3__item { grid-template-columns: 76px 1fr; grid-template-rows: auto auto; text-align: left; justify-items: start; column-gap: 14px; padding: 16px 16px 16px 18px; }
+  .steps3__item > img { grid-row: 1 / 3; align-self: center; height: 76px !important; }
+  .steps3__item::before { top: 8px; left: 8px; width: 22px; height: 22px; font-size: 11px; }
+  .sect-lead { margin-top: -20px !important; font-size: 15px; padding: 0 8px; }
+  .paths2__inner .chap-no { margin-bottom: -26px !important; }
+  .paths2__inner .result { margin-top: -10px; }
+  .seam-clouds { width: 760px; }
+  .paths__sun img { width: 96px !important; left: 6px !important; top: 10px !important; }
+}
+@media (max-width: 760px) {
+  .chapter.chapter--mustard { padding-bottom: 130px !important; }   /* room for the cloud seam so it never covers the persona link */
+  .chapter--blush .seam-clouds { translate: -50% -72%; }
+}

@@ -4,7 +4,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-25
- * Version:     one-strip title; v1.4 — word-mosaic pomegranate (collage) replaces the flat badge; v1.3 — flat critic badge (logo style, arc lettering) instead of the 3D kit; was v1.1 — "კრიტიკოსი" (not "მსაჯი"), no 3D jury figures, one button style
+ * Version:     chapter label + how-it-works steps; one-strip title; v1.4 — word-mosaic pomegranate (collage) replaces the flat badge; v1.3 — flat critic badge (logo style, arc lettering) instead of the 3D kit; was v1.1 — "კრიტიკოსი" (not "მსაჯი"), no 3D jury figures, one button style
  * Description: The closing section's one action: "გახდი კრიტიკოსი" (become a critic).
  *              A 3D "critic's kit" (notebook, magnifier, medal, khinkali — reusable later for the
  *              rating system), a short invitation and ONE button. The
@@ -44,11 +44,27 @@ export function JoinCritics() {
       <div className="container join__inner">
         {/* a pomegranate pieced together from thousands of paper scraps — dish names and critic words */}
         <Image className="join__kit join__mosaic" src="/collage/mosaic-pomegranate.webp" alt="" width={906} height={1000} sizes="(max-width: 640px) 70vw, 380px" />
+        <p className="chap-no"><span>05</span> კრიტიკოსი</p>
         <h2 id="join-title" className="section-title display join__title"><Strip text="გახდი კრიტიკოსი" straight className="title-strip" /></h2>
         <p className="join__lead">
           ჭამ, აკვირდები, გული გწყდება ცუდ ხინკალზე? ვეძებთ ადამიანებს, ვინც რესტორნებს შეამოწმებს და
           გულწრფელად დაწერს.
         </p>
+        {/* how it works — three steps, each a collage card (vision: a community that checks venues and writes honestly) */}
+        <ol className="steps3">
+          <li className="steps3__item">
+            <Image className="steps3__img" src="/illustrations/people/diner-3.webp" alt="" width={288} height={288} sizes="120px" />
+            <b>შემოგვიერთდი</b><span>ორი წუთი: სახელი, ელფოსტა და რა გიყვარს.</span>
+          </li>
+          <li className="steps3__item">
+            <Image className="steps3__img" src="/collage/khinkali-hand.webp" alt="" width={605} height={1000} sizes="80px" />
+            <b>გასინჯე</b><span>მიდი როგორც ჩვეულებრივი სტუმარი: ჭამე, დააკვირდი, დაიმახსოვრე.</span>
+          </li>
+          <li className="steps3__item">
+            <Image className="steps3__img" src="/collage/pomegranate.webp" alt="" width={384} height={425} sizes="100px" />
+            <b>დაწერე პირდაპირ</b><span>რა იყო კარგი, რა — არა. გულწრფელად, რეკლამის გარეშე.</span>
+          </li>
+        </ol>
 
         {status.kind === "closed" && (
           <button className="btn btn--lg" onClick={() => setStatus({ kind: "open", error: null, field: null })}>მინდა შეფასება</button>
