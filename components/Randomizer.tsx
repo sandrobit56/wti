@@ -326,17 +326,12 @@ export function Randomizer() {
   return (
     <>
       <section className="hero" id="wheel" ref={heroRef}>
-        {/* Figma v8: cream paper → "Clouds" shader at 20% → 66% pink veil */}
-        <FigmaFill name="heroClouds" className="fx--sky" />
-        <span className="sky-veil" aria-hidden="true" />
-        {/* collage layer: Hermes (marble, AI) flies in with a fork; sun, tape and doodles around */}
-        <div className="hero__collage" aria-hidden="true">
-          <span className="hero__sun" />
-          <Image className="hero__hermes" src="/collage/hermes.webp" alt="" width={888} height={1519} priority sizes="(max-width: 1023px) 40vw, 360px" />
-        </div>
+        {/* Figma 191:615: white paper with a halftone dot grid, pink clouds at the bottom, Hermes flying in */}
+        <div className="hero9__clouds" aria-hidden="true"><Image src="/collage/clouds-soft.webp" alt="" width={1600} height={406} sizes="100vw" /></div>
+        <Image className="hero9__hermes" src="/collage/hermes.webp" alt="" aria-hidden="true" width={888} height={1519} priority sizes="(max-width: 760px) 40vw, 391px" />
         <div className="hero__inner container">
           <HeroTitle winner={spun?.landed ? dish?.name ?? null : null} onOpen={() => pathsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })} />
-          <div className="hero__stage">
+          <div className="hero__stage hero9__stage">
             {wheel.length > 0
               ? <Wheel
                   dishes={wheel} rotation={rotation} spinning={spinning} spinMs={spinMs} winnerIndex={winner} landedOnce={Boolean(spun?.landed)}
@@ -347,6 +342,8 @@ export function Randomizer() {
                   onRemoveDiner={(d) => { void d; setDiners((n) => Math.max(1, n - 1)); setSpun((s) => (s?.landed ? null : s)); }}
                 />
               : <div className="wheel wheel--empty"><p>ფილტრებს მხოლოდ {matching} კერძი ერგება.<br />შეარბილე ბიუჯეტი, დიეტა ან გაზარდე რადიუსი.</p></div>}
+            {/* Figma: "+ 1/5" sits at the wheel's lower right */}
+            <button type="button" className="add-guest" onClick={addDiner} disabled={seated >= MAX_DINERS} aria-label={`დაამატე სტუმარი (${seated} / ${MAX_DINERS})`}>+ <span>{seated}/{MAX_DINERS}</span></button>
           </div>
           {together && seatSlices && (
             <p className="group-note" role="status">
@@ -356,8 +353,6 @@ export function Randomizer() {
           )}
           <div className="hero__controls">
             <FilterTokens filters={filters} place={place?.label ?? null} radius={radius} onOpen={() => setSheetOpen(true)} />
-            {/* Figma v8: "+ სტუმარი" sits under the filters, not on the wheel */}
-            <button type="button" className="add-guest" onClick={addDiner} disabled={seated >= MAX_DINERS} aria-label={`დაამატე სტუმარი (${seated} / ${MAX_DINERS})`}>+ სტუმარი <span>{seated}/{MAX_DINERS}</span></button>
             <p className="hero__status" aria-live="polite">{status}</p>
             {spinError && <p className="hero__error" role="alert">{spinError}</p>}
           </div>
@@ -416,15 +411,7 @@ export function Randomizer() {
 
       {quizOpen && <Quiz onClose={() => setQuizOpen(false)} onApply={applyPersona} onDish={(slug) => { setQuizOpen(false); openDish(slug); }} />}
 
-      <div className="chapter chapter--cream">
-      <FigmaFill name="heroClouds" className="fx--sky" />
-      <span className="sky-veil" aria-hidden="true" />
-      {/* lower half: paper wash + "Water caustic" shader at 20% */}
-      <div className="s2-water" aria-hidden="true"><FigmaFill name="section2Water" className="fx--water" /></div>
-      {/* pink cotton-candy clouds hide the seam between the hero and section 2 */}
-      <div className="clouds" aria-hidden="true"><Image className="clouds__img" src="/collage/clouds-soft.webp" alt="" width={1600} height={406} sizes="100vw" /></div>
-      {/* Figma v8: the khinkali hand sits inside a coral sun, top-right of the result card */}
-      <div className="paths__sun" aria-hidden="true"><Image src="/collage/courier.webp" alt="" width={900} height={897} sizes="300px" /></div>
+      <div className="chapter chapter--cream chapter--plain">
       <div ref={pathsRef} className="paths-anchor">
         <Paths
           dish={dish} place={place} radius={radius} onPickPlace={pickPlace}

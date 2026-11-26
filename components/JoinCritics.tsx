@@ -16,7 +16,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { checkSignup, DISTRICTS, LIMITS } from "@/lib/critics.ts";
-import { Strip } from "./Strip";
 
 type Status = { kind: "closed" } | { kind: "open"; error: string | null; field: string | null } | { kind: "sending" } | { kind: "done"; already: boolean } | { kind: "down" };
 
@@ -44,8 +43,7 @@ export function JoinCritics() {
       <div className="container join__inner">
         {/* a pomegranate pieced together from thousands of paper scraps — dish names and critic words */}
         <Image className="join__kit join__mosaic" src="/collage/mosaic-pomegranate.webp" alt="" width={906} height={1000} sizes="(max-width: 640px) 70vw, 380px" />
-        <p className="chap-no"><span>05</span> კრიტიკოსი</p>
-        <h2 id="join-title" className="section-title display join__title"><Strip text="გახდი კრიტიკოსი" straight className="title-strip" /></h2>
+        <h2 id="join-title" className="section-title display join__title">გახდი კრიტიკოსი</h2>
         <p className="join__lead">
           ჭამ, აკვირდები, გული გწყდება ცუდ ხინკალზე? ვეძებთ ადამიანებს, ვინც რესტორნებს შეამოწმებს და
           გულწრფელად დაწერს.

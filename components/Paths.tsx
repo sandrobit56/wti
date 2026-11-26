@@ -2,8 +2,10 @@
  * File:        components/Paths.tsx
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
- * Date:        2026-11-25
- * Version:     chapter label, lead line, three ways; v5.1 one-strip title; v5.0 — one result card: dish photo + name on the left, way / main action /
+ * Date:        2026-11-27
+ * Version:     v6.0 — Figma 191:615: title + switch + venue rows + one button on the left,
+ *              the dish photo with a coral name bar on the right; no labels, strips or tiles.
+ *              v5.2 chapter label, lead line, three ways; v5.1 one-strip title; v5.0 — one result card: dish photo + name on the left, way / main action /
  *              places on the right; clear empty state. (v4 stacked 9 centred blocks.)
  *              v4.1 — collage: a marble hand offers the dish, the name is a paper strip;
  *              v4.0 — one object, one choice, one button (Sandro's UX review: 4 boxes,
@@ -23,8 +25,6 @@ import { useEffect, useState } from "react";
 import type { Dish } from "@/lib/catalog.ts";
 import { stickerSrc } from "@/lib/stickers.ts";
 import { typePhoto } from "@/lib/photos.ts";
-import { Strip } from "./Strip";
-import { toMtavruli } from "@/lib/mtavruli.ts";
 import { deliveryLinks, mapsDirectionsUrl, mapsSearchUrl, type RadiusKm, type VenueMatch } from "@/lib/places.ts";
 import { MY_LOCATION, type Place } from "./FilterPanel";
 
@@ -72,82 +72,59 @@ export function Paths({ dish, place, radius, group, onPickPlace, onSpin }: Props
   const delivery = deliveryLinks(place?.wolt ?? null);
   const near = venues.kind === "ready" ? venues.venues.slice(0, 3) : [];
 
-  // the one main action for the chosen way
+  // the one main action for the chosen way (Figma: "იპოვე რუკაზე" under the venue rows)
   const main = !dish ? null
     : way === "order" ? { href: delivery[0].url, label: `შეუკვეთე ${delivery[0].name}-ზე` }
-    : near[0] && !group ? { href: mapsDirectionsUrl(near[0]), label: `გზა: ${near[0].name}` }
     : { href: mapsSearchUrl(term, nearArea), label: "იპოვე რუკაზე" };
 
   return (
-    <section className="paths2 sect" id="paths" aria-labelledby="paths-title">
-      <div className="container paths2__inner">
-        <p className="chap-no"><span>02</span> ადგილი</p>
-        <h2 id="paths-title" className="section-title display paths2__title">
-          <Strip text={toMtavruli("სად შეჭამ?")} straight className="title-strip title-strip--action" />
-        </h2>
-        <p className="sect-lead">ბორბალმა თავისი თქვა. დანარჩენი შენზეა: წახვალ, თუ მოგიტანენ?</p>
-
-        {!dish ? (
-          /* empty state: one picture, one sentence, one button */
-          <div className="result result--empty">
-            <Image className="result__hand" src="/collage/palm.webp" alt="" width={1000} height={494} sizes="(max-width: 640px) 80vw, 420px" />
-            <p className="result__hint">ბორბალი ჯერ არ დაგიტრიალებია. ჯერ კერძი ამოიღე, მერე აქ გაჩვენებ, სად შეჭამ.</p>
-            <button className="btn" onClick={onSpin}>დაატრიალე ბორბალი ↑</button>
-          </div>
-        ) : (
-          /* v5: one result card — left: the dish, right: how to get it */
-          <div className="result">
-            <figure className="result__dish">
-              <Image key={dish.slug} className="result__photo paths2__dish" src={typePhoto(dish.slug)?.src ?? stickerSrc(dish.slug)} alt={dish.name} width={640} height={640} sizes="(max-width: 640px) 90vw, 420px" />
-              <figcaption>
-                <div className="result__title"><h3 className="result__name">{dish.name}</h3><p className="result__meta">{dish.priceGel[0]}–{dish.priceGel[1]} ₾ · {dish.cuisine}</p></div>
-                {group && <p className="result__group"><strong>{group.summary}</strong><br />{group.dishes.join(" · ")}</p>}
-              </figcaption>
-            </figure>
-
-            <div className="result__how">
-              <div className="seg" role="radiogroup" aria-label="როგორ">
+    <section className="paths9 sect" id="paths" aria-labelledby="paths-title">
+      <div className="paths9__card">
+        <div className="paths9__how">
+          <h2 id="paths-title" className="title9">სად შეჭამ?</h2>
+          {!dish ? (
+            <>
+              <p className="paths9__hint">ბორბალი ჯერ არ დაგიტრიალებია. ჯერ კერძი ამოიღე, მერე აქ გაჩვენებ, სად შეჭამ.</p>
+              <button className="btn9" onClick={onSpin}>დაატრიალე ბორბალი ↑</button>
+            </>
+          ) : (
+            <>
+              <div className="seg9" role="radiogroup" aria-label="როგორ">
                 <button role="radio" aria-checked={way === "go"} className={way === "go" ? "on" : ""} onClick={() => setWay("go")}>მივალ</button>
                 <button role="radio" aria-checked={way === "order"} className={way === "order" ? "on" : ""} onClick={() => setWay("order")}>შევუკვეთავ</button>
               </div>
+              <div className="paths9__act">
+                <ul className="rows9">
+                  {way === "go" && venues.kind === "no-place" && (
+                    <li className="rows9__note"><button className="link" onClick={onPickPlace}>აირჩიე უბანი</button> — და ახლომახლო ადგილებს გაჩვენებ.</li>
+                  )}
+                  {way === "go" && venues.kind === "loading" && <li className="rows9__note">ვეძებ ახლოს…</li>}
+                  {way === "go" && venues.kind === "error" && <li className="rows9__note">ადგილები ვერ ჩაიტვირთა ({venues.message})</li>}
+                  {way === "go" && venues.kind === "ready" && near.length === 0 && <li className="rows9__note">{radius} კმ-ში ვერ ვიპოვე — სცადე რუკაზე.</li>}
+                  {way === "go" && near.map((v) => (
+                    <li key={v.id}><a className="row9" href={mapsDirectionsUrl(v)} target="_blank" rel="noreferrer"><span>{v.name}</span><span>{km(v.distanceKm)}</span></a></li>
+                  ))}
+                  {way === "order" && delivery.slice(1).map((d) => (
+                    <li key={d.id}><a className="row9" href={d.url} target="_blank" rel="noreferrer"><span><i style={{ background: d.dot }} />{d.name}</span><span>↗</span></a></li>
+                  ))}
+                </ul>
+                {group && <p className="paths9__group"><strong>{group.summary}</strong><br />{group.dishes.join(" · ")}</p>}
+                {main && <a className="btn9" href={main.href} target="_blank" rel="noreferrer">{main.label}</a>}
+              </div>
+            </>
+          )}
+        </div>
 
-              <ul className="result__list">
-                {way === "go" && venues.kind === "no-place" && (
-                  <li className="result__note"><button className="link" onClick={onPickPlace}>აირჩიე უბანი</button> — და ახლომახლო ადგილებს გაჩვენებ.</li>
-                )}
-                {way === "go" && venues.kind === "loading" && <li className="result__note">ვეძებ ახლოს…</li>}
-                {way === "go" && venues.kind === "error" && <li className="result__note">ადგილები ვერ ჩაიტვირთა ({venues.message})</li>}
-                {way === "go" && venues.kind === "ready" && near.length === 0 && <li className="result__note">{radius} კმ-ში ვერ ვიპოვე — სცადე რუკაზე.</li>}
-                {way === "go" && near.slice(group ? 0 : 1).map((v) => (
-                  <li key={v.id}><a className="row" href={mapsDirectionsUrl(v)} target="_blank" rel="noreferrer"><span>{v.name}</span><span>{km(v.distanceKm)} ↗</span></a></li>
-                ))}
-                {way === "order" && delivery.slice(1).map((d) => (
-                  <li key={d.id}><a className="row" href={d.url} target="_blank" rel="noreferrer"><span><i style={{ background: d.dot }} />{d.name}</span><span>↗</span></a></li>
-                ))}
-              </ul>
-
-              {main && <a className="btn btn--lg result__main" href={main.href} target="_blank" rel="noreferrer">{main.label} ↗</a>}
-            </div>
-          </div>
-        )}
-        {/* three ways the result can go — the same three switches the card has */}
-        <ul className="ways" aria-label="როგორ შეიძლება">
-          <li className="ways__item">
-            <Image className="ways__img" src="/collage/hermes-sm.webp" alt="" width={444} height={759} sizes="90px" />
-            <b>მივალ</b><span>ახლოს რა არის, გაჩვენებ რუკაზე, მანძილით.</span>
-          </li>
-          <li className="ways__item">
-            <Image className="ways__img ways__img--wide" src="/collage/courier.webp" alt="" width={900} height={897} sizes="110px" />
-            <b>შევუკვეთავ</b><span>Wolt, Bolt Food ან Glovo — პირდაპირ კერძის გვერდზე.</span>
-          </li>
-          <li className="ways__item">
-            <span className="ways__busts" aria-hidden="true">
-              <Image src="/illustrations/people/diner-1.webp" alt="" width={288} height={288} sizes="64px" />
-              <Image src="/illustrations/people/diner-3.webp" alt="" width={288} height={288} sizes="64px" />
-            </span>
-            <b>ერთად</b><span>„+ სტუმარი“ — და ერთ ადგილს ვეძებ, სადაც ყველას რაღაც ხვდება.</span>
-          </li>
-        </ul>
+        <figure className={dish ? "dish9" : "dish9 dish9--empty"}>
+          {dish ? (
+            <>
+              <Image key={dish.slug} className="dish9__photo" src={typePhoto(dish.slug)?.src ?? stickerSrc(dish.slug)} alt={dish.name} width={1054} height={672} sizes="(max-width: 760px) 92vw, 527px" />
+              <figcaption className="dish9__bar"><h3>{dish.name}</h3><p>{dish.priceGel[0]}–{dish.priceGel[1]} ₾ &nbsp; {dish.cuisine}</p></figcaption>
+            </>
+          ) : (
+            <figcaption className="dish9__bar"><h3>შენი კერძი</h3><p>აქ გამოჩნდება</p></figcaption>
+          )}
+        </figure>
       </div>
     </section>
   );

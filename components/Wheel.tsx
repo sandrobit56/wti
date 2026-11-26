@@ -2,8 +2,9 @@
  * File:        components/Wheel.tsx
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
- * Date:        2026-11-25
- * Version:     v10.2 — labels in Mkhedruli as in Figma v8;
+ * Date:        2026-11-27
+ * Version:     v10.3 — Figma 191:615: dark wine plate (colour in CSS), cream band, coral hub;
+ *              v10.2 — labels in Mkhedruli as in Figma v8;
  *              v10.1 — diners are marble busts; add button reads "+ სტუმარი";
  *              v10 — simpler, photo-first: each slice IS the dish photo (full wedge, no
  *              crooked mini cut-outs), names on one cream rim band, thin paper dividers,
@@ -168,8 +169,7 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
         onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>
         <Defs uid={uid} />
         {/* plain round paper plate */}
-        <circle r={PLATE} fill="#FFFAF2" filter={`url(#paste${uid})`} />
-        <circle r={PLATE} fill={`url(#paper${uid})`} style={{ mixBlendMode: "multiply" }} />
+        <circle r={PLATE} className="wheel__plate" />
 
         {/* everything that turns */}
         <g className={discCls} style={discStyle} onTransitionEnd={(e) => { if (e.propertyName === "transform") onLanded(); }}>
@@ -229,7 +229,7 @@ export function WheelShell() {
   return (
     <div className="wheel wheel--paper wheel--skeleton" aria-label="იტვირთება" style={BOX}>
       <svg className="wheel__svg" viewBox={`${-HALF} ${-HALF} ${HALF * 2} ${HALF * 2}`} aria-hidden="true">
-        <circle r={PLATE} fill="#FFF1DC" />
+        <circle r={PLATE} className="wheel__plate" />
       </svg>
     </div>
   );

@@ -14,7 +14,6 @@
 import type { Persona } from "@/lib/personas.ts";
 import type { PersonaId } from "@/lib/quiz.ts";
 import { TarotCard } from "./TarotCard";
-import { Strip } from "./Strip";
 
 type Props = { persona: Persona | null; onStart: () => void; onGallery: () => void };
 
@@ -25,9 +24,8 @@ export function PersonaSection({ persona, onStart, onGallery }: Props) {
   return (
     <section className="persona2 sect" id="persona" aria-labelledby="persona-title">
       <div className="container persona2__inner">
-        <p className="chap-no"><span>04</span> პერსონა</p>
         <h2 id="persona-title" className="section-title display persona2__title">
-          <Strip text={persona ? "შენ ხარ ეს" : "გაიგე შენი პერსონა"} straight className="title-strip" />
+          {persona ? "შენ ხარ ეს" : "გაიგე შენი პერსონა"}
         </h2>
 
         <button type="button" className="persona2__deck" onClick={persona ? onGallery : onStart}

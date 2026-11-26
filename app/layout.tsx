@@ -14,7 +14,8 @@ import "@fontsource-variable/noto-serif-georgian";
 import "@fontsource-variable/google-sans";
 import "./globals.css";
 import "./collage.css";   // collage art direction (v7)
-import "./v8.css";        // Sandro's Figma v8 frame, 1:1 — loaded last
+import "./v8.css";        // Sandro's Figma v8 frame, 1:1
+import "./v9.css";        // Sandro's simplified Figma frame 191:615 — loaded last
 import { SITE_DESC, SITE_NAME, SITE_URL } from "@/lib/site.ts";
 
 export const metadata: Metadata = {

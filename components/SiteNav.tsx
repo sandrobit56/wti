@@ -2,8 +2,10 @@
  * File:        components/SiteNav.tsx
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
- * Date:        2026-11-18
- * Version:     v1.4 — polished logo (bolder arc lettering, brand colours);
+ * Date:        2026-11-27
+ * Version:     v2.0 — Figma 191:615: one centred floating pill (logo + 4 links); blog and
+ *              profile placeholders removed from the header (the tab bar keeps profile).
+ *              v1.4 — polished logo (bolder arc lettering, brand colours);
  *              v1.3 — header tone follows the section under it (data-on), "join" in scroll-spy;
  *              v1.2 — "თამაში" link; scroll-spy sections in page order (fixes "ადგილები"
  *              staying lit further down the page)
@@ -21,11 +23,12 @@ import Image from "next/image";
 import { useEffect, useState, type ReactNode } from "react";
 
 type SectionId = "wheel" | "paths" | "game" | "persona" | "join";
-const LEFT: { id: SectionId; label: string }[] = [
+/** Figma 191:615 header: logo + these four, in one floating pill. */
+const NAV: { id: SectionId; label: string }[] = [
   { id: "wheel", label: "ბორბალი" },
-  { id: "paths", label: "ადგილები" },
   { id: "game", label: "თამაში" },
   { id: "persona", label: "ტესტი" },
+  { id: "join", label: "გახდი კრიტიკოსი" },
 ];
 
 /** Page order — the last section whose top passed the line wins. */
@@ -74,25 +77,20 @@ export function SiteHeader() {
   const active = useActiveSection();
   const scrolled = useScrolled();
 
+  // "ადგილები" has no link in the pill any more — it belongs to the wheel's story
+  const lit: SectionId = active === "paths" ? "wheel" : active;
   return (
-    <header className={scrolled ? "header header--scrolled" : "header"} data-on={active}>
-      <nav className="header__nav nav-live only-desktop" aria-label="მთავარი">
-        {LEFT.map((l) => (
-          <a key={l.id} data-id={l.id} href={`#${l.id}`} className={active === l.id ? "on" : undefined} aria-current={active === l.id ? "true" : undefined}>
-            {l.label}
-          </a>
-        ))}
-      </nav>
-      <a href="#wheel" className="header__logo" aria-label="რა ვჭამოთ? — მთავარი">
-        <Image src="/logo.svg" alt="რა ვჭამოთ?" width={66} height={60} priority />
-      </a>
-      <nav className="header__nav header__nav--right nav-live" aria-label="დამატებითი">
-        <a className={`only-desktop${active === "join" ? " on" : ""}`} href="#join">გახდი კრიტიკოსი</a>
-        <span className="only-desktop nav-live__soon" title="მალე">ბლოგი<sup>მალე</sup></span>
-        <span className="header__user" title="პროფილი — მალე" role="img" aria-label="პროფილი (მალე)">
-          <Image src="/icons/user.svg" alt="" width={24} height={24} />
-        </span>
-      </nav>
+    <header className={scrolled ? "header9 header9--scrolled" : "header9"} data-on={active}>
+      <div className="header9__pill">
+        <a href="#wheel" className="header9__logo" aria-label="რა ვჭამოთ? — მთავარი">
+          <Image src="/logo.svg" alt="რა ვჭამოთ?" width={52} height={47} priority />
+        </a>
+        <nav className="header9__nav only-desktop" aria-label="მთავარი">
+          {NAV.map((l) => (
+            <a key={l.id} href={`#${l.id}`} className={lit === l.id ? "on" : undefined} aria-current={lit === l.id ? "true" : undefined}>{l.label}</a>
+          ))}
+        </nav>
+      </div>
     </header>
   );
 }

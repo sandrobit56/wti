@@ -25,7 +25,6 @@ import { stickerSrc } from "@/lib/stickers.ts";
 import { toMtavruli } from "@/lib/mtavruli.ts";
 import type { PersonaId } from "@/lib/quiz.ts";
 import { TarotCard } from "./TarotCard";
-import { Strip } from "./Strip";
 
 type Item = { x: number; y: number; bob: number; what: Spawn };
 type Pop = { x: number; y: number; t: number; text: string; bad: boolean };
@@ -190,8 +189,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
   return (
     <section className="game2 sect" id="game" aria-labelledby="game-title">
       <div className="container game2__inner">
-        <p className="chap-no chap-no--light"><span>03</span> თამაში</p>
-        <h2 id="game-title" className="section-title display game2__title"><Strip text={toMtavruli("სუფრის მფრინავი")} straight className="title-strip title-strip--action" /></h2>
+        <h2 id="game-title" className="section-title display game2__title">სუფრის მფრინავი</h2>
         <p className="game2__sub">გაიფრინე სუფრაზე: შეჭამე ყველა კერძი, აარიდე წიწაკას. თამადა ელოდება.</p>
 
         <ol className="game2__steps" aria-label="სუფრის რიგი">
