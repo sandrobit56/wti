@@ -24,6 +24,7 @@ import type { Dish } from "@/lib/catalog.ts";
 import { stickerSrc } from "@/lib/stickers.ts";
 import { typePhoto } from "@/lib/photos.ts";
 import { Strip } from "./Strip";
+import { toMtavruli } from "@/lib/mtavruli.ts";
 import { deliveryLinks, mapsDirectionsUrl, mapsSearchUrl, type RadiusKm, type VenueMatch } from "@/lib/places.ts";
 import { MY_LOCATION, type Place } from "./FilterPanel";
 
@@ -81,7 +82,7 @@ export function Paths({ dish, place, radius, group, onPickPlace, onSpin }: Props
     <section className="paths2 sect" id="paths" aria-labelledby="paths-title">
       <div className="container paths2__inner">
         <h2 id="paths-title" className="section-title display paths2__title">
-          <Strip text="სად შეჭამ?" straight className="title-strip title-strip--action" />
+          <Strip text={toMtavruli("სად შეჭამ?")} straight className="title-strip title-strip--action" />
         </h2>
 
         {!dish ? (

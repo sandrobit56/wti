@@ -4,7 +4,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-22
- * Version:     one-strip title; no emoji; v1.0 — replaces PersonaTeaser (title + text + 2 buttons + a fan of 3 cards
+ * Version:     Figma v8: cards face up (tamada on top of world + sushi); one-strip title; no emoji; v1.0 — replaces PersonaTeaser (title + text + 2 buttons + a fan of 3 cards
  *              competed for attention, per Sandro's review)
  * Description: Section "პერსონა" with one object: the fate deck. Before the quiz the top card
  *              lies face down ("ბედმა იცის, შენ — ჯერ არა"); tapping the deck or the one button
@@ -19,7 +19,7 @@ import { Strip } from "./Strip";
 type Props = { persona: Persona | null; onStart: () => void; onGallery: () => void };
 
 /** Cards under the top one: just their backs show, fanned a little. */
-const UNDER: PersonaId[] = ["spice", "tamada", "khinkali"];
+const UNDER: PersonaId[] = ["world", "sushi"];   // Figma v8 deck: world left, sushi right, tamada on top
 
 export function PersonaSection({ persona, onStart, onGallery }: Props) {
   return (
@@ -33,11 +33,11 @@ export function PersonaSection({ persona, onStart, onGallery }: Props) {
           aria-label={persona ? `${persona.name} — ნახე 12-ვე ბარათი` : "გამოსცადე ბედი — ტესტის დაწყება"}>
           {UNDER.map((id, i) => (
             <span key={id} className="persona2__under" style={{ ["--i" as string]: i }} aria-hidden="true">
-              <TarotCard id={id} flipped size="md" tilt={false} />
+              <TarotCard id={id} size="md" tilt={false} />
             </span>
           ))}
           <span className="persona2__top">
-            <TarotCard id={persona?.id ?? "world"} flipped={!persona} size="md" me={Boolean(persona)} tilt={Boolean(persona)} />
+            <TarotCard id={persona?.id ?? "tamada"} size="md" me={Boolean(persona)} tilt={false} />
           </span>
         </button>
 

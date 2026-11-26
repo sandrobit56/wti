@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-25
- * Version:     v10.1 — diners are marble busts; add button reads "+ სტუმარი";
+ * Version:     v10.2 — labels in Mkhedruli as in Figma v8;
+ *              v10.1 — diners are marble busts; add button reads "+ სტუმარი";
  *              v10 — simpler, photo-first: each slice IS the dish photo (full wedge, no
  *              crooked mini cut-outs), names on one cream rim band, thin paper dividers,
  *              plain round plate (no torn edge, dashed ring or tape). Winner's band turns coral.
@@ -26,11 +27,9 @@
 import Image from "next/image";
 import { useEffect, useId, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import type { Dish } from "@/lib/catalog.ts";
-import { toMtavruli } from "@/lib/mtavruli.ts";
 import { typePhoto } from "@/lib/photos.ts";
 import { MAX_DINERS, seatAngles } from "@/lib/seats.ts";
 import { stickerSrc } from "@/lib/stickers.ts";
-import { Scribble } from "./Scribble";
 
 export const FLING_MIN = 0.35;   // deg/ms
 const HALF = 210;                // viewBox is (−HALF … HALF)²
@@ -191,7 +190,7 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
                   <>
                     <path id={arcId} d={labelArc(n, flip)} fill="none" />
                     <text className="wheel__label" dy={flip ? "0.7em" : "0.3em"}>
-                      <textPath href={`#${arcId}`} startOffset="50%" textAnchor="middle">{toMtavruli(d.name)}</textPath>
+                      <textPath href={`#${arcId}`} startOffset="50%" textAnchor="middle">{d.name}</textPath>
                     </text>
                   </>
                 )}
@@ -204,10 +203,9 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
         </g>
       </svg>
 
-      {diners === 1 && <Scribble kind="arrowDown" className="wheel__arrow" width={4} />}
 
       <button className="wheel__hub" onClick={() => { const o = offset; setOffset(0); onSpin(o); }} disabled={spinning} aria-label="დაატრიალე ბორბალი">
-        <span aria-hidden="true">{toMtavruli(hubLabel)}</span>
+        <span aria-hidden="true">{hubLabel}</span>
       </button>
 
       {seats.map((t) => (

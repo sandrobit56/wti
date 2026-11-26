@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-15
- * Version:     v3.6 Figma v8 layout (Sandro 2026-11-26); v3.5 — hero calmed down (no chili, one centred column);
+ * Version:     v3.7 Figma shader fills; v3.6 Figma v8 layout (Sandro 2026-11-26); v3.5 — hero calmed down (no chili, one centred column);
  *              v3.4 — clouds over the first seam, floating food cut-outs;
  *              v3.3 — collage bridges between chapters (was torn seams), hero doodles removed;
  *              v3.2 — flick-to-spin: a fast drag on the plate spins it (strength → turns and
@@ -35,6 +35,7 @@ import Image from "next/image";
 import { HeroTitle } from "./HeroTitle";
 import { Bridge } from "./Bridge";
 import { Float } from "./Float";
+import { FigmaFill } from "./FigmaShaders";
 import { JoinCritics } from "./JoinCritics";
 import { mapsSearchUrl } from "@/lib/places.ts";
 import { MAX_DINERS, fillSeats, seatAngles, seatsFor, sharedVenue, sliceAt, venueLabel } from "@/lib/seats.ts";
@@ -320,9 +321,14 @@ export function Randomizer() {
     />
   );
 
+  const addDiner = () => { setDiners((n) => Math.min(MAX_DINERS, n + 1)); setSpun((s) => (s?.landed ? null : s)); };
+
   return (
     <>
       <section className="hero" id="wheel" ref={heroRef}>
+        {/* Figma v8: cream paper → "Clouds" shader at 20% → 66% pink veil */}
+        <FigmaFill name="heroClouds" className="fx--sky" />
+        <span className="sky-veil" aria-hidden="true" />
         {/* collage layer: Hermes (marble, AI) flies in with a fork; sun, tape and doodles around */}
         <div className="hero__collage" aria-hidden="true">
           <span className="hero__sun" />
@@ -337,7 +343,7 @@ export function Randomizer() {
                   onSpin={(o) => doSpin(false, [], { ...DEFAULT_SPIN, offset: o })} onFling={onFling} onLanded={onLanded}
                   diners={seated} seatDishes={seatSlices ? seatSlices.map((i) => wheel[i].name) : null}
                   onSeat={(d) => { if (!seatSlices) return; const i = seatSlices[d]; setSpun((s) => (s ? { ...s, winner: i, why: d === 0 ? s.why : [] } : s)); setModalOpen(true); }}
-                  onAddDiner={() => { setDiners((n) => Math.min(MAX_DINERS, n + 1)); setSpun((s) => (s?.landed ? null : s)); }}
+                  onAddDiner={addDiner}
                   onRemoveDiner={(d) => { void d; setDiners((n) => Math.max(1, n - 1)); setSpun((s) => (s?.landed ? null : s)); }}
                 />
               : <div className="wheel wheel--empty"><p>ფილტრებს მხოლოდ {matching} კერძი ერგება.<br />შეარბილე ბიუჯეტი, დიეტა ან გაზარდე რადიუსი.</p></div>}
@@ -350,6 +356,8 @@ export function Randomizer() {
           )}
           <div className="hero__controls">
             <FilterTokens filters={filters} place={place?.label ?? null} radius={radius} onOpen={() => setSheetOpen(true)} />
+            {/* Figma v8: "+ სტუმარი" sits under the filters, not on the wheel */}
+            <button type="button" className="add-guest" onClick={addDiner} disabled={seated >= MAX_DINERS} aria-label={`დაამატე სტუმარი (${seated} / ${MAX_DINERS})`}>+ სტუმარი <span>{seated}/{MAX_DINERS}</span></button>
             <p className="hero__status" aria-live="polite">{status}</p>
             {spinError && <p className="hero__error" role="alert">{spinError}</p>}
           </div>
@@ -409,6 +417,10 @@ export function Randomizer() {
       {quizOpen && <Quiz onClose={() => setQuizOpen(false)} onApply={applyPersona} onDish={(slug) => { setQuizOpen(false); openDish(slug); }} />}
 
       <div className="chapter chapter--cream">
+      <FigmaFill name="heroClouds" className="fx--sky" />
+      <span className="sky-veil" aria-hidden="true" />
+      {/* lower half: paper wash + "Water caustic" shader at 20% */}
+      <div className="s2-water" aria-hidden="true"><FigmaFill name="section2Water" className="fx--water" /></div>
       {/* pink cotton-candy clouds hide the seam between the hero and section 2 */}
       <div className="clouds" aria-hidden="true"><Image className="clouds__img" src="/collage/clouds-soft.webp" alt="" width={1600} height={406} sizes="100vw" /></div>
       {/* Figma v8: the khinkali hand sits inside a coral sun, top-right of the result card */}
@@ -430,6 +442,7 @@ export function Randomizer() {
         <SupraFlyer onDish={openDish} />
       </div>
       <div className="chapter chapter--mustard">
+        <FigmaFill name="personaPaper" className="fx--paper" />
         <Image className="persona__athena" src="/collage/athena.webp" alt="" aria-hidden="true" width={645} height={1000} sizes="250px" />
         <Float item="tarragon" className="persona__tarragon" />
         <PersonaSection persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />

@@ -1,0 +1,254 @@
+/**
+ * File:        app/v8.css
+ * Application: რა ვჭამოთ? (WTI)
+ * Author:      Sandro Germanishvili
+ * Date:        2026-11-26
+ * Version:     v1.0
+ * Description: The site as Sandro drew it in Figma (file WTI, frame "Desktop 1440 · v8",
+ *              node 174:148). Every number below is read from that frame with get_design_context:
+ *              sizes, offsets, fonts, colours, shadows. Loaded last, so it wins over globals.css
+ *              and collage.css (both still carry older looks — known debt, see art-direction.md).
+ *              Desktop (≥1024px) follows the frame 1:1; smaller screens keep the same parts and
+ *              proportions in one column.
+ */
+
+/* ── tokens + type (Figma variables "WTI v8 tokens") ───────────────────── */
+:root {
+  --font: "Noto Sans Georgian Variable", system-ui, sans-serif;    /* Figma: Noto Sans Georgian everywhere */
+  --display: "Noto Sans Georgian Variable", system-ui, sans-serif;
+}
+body { font-family: var(--font); }
+.v8-cond, .strip__paper, .result__name, .game2__how b { font-family: var(--display); font-weight: 800; font-stretch: 75%; }
+
+/* ── shader fills (components/FigmaShaders.tsx) ────────────────────────── */
+.fx { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.fx--sky, .fx--water, .fx--paper { opacity: .2; }
+.fx__canvas { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; display: block; }
+.sky-veil { position: absolute; inset: 0; z-index: 0; pointer-events: none; background: rgba(255, 227, 232, .66); }
+.hero__inner { position: relative; z-index: 2; }
+.chapter--cream .clouds, .chapter--cream .paths__sun { position: absolute !important; }
+.paths-anchor { position: relative; }
+/* Figma frames are static: no scroll-in on titles */
+.chapter .section-title, .chapter .section-title * { animation: none !important; opacity: 1 !important; translate: none; }
+
+/* ── header (174:149): 72px paper bar, nav pills 14/bold ───────────────── */
+.header.header, .header--scrolled.header { min-height: 72px; background: var(--c-paper) !important; box-shadow: 0 8px 20px -14px rgba(28, 26, 23, .18) !important; }
+.header__nav a { font: 700 14px/1 var(--font) !important; padding: 10px 14px !important; border-radius: 999px !important; }
+
+/* ── hero + section 2 = one frame (174:189, 1440 × 2211) ───────────────── */
+.hero, .chapter.chapter--cream {
+  background: var(--s-cream) var(--paper-tex) 0 0 / 512px 512px !important;   /* wrapper fill: cream + paper, multiply */
+  background-blend-mode: multiply !important;
+  border-radius: 0 !important; box-shadow: none !important; margin-top: 0 !important; animation: none !important;
+}
+.hero { min-height: 0 !important; height: auto; padding: 0 !important; overflow: clip; }
+.hero__inner.hero__inner { display: flex !important; flex-direction: column; align-items: center; gap: 12px !important; min-height: 0 !important;
+  padding: 20px 0 0 !important; height: 1000px; justify-content: flex-start; grid-template-columns: none !important; }
+/* title strips: flat paper, no wobble, no tape */
+.sign--paper { display: flex !important; flex-direction: column; align-items: center; gap: 12px; margin: 0 !important; }
+.sign__title.strip { rotate: 0deg !important; filter: none !important; font-size: 84px !important; }
+.sign__title .strip__paper { padding: 4px 18px 9px !important; background: var(--c-paper) !important; color: var(--brand) !important; line-height: normal; }
+.sign__ask.strip, .sign__won.strip { rotate: -1.5deg !important; filter: none !important; font-size: 52px !important; margin: 0 !important; }
+.sign__ask .strip__paper, .sign__won .strip__paper { padding: 4px 18px 9px !important; line-height: normal; background: var(--c-ink) !important; color: var(--s-yellow) !important; clip-path: none !important; }
+.strip__tape { display: none !important; }
+.hero__stage.hero__stage { width: 420px !important; max-width: 100%; margin: 0 !important; }
+.hero__controls.hero__controls { display: flex !important; flex-direction: column; align-items: center; gap: 12px !important; width: auto !important; }
+.hero__controls .tokens { gap: 8px !important; flex-wrap: nowrap !important; }
+.token.token { min-height: 0 !important; padding: 10px 16px !important; font: 600 14px/normal var(--font) !important; background: var(--c-paper) !important;
+  border: 1.5px solid rgba(28, 26, 23, .18) !important; border-radius: 999px !important; }
+.token .token__icon, .token svg, .token img { display: none !important; }   /* Figma chips are text only */
+.add-guest { display: inline-flex; gap: 8px; align-items: center; padding: 11px 16px; border: 0; border-radius: 999px; cursor: pointer;
+  background: var(--c-ink); color: var(--c-paper); font: 700 14px/normal var(--font); transition: background-color .18s; }
+.add-guest span { font-weight: 600; opacity: .6; }
+.add-guest:hover:not(:disabled) { background: var(--c-action); }
+.add-guest:disabled { opacity: .45; cursor: not-allowed; }
+.wheel__add { display: none !important; }
+.hero__status.hero__status { font: 600 13px/normal var(--font) !important; opacity: .7; margin: 0 !important; }
+/* Hermes + sun: x1048/y80 and x1039/y140 in a 1440 frame → anchored to the centre line */
+.hero__collage { position: absolute; inset: 0; z-index: 1 !important; pointer-events: none; }
+.hero__sun.hero__sun { position: absolute; left: calc(50% + 319px); right: auto; top: 140px; width: 300px; height: 300px; border-radius: 50%;
+  background: var(--s-yellow) !important; box-shadow: 0 0 0 24px rgba(255, 201, 61, .5) !important; opacity: 1; animation: none !important; }
+.hero__hermes.hero__hermes { position: absolute; left: calc(50% + 328px); right: auto; top: 80px; width: 320px !important; height: auto;
+  filter: drop-shadow(0 14px 18px rgba(28, 26, 23, .3)); animation: none !important; translate: none !important; rotate: 0deg !important; }
+.group-note { margin: 0 !important; }
+
+/* section 2 (inside the same frame): title y329, sun y247, card y523, height 1211 */
+.chapter.chapter--cream { overflow: visible; padding: 0 !important; }
+.chapter--cream .clouds { position: absolute; z-index: 2 !important; top: -74px; left: calc(50% - 859px); width: 1688px; height: 393px; translate: none !important; overflow: visible; pointer-events: none; }
+.chapter--cream .clouds__img { width: 1688px !important; height: 393px !important; margin: 0 !important; object-fit: contain; animation: none !important; }
+.s2-water { position: absolute; z-index: 0; left: -7px; right: 0; top: 195px; height: 1016px; overflow: hidden; pointer-events: none; background: rgba(255, 250, 242, .11); }
+.paths-anchor { position: relative; z-index: 3; }
+.paths2.sect { padding: 329px 0 187px !important; min-height: 0 !important; }
+.paths2__inner.paths2__inner { display: flex !important; flex-direction: column; align-items: center; gap: 89px !important; max-width: none !important; }
+.section-title.section-title { margin: 0 !important; line-height: normal; }
+.title-strip.strip { rotate: 0deg !important; filter: drop-shadow(0 6px 3.5px rgba(28, 26, 23, .28)) !important; font-size: 66px !important; animation: none !important; }
+.title-strip .strip__paper { padding: 4px 18px 9px !important; background: var(--c-paper) !important; color: var(--brand) !important; clip-path: none !important; line-height: normal; font-stretch: 75%; }
+.title-strip--action.strip { font-size: 68px !important; }
+.title-strip--action .strip__paper { color: var(--c-action) !important; text-transform: uppercase; }   /* sections 2–3: 68px, uppercase, #D92F4C */
+/* coral sun with the khinkali hand: x1040 y1247 (frame) → under the card, hand above it */
+.paths__sun.paths__sun { position: absolute; z-index: 2 !important; top: 247px; left: calc(50% + 320px); right: auto; width: 300px; height: 300px;
+  border-radius: 50%; background: var(--brand); box-shadow: 0 0 0 24px var(--s-pink); display: block; }
+.paths__sun img { position: absolute; left: 74px; top: 14px; width: auto !important; height: 205px !important; rotate: 8deg; z-index: 5;
+  filter: drop-shadow(0 14px 18px rgba(28, 26, 23, .3)); }
+.paths-anchor .result { position: relative; z-index: 4; }
+/* result card (175:53) */
+.result.result { width: 980px; max-width: calc(100% - 32px); display: flex; gap: 32px; padding: 28px; background: #fff !important;
+  border: 1px solid #d9d9d9; border-radius: 16px; box-shadow: none !important; align-items: flex-start; }
+.result__dish { flex: 1 1 0; min-width: 0; gap: 10px !important; }
+.result__photo.result__photo { height: 336px !important; aspect-ratio: auto !important; border-radius: 10px; }
+.result__title { display: flex; justify-content: space-between; align-items: center; }
+.result__name { font-size: 36px !important; line-height: normal; }
+.result__meta { font: 400 15px/normal var(--font) !important; opacity: .62; color: var(--c-ink) !important; margin: 0 !important; }
+.result__group { font: 600 14px/normal var(--font) !important; margin: 0 !important; }
+.result__how { flex: 1 1 0; min-width: 0; display: flex !important; flex-direction: column; gap: 48px !important; }
+.result__list { gap: 16px !important; order: 2; }
+.result__main { order: 3; margin: -32px 0 0 !important; width: 100%; }   /* rows → 16px → button (one group under the switch) */
+.result__list .row { padding: 12px 14px !important; border: 1.5px solid rgba(28, 26, 23, .16) !important; border-radius: 10px !important; font: 600 15px/normal var(--font) !important; }
+.seg.seg { padding: 4px; border: 1.5px solid rgba(28, 26, 23, .16); background: #fff; }
+.seg button { padding: 10px 0; min-height: 0; font: 700 15px/normal var(--font); }
+.btn.btn, .pill.pill--dark { padding: 13px 24px !important; min-height: 0 !important; font: 700 15px/normal var(--font) !important; }
+.btn--lg.btn { padding: 13px 24px !important; font-size: 15px !important; }
+.result--empty.result { flex-direction: column; align-items: center; width: 560px; }
+
+/* ── section 3 · game (175:78, 960 tall, plum radial) ──────────────────── */
+.chapter.chapter--wine { background: radial-gradient(ellipse 720px 480px at 50% 50%, #171717 0%, #282526 10.6%, #393234 21.2%, #5a4d52 42.3%) #5a4d52 !important;
+  border-radius: 0 !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; overflow: clip; }
+.game2.game2 { background: none !important; padding: 69px 0 120px !important; min-height: 0 !important; }
+.game2 .container, .game2__inner { display: flex; flex-direction: column; align-items: center; }
+.game2__title.game2__title { margin: 0 0 26px !important; }
+.game2__title .title-strip .strip__paper { width: 675px; text-align: center; }
+.game2__sub.game2__sub { font: 400 18px/normal var(--font) !important; color: var(--s-cream) !important; opacity: .8; margin: 0 0 26px !important; }
+.game2__steps.game2__steps { gap: 8px !important; margin: 0 0 38px !important; }
+.game2__steps li { background: rgba(255, 241, 220, .1) !important; color: var(--s-cream) !important; padding: 6px 14px 6px 8px !important; font: 700 14px/normal var(--font) !important; }
+.game2__stage.game2__stage { width: 1040px !important; max-width: calc(100% - 32px); height: 520px !important; border: 1px solid #fff !important; border-radius: 16px !important; box-shadow: none !important; }
+.game2__hero { width: 70px !important; rotate: 8deg !important; animation: none !important; filter: drop-shadow(0 14px 18px rgba(28, 26, 23, .3)) !important; }
+.game2__how { padding: 12px 18px !important; border-radius: 16px !important; box-shadow: none !important; }
+.game2__how b { font-size: 20px !important; }
+.game2__how { font: 400 15px/normal var(--font) !important; }
+.game2__rules { font: 400 13px/normal var(--font) !important; opacity: .62; }
+/* Icarus: box x1089 y23, 302px, flipped (scaleY -1 · rotate 170°) */
+.chapter--wine .bridge--icarus.bridge { position: absolute; top: 47px; left: calc(50% + 393px); right: auto; width: 302px !important; translate: none !important; rotate: 0deg !important; z-index: 3; }
+.chapter--wine .bridge--icarus .bridge__img { transform: scaleY(-1) rotate(170deg); animation: none !important; filter: drop-shadow(0 14px 18px rgba(28, 26, 23, .3)); }
+
+/* ── section 4 · persona (175:110, 900 tall) ───────────────────────────── */
+.chapter.chapter--mustard { background: var(--s-yellow) !important; border-radius: 0 !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; overflow: clip; }
+.chapter--mustard .persona2 { position: relative; z-index: 1; }
+.persona__athena.persona__athena, .persona__tarragon.float { position: absolute !important; z-index: 2; }
+.persona2.persona2 { background: none !important; padding: 82px 0 80px !important; min-height: 0 !important; }
+.persona2__inner.persona2__inner { display: flex !important; flex-direction: column; align-items: center; gap: 0 !important; }
+.persona2__title.persona2__title { margin: 0 0 65px !important; translate: 29px 0; }
+.persona2__deck.persona2__deck { position: relative; width: 300px !important; height: 400px !important; margin: 0 0 30px !important; padding: 0; border: 0; background: none; animation: none !important; }
+.persona2__deck .tarot { position: absolute !important; width: 240px !important; height: 340px !important; }
+.persona2__under, .persona2__top { position: absolute !important; inset: auto !important; translate: none !important; rotate: 0deg !important; transform: none !important; }
+.persona2__under:nth-of-type(1) { left: -35px !important; top: 45px !important; rotate: 8deg !important; }    /* world */
+.persona2__under:nth-of-type(2) { left: 87px !important; top: 16px !important; rotate: -6deg !important; }    /* sushi */
+.persona2__top { left: 30px !important; top: 30px !important; }
+.persona2__deck .tarot, .persona2__deck .tarot__inner, .persona2__deck .tarot__face { width: 240px !important; height: 340px !important; }
+.persona2__deck .tarot__face { border-radius: 4px !important; box-shadow: 0 16px 26px -10px rgba(28, 26, 23, .45) !important; }
+.persona2__deck .tarot__front { padding: 17px 17px 49px !important; }
+.persona2__deck .tarot__front > img:first-child, .persona2__deck .tarot__art { width: 206px !important; height: 274px !important; object-fit: cover; border-radius: 2px; }
+.persona2__deck .tarot__banner.strip { left: 14.5px !important; bottom: auto !important; top: 290px !important; translate: none !important; font-size: 18px !important;
+  filter: drop-shadow(0 6px 3.5px rgba(28, 26, 23, .28)) !important; rotate: 0deg !important; }
+.persona2__deck .tarot__banner .strip__paper { padding: 4px 18px 9px !important; background: var(--c-paper) !important; color: var(--brand) !important; clip-path: none !important; white-space: nowrap !important; }
+.persona2__under .tarot__banner { display: none !important; }
+.persona2__line.persona2__line { font: 400 18px/normal var(--font) !important; margin: 0 0 26px !important; color: var(--c-ink) !important; }
+.persona2__inner .btn { margin: 0 0 24px !important; }
+.persona2__all.link { font: 700 15px/normal var(--font) !important; text-decoration-color: var(--c-ink) !important; }
+.persona__athena.persona__athena { left: calc(50% - 643px); top: 179px; width: 250px; rotate: 5deg; }
+.persona__tarragon.float { left: calc(50% + 314px) !important; right: auto !important; top: 239px !important; width: 262px !important; animation: none !important; rotate: -14deg; }
+
+/* ── section 5 · critic (175:131, 860 tall, rounded top) ───────────────── */
+.chapter.chapter--blush { background: var(--s-pink) var(--paper-tex) 0 0 / 512px 512px !important; background-blend-mode: multiply !important;
+  border-radius: 34px 34px 0 0 !important; box-shadow: 0 -18px 20px -0px rgba(28, 26, 23, .45) !important; margin: 0 !important; padding: 0 !important; animation: none !important; position: relative; z-index: 2; }
+.join.join { background: none !important; padding: 64px 0 114px !important; min-height: 0 !important; }
+.join__inner.join__inner { display: flex !important; flex-direction: column; align-items: center; gap: 0 !important; }
+.join__kit.join__mosaic { width: 344px !important; height: auto; rotate: 4deg !important; margin: 0 0 30px 0 !important; translate: -30px 0; filter: none !important; animation: none !important; }
+.join__title.join__title { margin: 0 0 14px !important; translate: -30px 0; }
+.join__lead.join__lead { width: 636px; max-width: 100%; text-align: center; font: 400 16px/normal var(--font) !important; margin: 0 0 46px !important; translate: -30px 0; }
+
+/* ── footer (175:141) ───────────────────────────────────────────────────── */
+.footer.footer, footer.site-footer { background: var(--c-ink) !important; min-height: 120px; padding: 0 40px !important; display: flex; align-items: center; justify-content: space-between; }
+
+/* ── under 1024px: same parts, one column, scaled down ─────────────────── */
+@media (max-width: 1023px) {
+  .hero__inner.hero__inner { height: auto; padding: 24px 16px 120px !important; }
+  .hero__sun.hero__sun { left: auto; right: 4%; top: 120px; width: 26vw; height: 26vw; box-shadow: 0 0 0 2.2vw rgba(255, 201, 61, .5) !important; }
+  .hero__hermes.hero__hermes { left: auto; right: 2%; top: 70px; width: 26vw !important; }
+  .hero__controls .tokens { flex-wrap: wrap !important; justify-content: center; }
+  .paths2.sect { padding: 200px 16px 120px !important; }
+  .paths2__inner.paths2__inner { gap: 48px !important; }
+  .paths__sun.paths__sun { left: auto; right: 4%; top: 150px; width: 180px; height: 180px; box-shadow: 0 0 0 14px var(--s-pink); }
+  .paths__sun img { height: 124px !important; left: 44px; top: 8px; }
+  .result.result { flex-direction: column; }
+  .result__dish, .result__how { width: 100%; }
+  .game2__stage.game2__stage { height: min(68svh, 520px) !important; }
+  .game2__title .title-strip .strip__paper { width: auto; }
+  .persona__athena.persona__athena { left: 2%; width: 18vw; top: 160px; }
+  .persona__tarragon.float { left: auto !important; right: 2% !important; width: 18vw !important; }
+  .persona2__title.persona2__title, .join__kit.join__mosaic, .join__title.join__title, .join__lead.join__lead { translate: none; }
+}
+@media (max-width: 640px) {
+  .sign__title.strip { font-size: 44px !important; }
+  .sign__ask.strip, .sign__won.strip { font-size: 30px !important; }
+  .hero__stage.hero__stage { width: min(88vw, 340px) !important; }
+  .hero__sun.hero__sun { top: 96px; width: 34vw; height: 34vw; right: -4vw; }
+  .hero__hermes.hero__hermes { top: 60px; width: 30vw !important; right: -2vw; }
+  .chapter--cream .clouds { width: 760px; left: calc(50% - 380px); top: -60px; height: 177px; }
+  .chapter--cream .clouds__img { width: 760px !important; height: 177px !important; }
+  .paths2.sect { padding: 150px 16px 96px !important; }
+  .paths2__inner.paths2__inner { gap: 36px !important; }
+  .paths__sun.paths__sun { top: 120px; right: 2%; width: 110px; height: 110px; box-shadow: 0 0 0 9px var(--s-pink); }
+  .paths__sun img { height: 76px !important; left: 27px; top: 5px; }
+  .title-strip.strip, .title-strip--action.strip { font-size: 32px !important; }
+  .title-strip .strip__paper { white-space: nowrap !important; padding: 3px 12px 6px !important; }
+  .result.result { padding: 16px; gap: 20px; }
+  .result__photo.result__photo { height: 220px !important; }
+  .result__name { font-size: 28px !important; }
+  .result__how { gap: 24px !important; }
+  .result__main { margin-top: -8px !important; }
+  .game2.game2 { padding: 48px 0 72px !important; }
+  .game2__sub.game2__sub { font-size: 15px !important; padding: 0 16px; text-align: center; }
+  .game2__steps.game2__steps { flex-wrap: wrap; justify-content: center; margin-bottom: 24px !important; }
+  .chapter--wine .bridge--icarus.bridge { width: 120px !important; left: auto; right: -8px; top: 8px; }
+  .persona2.persona2 { padding: 56px 16px 64px !important; }
+  .persona2__title.persona2__title { margin-bottom: 36px !important; }
+  .persona2__deck.persona2__deck { scale: .8; margin: -30px 0 -10px !important; }
+  .persona2__line.persona2__line { font-size: 15px !important; text-align: center; }
+  .persona__athena.persona__athena { display: none; }
+  .persona__tarragon.float { width: 70px !important; top: 24px !important; }
+  .join.join { padding: 48px 16px 72px !important; }
+  .join__kit.join__mosaic { width: 200px !important; }
+  .join__lead.join__lead { font-size: 15px !important; }
+}
+
+/* wheel pointer (Figma "pointer": ink triangle at 12 o'clock), replaces the drawn arrow */
+.wheel__arrow { display: none !important; }
+.wheel--paper::before { content: ""; position: absolute; z-index: 5; left: 50%; top: 7.1%; width: 22px; height: 14px; translate: -50% 0;
+  background: var(--c-ink); clip-path: polygon(0 0, 100% 0, 50% 100%); }
+
+/* fixes after the side-by-side check (2026-11-26) */
+.chapter.chapter--wine, .chapter.chapter--mustard { background-blend-mode: normal !important; }   /* an old multiply blend darkened the plum to near-black */
+.game2__scene { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.game2__scene-clouds { position: absolute; left: 0; top: 30px; width: 100%; height: 264px; object-fit: contain; opacity: .55; }
+.game2__scene-supra { position: absolute; left: 0; top: 41.5%; width: 100%; height: auto; aspect-ratio: 1040 / 371; object-fit: contain; }
+.game2__screen { z-index: 1; justify-content: flex-start !important; padding-top: 40px !important; }
+.game2__steps li { counter-increment: none; }
+.game2__steps li::before { color: transparent !important; background: rgba(255, 241, 220, .15) !important; width: 20px !important; height: 20px !important; }
+@media (min-width: 1024px) { .game2__sub.game2__sub { white-space: nowrap; } }
+/* Figma "line-height: normal" for Noto Sans Georgian ≈ 1.35 — 68px title = 105px strip */
+.title-strip .strip__paper, .sign__title .strip__paper, .sign__ask .strip__paper, .sign__won .strip__paper { line-height: 1.35 !important; }
+.game2 .container, .game2__inner, .persona2__inner { gap: 0 !important; row-gap: 0 !important; }
+.game2__sub.game2__sub, .game2__steps.game2__steps, .game2__title.game2__title, .persona2__line.persona2__line { margin-top: 0 !important; }
+/* deck: each slot is a 240×340 card, the card fills its slot */
+.persona2__under, .persona2__top { width: 240px !important; height: 340px !important; }
+.persona2__deck .tarot { position: static !important; inset: auto !important; translate: none !important; rotate: 0deg !important; transform: none !important; }
+@media (min-width: 1024px) { .persona2__line.persona2__line { white-space: nowrap; } }
+@media (min-width: 1024px) { .game2__how { white-space: nowrap; max-width: none !important; } }
+.result__photo.paths2__dish { box-shadow: none !important; filter: none !important; outline: 0 !important; clip-path: none !important; rotate: 0deg !important; }
+@media (max-width: 640px) {
+  .hero__sun.hero__sun { top: 150px; width: 28vw; height: 28vw; right: -6vw; box-shadow: 0 0 0 2.4vw rgba(255, 201, 61, .5) !important; }
+  .hero__hermes.hero__hermes { top: 128px; width: 22vw !important; right: -1vw; }
+  .game2__scene-supra { left: -30%; width: 160%; top: auto; bottom: -4%; }
+  .game2__scene-clouds { width: 180%; left: -40%; height: auto; }
+  .persona2__deck.persona2__deck { margin: 0 0 -40px !important; transform-origin: top center; }
+}

@@ -190,7 +190,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
   return (
     <section className="game2 sect" id="game" aria-labelledby="game-title">
       <div className="container game2__inner">
-        <h2 id="game-title" className="section-title display game2__title"><Strip text="სუფრის მფრინავი" straight className="title-strip title-strip--action" /></h2>
+        <h2 id="game-title" className="section-title display game2__title"><Strip text={toMtavruli("სუფრის მფრინავი")} straight className="title-strip title-strip--action" /></h2>
         <p className="game2__sub">გაიფრინე სუფრაზე: შეჭამე ყველა კერძი, აარიდე წიწაკას. თამადა ელოდება.</p>
 
         <ol className="game2__steps" aria-label="სუფრის რიგი">
@@ -214,11 +214,18 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
           )}
 
           {screen === "idle" && (
+            /* Figma v8 start frame: soft clouds (55%) and the supra on clouds, drawn as still images until play starts */
+            <div className="game2__scene" aria-hidden="true">
+              <Image className="game2__scene-clouds" src="/collage/clouds-soft.webp" alt="" width={1600} height={406} sizes="1040px" />
+              <Image className="game2__scene-supra" src="/collage/supra-clouds.webp" alt="" width={1600} height={571} sizes="1040px" />
+            </div>
+          )}
+          {screen === "idle" && (
             <div className="game2__screen">
               <Image className="game2__hero" src="/collage/hermes-sm.webp" alt="" width={444} height={759} sizes="120px" />
               <p className="game2__how"><b>ჰერმესს შია.</b> თითით ან მაუსით ატარე სუფრაზე, შეჭამე კერძები, აარიდე წიწაკას.</p>
               <p className="game2__rules">4 რიგი · 3 სიცოცხლე</p>
-              <button className="btn" onClick={start}>▶ აფრენა</button>
+              <button className="btn" onClick={start}>აფრენა</button>
             </div>
           )}
 
