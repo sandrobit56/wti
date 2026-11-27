@@ -415,3 +415,102 @@
   .rows9x li { grid-template-columns: 56px 1fr; }
   .sticker9 { width: 48px; height: 48px; grid-row: 1 / 3; }
 }
+
+/* ════ v9.4 (2026-11-27): pop-ups, sheets, forms and their states in the v9 language ════
+   One set of states everywhere:
+     quiet   white surface, 1.5px #ece7e1 border
+     hover   border → ink 45%, lifts 1px
+     chosen  cream fill, ink border, bold
+     primary coral pill with the 3px #a8253b lip (B1); secondary white pill with border    */
+
+/* surfaces */
+.modal::backdrop { background: rgba(28, 26, 23, .42) !important; backdrop-filter: blur(6px) !important; -webkit-backdrop-filter: blur(6px) !important; }
+.modal .modal__card, .bsheet .modal__card, .bs, .sheet__card { background: #fff !important; background-image: none !important; border-radius: 24px !important;
+  border: 1px solid rgba(28, 26, 23, .06) !important; box-shadow: 0 40px 90px -30px rgba(28, 26, 23, .45) !important; }
+@media (max-width: 640px) { .bsheet .modal__card, .modal .modal__card { border-radius: 24px 24px 0 0 !important; } }
+.bs__top, .bs__foot { background: #fff !important; background-image: none !important; }
+.bs__foot { border-top: 1px solid #f1ece6 !important; }
+.bs__grab { background: #e6e0d9 !important; }
+
+/* close button: soft round, ink on hover */
+.bs__close, .modal__close, .panel__close { width: 36px !important; height: 36px !important; border-radius: 50% !important; border: 0 !important;
+  background: #f4f1ed !important; color: var(--c-ink) !important; transition: background-color .15s, rotate .2s !important; }
+.bs__close svg path, .modal__close svg path, .panel__close svg path { stroke: currentColor !important; }
+.bs__close:hover, .modal__close:hover, .panel__close:hover { background: var(--c-ink) !important; color: var(--c-paper) !important; rotate: 90deg; transform: none !important; }
+
+/* titles inside pop-ups speak the page's title face */
+.modal .modal__name, .modal .panel__title, .modal .gallery__title, .modal .quiz__q, .modal .quiz__result h2, .bs__top h2 {
+  font-family: var(--title9) !important; font-weight: 400 !important; letter-spacing: 1px !important; color: var(--c-ink) !important; text-transform: none !important; }
+.modal .modal__name { color: var(--c9-coral) !important; }
+.modal .caps, .modal .more__h, .modal .h3-note { font: 700 12px/1.3 var(--font) !important; letter-spacing: .06em !important; color: rgba(28, 26, 23, .6) !important; }
+
+/* buttons */
+.modal .pill.pill--dark, .modal .btn, .bs__foot .pill--dark, .panel__actions .pill--dark, .gallery .btn {
+  background: var(--c-action) !important; color: var(--c-paper) !important; border: 0 !important; border-radius: 999px !important;
+  box-shadow: 0 3px 0 #a8253b !important; filter: none !important; padding: 13px 24px !important; font: 700 15px/normal var(--font) !important;
+  transition: background-color .15s, translate .15s !important; transform: none !important; rotate: 0deg !important; }
+.modal .pill.pill--dark:hover, .modal .btn:hover, .bs__foot .pill--dark:hover, .panel__actions .pill--dark:hover, .gallery .btn:hover { background: var(--c-ink) !important; box-shadow: 0 3px 0 #000 !important; }
+.modal .pill.pill--outline, .bs__foot .pill--outline, .panel__actions .pill--outline {
+  background: #fff !important; color: var(--c-ink) !important; border: 1.5px solid #ece7e1 !important; border-radius: 999px !important; box-shadow: none !important;
+  padding: 12px 22px !important; font: 700 15px/normal var(--font) !important; transform: none !important; rotate: 0deg !important; transition: border-color .15s !important; }
+.modal .pill.pill--outline:hover, .bs__foot .pill--outline:hover, .panel__actions .pill--outline:hover { border-color: rgba(28, 26, 23, .45) !important; background: #fff !important; }
+.modal .link { color: var(--c-ink) !important; text-decoration: underline !important; text-underline-offset: 3px; text-decoration-thickness: 1.5px !important; background: none !important; }
+.modal .link:hover { color: var(--c-action) !important; }
+
+/* chips (filters, moods, quiz chips) — same states as the hero tokens */
+.modal .chip, .modal .mood, .modal .place, .chips .chip {
+  background: #fff !important; color: var(--c-ink) !important; border: 1.5px solid #ece7e1 !important; border-radius: 999px !important;
+  box-shadow: none !important; transform: none !important; rotate: 0deg !important; font: 600 14px/normal var(--font) !important; min-height: 40px;
+  padding: 9px 16px !important; transition: border-color .15s, background-color .15s, translate .15s !important; }
+.modal .chip:hover, .modal .mood:hover, .modal .place:hover { border-color: rgba(28, 26, 23, .45) !important; translate: 0 -1px; }
+.modal .chip.on, .modal .mood.on, .modal .chip[aria-pressed="true"], .modal .mood[aria-pressed="true"] {
+  background: var(--c9-cream) !important; border-color: var(--c-ink) !important; font-weight: 800 !important; color: var(--c-ink) !important; }
+.modal .chip__ico, .modal .chip img { display: none !important; }
+.modal .chip__tick { color: var(--c-action) !important; }
+
+/* segmented (radius, budget) — like the "მივალ / შევუკვეთავ" switch */
+.modal .segmented { background: #fff !important; border: 1.5px solid #ece7e1 !important; border-radius: 999px !important; padding: 4px !important; box-shadow: none !important; }
+.modal .segmented button { background: transparent !important; color: var(--c-ink) !important; border-radius: 999px !important; box-shadow: none !important; font: 700 14px/1.2 var(--font) !important; }
+.modal .segmented button:hover:not(.on):not(:disabled) { background: #f6f2ee !important; }
+.modal .segmented button.on { background: var(--c-ink) !important; color: var(--c-paper) !important; }
+.modal .segmented button.on .seg__sub { color: rgba(255, 250, 242, .7) !important; }
+
+/* list rows (versions, venues, delivery, "more filters", quiz answers) */
+.modal .row-card, .modal .version, .modal .more, .modal .more__sum, .modal .quiz__a {
+  background: #fff !important; border: 1.5px solid #ece7e1 !important; border-radius: 14px !important; box-shadow: none !important; transform: none !important; }
+.modal a.row-card:hover, .modal .version:hover, .modal .more__sum:hover, .modal .quiz__a:hover { border-color: rgba(28, 26, 23, .45) !important; background: #fff !important; translate: 0 -1px; }
+.modal .quiz__a:active { translate: 0 0; scale: .99; }
+.modal .quiz__letter { background: var(--c-ink) !important; color: var(--c-paper) !important; border-radius: 50% !important; }
+.modal .quiz__a:hover .quiz__letter { background: var(--c-action) !important; }
+.modal .quiz__bar, .modal .quiz__bar > * { border-radius: 999px !important; }
+.modal .quiz__bar { background: #f1ece6 !important; }
+.modal .quiz__bar > * { background: var(--c-action) !important; }
+.modal .version__icon, .modal .row-card__side { filter: none !important; }
+
+/* critic form: boxed fields, clear focus */
+.join__form.join__form { padding: 28px !important; border-radius: 20px !important; gap: 16px !important; }
+.join__form label { font: 700 13px/1.3 var(--font) !important; color: var(--c-ink); }
+.join__form label small { font-weight: 500; opacity: .6; }
+.join__form input:not([type=checkbox]), .join__form select {
+  border: 1.5px solid #ece7e1 !important; border-radius: 12px !important; background: #fff !important; padding: 12px 14px !important;
+  font: 500 16px/1.3 var(--font) !important; color: var(--c-ink); transition: border-color .15s, box-shadow .15s !important; }
+.join__form input:not([type=checkbox]):hover, .join__form select:hover { border-color: rgba(28, 26, 23, .45) !important; }
+.join__form input:not([type=checkbox]):focus, .join__form select:focus { outline: none; border-color: var(--c-ink) !important; box-shadow: 0 0 0 4px rgba(241, 67, 94, .16) !important; }
+.join__form [aria-invalid="true"] { border-color: var(--c-action) !important; }
+.join__form input[type=checkbox] { accent-color: var(--c-action); width: 18px; height: 18px; }
+.join__form .btn9 { width: 100%; }
+.join__error { color: var(--c-action) !important; font: 600 14px/1.4 var(--font) !important; }
+.join__done { padding: 18px 20px; border-radius: 16px; background: #fff; border: 1.5px solid #ece7e1; font: 600 16px/1.4 var(--font); }
+
+/* keyboard focus everywhere: one coral ring */
+.modal button:focus-visible, .modal a:focus-visible, .btn9:focus-visible, .seg9 button:focus-visible, .row9:focus-visible, .table9__who:focus-visible {
+  outline: 2px solid var(--c-action) !important; outline-offset: 2px; }
+/* follow-ups after the side-by-side check */
+.modal .panel__title { font: 800 14px/1.3 var(--font) !important; letter-spacing: 0 !important; }   /* section labels: body face, not the title face */
+.modal .panel__title img { display: none !important; }
+.bs__top .panel__title, .modal .panel__head .panel__title { font: 400 28px/1.3 var(--title9) !important; letter-spacing: 1px !important; }
+.modal .modal__hero { background: #fbf7f3 !important; background-image: none !important; border-radius: 16px !important; }
+/* the old sliding mustard thumb under segmented controls → gone; the chosen option itself turns ink */
+.modal .segmented::before, .modal .segmented::after { display: none !important; }
+.modal .segmented button:disabled { opacity: .4 !important; }
+.modal .segmented button.on:disabled { background: #e9e4de !important; color: var(--c-ink) !important; }
