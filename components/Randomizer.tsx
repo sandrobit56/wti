@@ -318,6 +318,14 @@ export function Randomizer() {
     />
   );
 
+  /** A diner's seat (on the rim or in the list) opens the dish in front of them. */
+  function openSeat(d: number) {
+    if (!seatSlices) return;
+    const i = seatSlices[d];
+    setSpun((s) => (s ? { ...s, winner: i, why: d === 0 ? s.why : [] } : s));
+    setModalOpen(true);
+  }
+
   const addDiner = () => { setDiners((n) => Math.min(MAX_DINERS, n + 1)); setSpun((s) => (s?.landed ? null : s)); };
 
   return (
@@ -334,7 +342,7 @@ export function Randomizer() {
                   dishes={wheel} rotation={rotation} spinning={spinning} spinMs={spinMs} winnerIndex={winner} landedOnce={Boolean(spun?.landed)}
                   onSpin={(o) => doSpin(false, [], { ...DEFAULT_SPIN, offset: o })} onFling={onFling} onLanded={onLanded}
                   diners={seated} seatDishes={seatSlices ? seatSlices.map((i) => wheel[i].name) : null}
-                  onSeat={(d) => { if (!seatSlices) return; const i = seatSlices[d]; setSpun((s) => (s ? { ...s, winner: i, why: d === 0 ? s.why : [] } : s)); setModalOpen(true); }}
+                  onSeat={openSeat}
                   onAddDiner={addDiner}
                   onRemoveDiner={(d) => { void d; setDiners((n) => Math.max(1, n - 1)); setSpun((s) => (s?.landed ? null : s)); }}
                 />
@@ -342,11 +350,31 @@ export function Randomizer() {
             {/* Figma: "+ 1/5" sits at the wheel's lower right */}
             <button type="button" className="add-guest" onClick={addDiner} disabled={seated >= MAX_DINERS} aria-label={`დაამატე სტუმარი (${seated} / ${MAX_DINERS})`}>+ <span>{seated}/{MAX_DINERS}</span></button>
           </div>
-          {together && seatSlices && (
-            <p className="group-note" role="status">
-              {together.covered === seatSlices.length ? "ყველა ერთად" : `${together.covered} / ${seatSlices.length} ერთად`} — <strong>{venueLabel(together.cat)}</strong>
-              {together.cat && <a href={mapsSearchUrl(together.cat.replace(/_/g, " ") + " restaurant", place?.label ?? null)} target="_blank" rel="noopener noreferrer">იპოვე რუკაზე ↗</a>}
-            </p>
+          {/* group mode: everyone at the table in one tidy row — who, what they got, remove */}
+          {seated > 1 && (
+            <div className="table9">
+              <ul className="table9__seats">
+                {Array.from({ length: seated }, (_, i) => (
+                  <li key={i} className="table9__seat">
+                    <button className="table9__who" onClick={() => openSeat(i)} disabled={!seatSlices}
+                      aria-label={`${i === 0 ? "შენ" : `სტუმარი ${i + 1}`}${seatSlices ? `: ${wheel[seatSlices[i]].name}` : ""}`}>
+                      <span className="table9__n">{i + 1}</span>
+                      <Image src={`/illustrations/people/diner-${i + 1}.webp`} alt="" width={64} height={64} />
+                      <span className="table9__txt"><small>{i === 0 ? "შენ" : `სტუმარი ${i + 1}`}</small><b>{seatSlices ? wheel[seatSlices[i]].name : "…"}</b></span>
+                    </button>
+                    {i > 0 && !spinning && (
+                      <button className="table9__x" onClick={() => { setDiners((n) => Math.max(1, n - 1)); setSpun((s) => (s?.landed ? null : s)); }} aria-label={`მოაშორე სტუმარი ${i + 1}`}>×</button>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              {together && seatSlices && (
+                <p className="table9__note" role="status">
+                  {together.covered === seatSlices.length ? "ყველა ერთად" : `${together.covered} / ${seatSlices.length} ერთად`} — <strong>{venueLabel(together.cat)}</strong>
+                  {together.cat && <a href={mapsSearchUrl(together.cat.replace(/_/g, " ") + " restaurant", place?.label ?? null)} target="_blank" rel="noopener noreferrer">იპოვე რუკაზე ↗</a>}
+                </p>
+              )}
+            </div>
           )}
           <div className="hero__controls">
             <FilterTokens filters={filters} place={place?.label ?? null} radius={radius} onOpen={() => setSheetOpen(true)} />

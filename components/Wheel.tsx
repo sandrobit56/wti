@@ -3,7 +3,9 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-27
- * Version:     v10.3 — Figma 191:615: dark wine plate (colour in CSS), cream band, coral hub;
+ * Version:     v10.4 — group mode: seats are numbered busts on the rim only; their names, dishes
+ *              and remove buttons moved to one list under the wheel (was: pills and × all around);
+ *              v10.3 — Figma 191:615: dark wine plate (colour in CSS), cream band, coral hub;
  *              v10.2 — labels in Mkhedruli as in Figma v8;
  *              v10.1 — diners are marble busts; add button reads "+ სტუმარი";
  *              v10 — simpler, photo-first: each slice IS the dish photo (full wedge, no
@@ -103,7 +105,7 @@ function Defs({ uid }: { uid: string }) {
   );
 }
 
-export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedOnce, onSpin, onFling, onLanded, diners, seatDishes, onSeat, onAddDiner, onRemoveDiner }: Props) {
+export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedOnce, onSpin, onFling, onLanded, diners, seatDishes, onSeat, onAddDiner }: Props) {
   const n = dishes.length;
   const a = 360 / n;
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
@@ -213,8 +215,8 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
           <button className="seat__who" onClick={() => t.dish && onSeat(t.i)} disabled={!t.dish} tabIndex={-1} aria-hidden="true">
             <Image src={`/illustrations/people/diner-${t.i + 1}.webp`} alt="" width={96} height={96} />
           </button>
-          {t.i > 0 && !spinning && <button className="seat__x" onClick={() => onRemoveDiner(t.i)} aria-label={`მოაშორე სტუმარი ${t.i + 1}`}>×</button>}
-          {t.dish && <button className="seat-card" onClick={() => onSeat(t.i)} aria-label={`${t.i === 0 ? "შენ" : `სტუმარი ${t.i + 1}`}: ${t.dish}`}>{t.dish}</button>}
+          {/* v10.4: only a number here; names, dishes and "×" live in the tidy list under the wheel */}
+          <span className="seat__n" aria-hidden="true">{t.i + 1}</span>
         </div>
       ))}
       {diners < MAX_DINERS && !spinning && (

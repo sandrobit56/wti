@@ -4,7 +4,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-27
- * Version:     v2.0 — editorial: kicker + title stay on the left (sticky), drop-cap manifesto and
+ * Version:     v2.1 — stickers instead of 01/02/03, no kicker; v2.0 — editorial: kicker + title stay on the left (sticky), drop-cap manifesto and
  *              ruled numbered rows on the right, on cream paper; chapter label + how-it-works steps; one-strip title; v1.4 — word-mosaic pomegranate (collage) replaces the flat badge; v1.3 — flat critic badge (logo style, arc lettering) instead of the 3D kit; was v1.1 — "კრიტიკოსი" (not "მსაჯი"), no 3D jury figures, one button style
  * Description: The closing section's one action: "გახდი კრიტიკოსი" (become a critic).
  *              A 3D "critic's kit" (notebook, magnifier, medal, khinkali — reusable later for the
@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { checkSignup, DISTRICTS, LIMITS } from "@/lib/critics.ts";
 import { Lines } from "./Lines";
+import { Sticker9 } from "./Stickers9";
 
 type Status = { kind: "closed" } | { kind: "open"; error: string | null; field: string | null } | { kind: "sending" } | { kind: "done"; already: boolean } | { kind: "down" };
 
@@ -45,7 +46,6 @@ export function JoinCritics() {
       <div className="join9__inner">
         {/* editorial layout: the title + action stay put on the left while the manifesto reads on the right */}
         <div className="join9__side">
-          <p className="kicker9">05 · კრიტიკოსები</p>
           <h2 id="join-title" className="title9">გახდი კრიტიკოსი</h2>
         </div>
         <div className="join9__body">
@@ -54,9 +54,9 @@ export function JoinCritics() {
             სტუმრად შეამოწმებს და გულწრფელად დაწერს — რეკლამის, ფასდაკლების და მეგობრული „კარგია“-ს გარეშე.
           </p>
           <ol className="rows9x">
-            <li><span>01</span><b>შემოგვიერთდი</b><em>ორი წუთი: სახელი, ელფოსტა და რა გიყვარს.</em></li>
-            <li><span>02</span><b>გასინჯე</b><em>მიდი როგორც ჩვეულებრივი სტუმარი: ჭამე, დააკვირდი.</em></li>
-            <li><span>03</span><b>დაწერე პირდაპირ</b><em>რა იყო კარგი, რა — არა. შენი სიტყვა ბორბალსაც ასწავლის.</em></li>
+            <li><Sticker9 kind="join" /><b>შემოგვიერთდი</b><em>ორი წუთი: სახელი, ელფოსტა და რა გიყვარს.</em></li>
+            <li><Sticker9 kind="taste" /><b>გასინჯე</b><em>მიდი როგორც ჩვეულებრივი სტუმარი: ჭამე, დააკვირდი.</em></li>
+            <li><Sticker9 kind="write" /><b>დაწერე პირდაპირ</b><em>რა იყო კარგი, რა — არა. შენი სიტყვა ბორბალსაც ასწავლის.</em></li>
           </ol>
 
         {status.kind === "closed" && (
