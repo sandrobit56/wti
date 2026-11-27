@@ -3,8 +3,9 @@
  * File:        components/JoinCritics.tsx
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
- * Date:        2026-11-25
- * Version:     chapter label + how-it-works steps; one-strip title; v1.4 — word-mosaic pomegranate (collage) replaces the flat badge; v1.3 — flat critic badge (logo style, arc lettering) instead of the 3D kit; was v1.1 — "კრიტიკოსი" (not "მსაჯი"), no 3D jury figures, one button style
+ * Date:        2026-11-27
+ * Version:     v2.0 — editorial: kicker + title stay on the left (sticky), drop-cap manifesto and
+ *              ruled numbered rows on the right, on cream paper; chapter label + how-it-works steps; one-strip title; v1.4 — word-mosaic pomegranate (collage) replaces the flat badge; v1.3 — flat critic badge (logo style, arc lettering) instead of the 3D kit; was v1.1 — "კრიტიკოსი" (not "მსაჯი"), no 3D jury figures, one button style
  * Description: The closing section's one action: "გახდი კრიტიკოსი" (become a critic).
  *              A 3D "critic's kit" (notebook, magnifier, medal, khinkali — reusable later for the
  *              rating system), a short invitation and ONE button. The
@@ -15,6 +16,7 @@
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { checkSignup, DISTRICTS, LIMITS } from "@/lib/critics.ts";
+import { Lines } from "./Lines";
 
 type Status = { kind: "closed" } | { kind: "open"; error: string | null; field: string | null } | { kind: "sending" } | { kind: "done"; already: boolean } | { kind: "down" };
 
@@ -39,15 +41,23 @@ export function JoinCritics() {
 
   return (
     <section className="join9 sect" id="join" aria-labelledby="join-title">
+      <Lines kind="page" />
       <div className="join9__inner">
-        <h2 id="join-title" className="title9 title9--center">გახდი კრიტიკოსი</h2>
-        <p className="lead9">ჭამ, აკვირდები, გული გწყდება ცუდ ხინკალზე? ვეძებთ ადამიანებს, ვინც რესტორნებს შეამოწმებს და გულწრფელად დაწერს.</p>
-        {/* how it works: three plain steps — number, verb, one line */}
-        <ol className="steps9">
-          <li><b>შემოგვიერთდი</b><span>ორი წუთი: სახელი, ელფოსტა და რა გიყვარს.</span></li>
-          <li><b>გასინჯე</b><span>მიდი როგორც ჩვეულებრივი სტუმარი: ჭამე, დააკვირდი.</span></li>
-          <li><b>დაწერე პირდაპირ</b><span>რა იყო კარგი, რა — არა. რეკლამის გარეშე.</span></li>
-        </ol>
+        {/* editorial layout: the title + action stay put on the left while the manifesto reads on the right */}
+        <div className="join9__side">
+          <p className="kicker9">05 · კრიტიკოსები</p>
+          <h2 id="join-title" className="title9">გახდი კრიტიკოსი</h2>
+        </div>
+        <div className="join9__body">
+          <p className="dropcap9">
+            ჭამ, აკვირდები, გული გწყდება ცუდ ხინკალზე? ვეძებთ ადამიანებს, ვინც რესტორნებს ჩვეულებრივ
+            სტუმრად შეამოწმებს და გულწრფელად დაწერს — რეკლამის, ფასდაკლების და მეგობრული „კარგია“-ს გარეშე.
+          </p>
+          <ol className="rows9x">
+            <li><span>01</span><b>შემოგვიერთდი</b><em>ორი წუთი: სახელი, ელფოსტა და რა გიყვარს.</em></li>
+            <li><span>02</span><b>გასინჯე</b><em>მიდი როგორც ჩვეულებრივი სტუმარი: ჭამე, დააკვირდი.</em></li>
+            <li><span>03</span><b>დაწერე პირდაპირ</b><em>რა იყო კარგი, რა — არა. შენი სიტყვა ბორბალსაც ასწავლის.</em></li>
+          </ol>
 
         {status.kind === "closed" && (
           <button className="btn9" onClick={() => setStatus({ kind: "open", error: null, field: null })}>მინდა შეფასება</button>
@@ -70,7 +80,7 @@ export function JoinCritics() {
               <span>ვეთანხმები, რომ ეს მონაცემები შეინახოთ მხოლოდ კრიტიკოსების შესარჩევად. <Link href="/privacy#critics">დეტალები</Link></span>
             </label>
             {status.kind === "open" && status.error && <p className="join__error" role="alert">{status.error}</p>}
-            <button className="btn" type="submit" disabled={status.kind === "sending"}>{status.kind === "sending" ? "იგზავნება…" : "გაგზავნა"}</button>
+            <button className="btn9" type="submit" disabled={status.kind === "sending"}>{status.kind === "sending" ? "იგზავნება…" : "გაგზავნა"}</button>
           </form>
         )}
 
@@ -78,6 +88,7 @@ export function JoinCritics() {
           <p className="join__done" role="status">{status.already ? "უკვე სიაში ხარ — დაგიკავშირდებით." : "მადლობა! როცა პირველ შეფასებას დავგეგმავთ, მოგწერთ."}</p>
         )}
         {status.kind === "down" && <p className="join__done" role="status">ფორმა ჯერ არ არის ჩართული — ცოტა ხანში დაბრუნდი.</p>}
+        </div>
       </div>
     </section>
   );

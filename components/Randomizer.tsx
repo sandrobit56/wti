@@ -421,14 +421,14 @@ export function Randomizer() {
         />
       </div>
       </div>
-      <div className="chapter chapter--plain chapter--dots">
+      <div className="chapter chapter--plain chapter--ink">
         <SupraFlyer onDish={openDish} />
       </div>
-      <div className="chapter chapter--plain">
+      <div className="chapter chapter--plain chapter--dots">
         <PersonaSection persona={persona} onStart={() => setQuizOpen(true)} onGallery={() => setGalleryOpen(true)} />
       {galleryOpen && <PersonaGallery current={prefs.persona} onClose={() => setGalleryOpen(false)} onStart={() => { setGalleryOpen(false); setQuizOpen(true); }} onDish={(slug) => { setGalleryOpen(false); openDish(slug); }} />}
       </div>
-      <div className="chapter chapter--plain chapter--dots">
+      <div className="chapter chapter--plain chapter--paper">
         <JoinCritics />
       </div>
     </>

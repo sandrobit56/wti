@@ -4,13 +4,14 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-27
- * Version:     v9 — one style with the page (white paper, BPG title, light sky stage); HUD in
+ * Version:     v9.2 — the hero is ჭამია, the logo chick (chomps, flaps, gulps), not Hermes;
+ *              v9 — one style with the page (white paper, BPG title, light sky stage); HUD in
  *              three fixed places (course progress bar · score + combo · lives); score, ×5 combo and
  *              a best score in this browser; clean start/over cards; no stepper, no toast art.
  *              v8.1 one-strip title; v8 — surreal sky: Hermes flies over a supra floating on pink clouds
  *              with marble ruins (parallax, mirrored tiles); start screen explains the goal;
  *              v7.4 collage chili + toast art, no emoji; v1.0 — replaces "კუჭის ჩელენჯი" (no story arc, per Sandro's review)
- * Description: "სუფრის მფრინავი". Hermes flies over a supra floating in a pink sky.
+ * Description: "სუფრის მფრინავი". ჭამია (the logo chick) flies over a supra floating in a pink sky.
  *              Four courses = a story line (stepper above the stage); the tamada's toast is the
  *              break between them; the end reveals your stomach's persona (tarot card).
  *              Rules live in lib/flyer.ts (tested); this file only draws and reads input.
@@ -25,6 +26,8 @@ import { stomachPersona } from "@/lib/game.ts";
 import { PERSONAS } from "@/lib/personas.ts";
 import { DISHES } from "@/lib/catalog.ts";
 import { stickerSrc } from "@/lib/stickers.ts";
+import { ChickMark, drawChick } from "./Chick";
+import { Lines } from "./Lines";
 import type { PersonaId } from "@/lib/quiz.ts";
 
 type Item = { x: number; y: number; bob: number; what: Spawn };
@@ -58,7 +61,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
   const items = useRef<Item[]>([]);
   const pops = useRef<Pop[]>([]);
   const me = useRef({ x: 120, y: 160, ty: 160, tx: 120, vy: 0 });
-  const clock = useRef({ spawnIn: 0.6, spin: 0, shake: 0 });
+  const clock = useRef({ spawnIn: 0.6, spin: 0, shake: 0, t: 0, gulp: 0 });
   const imgs = useRef<Record<string, HTMLImageElement>>({});
 
   // preload art once
@@ -66,7 +69,6 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
     const load = (key: string, src: string) => { const im = new window.Image(); im.src = src; imgs.current[key] = im; };
     for (const c of COURSES) for (const s of c.dishes) load(s, stickerSrc(s));
     load("chili", "/collage/chili.webp");   // collage cut-out (v7.4)
-    load("mascot", "/collage/hermes-sm.webp");   // v8: Hermes, god of delivery, flies the supra
     load("supra", "/collage/supra-clouds.webp");  // feast table on pink clouds with marble ruins
     load("clouds", "/collage/clouds-soft.webp");   // bottom faded, no hard edge in the sky
   }, []);
@@ -83,7 +85,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
 
   function start() {
     game.current = START; items.current = []; pops.current = [];
-    clock.current = { spawnIn: 0.6, spin: 0, shake: 0 };
+    clock.current = { spawnIn: 0.6, spin: 0, shake: 0, t: 0, gulp: 0 };
     setHud(START); setPersona(null); setScreen("play");
     stageRef.current?.focus({ preventScroll: true });
   }
@@ -116,6 +118,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
 
       // ── update
       c.spin += dt * speed * 0.0009;
+      c.t += dt; c.gulp = Math.max(0, c.gulp - dt);
       m.ty = Math.max(skyTop, Math.min(skyBottom, m.ty));
       m.tx = Math.max(W * 0.1, Math.min(W * 0.5, m.tx));
       const py = m.y; m.y += (m.ty - m.y) * Math.min(1, dt * 7); m.x += (m.tx - m.x) * Math.min(1, dt * 4);
@@ -135,7 +138,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
           const s = onCatch(game.current, it.what);
           game.current = s; setHud(s);
           const bad = it.what.kind === "chili";
-          if (bad) c.shake = 0.35;
+          if (bad) c.shake = 0.35; else c.gulp = 0.22;
           pops.current.push({ x: m.x, y: m.y - 30, t: 0, bad, text: bad ? "−♥  ×0" : s.combo > 1 ? `+${POINTS * s.combo}  ×${s.combo}` : `+${POINTS}` });
           if (s.phase === "toast") { items.current = []; setScreen("toast"); }
           if (s.phase === "won" || s.phase === "lost") { finish(s); return; }
@@ -172,11 +175,11 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
         if (im?.complete) ctx.drawImage(im, it.x - s / 2, y - s / 2, s, s);
       }
       // mascot, tilted by its climb
-      const mascot = imgs.current.mascot;
-      if (mascot?.complete) {
-        ctx.save(); ctx.translate(m.x, m.y); ctx.rotate(Math.max(-0.5, Math.min(0.5, m.vy * 0.0012)));
-        const h = MASCOT_R * 4, w = h * (444 / 759); ctx.drawImage(mascot, -w / 2, -h * 0.55, w, h); ctx.restore();
-      }
+      // ჭამია: the logo chick chomps as it flies, opens wide on a catch, flashes red on chili
+      const near = items.current.some((it) => it.what.kind === "dish" && it.x > m.x && it.x - m.x < 160 && Math.abs(it.y - m.y) < 70);
+      const mouth = c.gulp > 0 ? 0.75 : near ? 0.55 : 0.12 + 0.38 * Math.abs(Math.sin(c.t * 9));
+      drawChick(ctx, m.x, m.y, MASCOT_R * 1.15, Math.max(-0.45, Math.min(0.45, m.vy * 0.0011)),
+        { mouth, wing: Math.sin(c.t * (reduce ? 8 : 16)) * 0.55, hurt: c.shake > 0 });
       ctx.font = "800 22px 'Noto Sans Georgian Variable', sans-serif"; ctx.textAlign = "center";
       for (const p of pops.current) { ctx.globalAlpha = 1 - p.t / 0.8; ctx.fillStyle = p.bad ? "#D92F4C" : "#1C1A17"; ctx.fillText(p.text, p.x, p.y); }
       ctx.globalAlpha = 1; ctx.restore();
@@ -201,9 +204,10 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
   const playing = screen === "play" || screen === "toast";
   return (
     <section className="game9 sect" id="game" aria-labelledby="game-title">
+      <Lines kind="slices" />
       <div className="game9__inner">
         <h2 id="game-title" className="title9 title9--center">სუფრის მფრინავი</h2>
-        <p className="lead9">ჰერმესს შია. გაატარე სუფრაზე, შეჭამე ოთხივე რიგი და აარიდე წიწაკას.</p>
+        <p className="lead9">ჭამიას შია. გაატარე სუფრაზე, შეჭამე ოთხივე რიგი და აარიდე წიწაკას.</p>
 
         <div
           ref={stageRef} className={`game9__stage game9__stage--${screen}`} tabIndex={0}
@@ -232,7 +236,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
           )}
           {screen === "idle" && (
             <div className="card9 game9__card">
-              <Image className="game9__hermes" src="/collage/hermes-sm.webp" alt="" width={444} height={759} sizes="72px" />
+              <ChickMark className="game9__chick" size={104} />
               <ul className="game9__rules">
                 <li><b>4 რიგი</b><span>სალათები → ცხელი → მწვადი → ტკბილეული</span></li>
                 <li><b>×5</b><span>კერძები ზედიზედ = მეტი ქულა</span></li>
@@ -252,6 +256,7 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
 
           {(screen === "won" || screen === "lost") && (
             <div className="card9 game9__card game9__card--over" role="status">
+              <ChickMark className="game9__chick" size={72} mouth={screen === "won" ? 40 : 6} />
               <p className="game9__verdict">{screen === "won" ? "სუფრა დაასრულე!" : `წიწაკამ გაჯობა · ${course.name}`}</p>
               <p className="game9__final"><b>{hud.score}</b> ქულა{best?.record ? <span className="game9__record">ახალი რეკორდი</span> : best ? <small> · რეკორდი {best.score}</small> : null}</p>
               {persona && (

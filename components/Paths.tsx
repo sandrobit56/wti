@@ -25,6 +25,7 @@ import { useEffect, useState } from "react";
 import type { Dish } from "@/lib/catalog.ts";
 import { stickerSrc } from "@/lib/stickers.ts";
 import { typePhoto } from "@/lib/photos.ts";
+import { Lines } from "./Lines";
 import { deliveryLinks, mapsDirectionsUrl, mapsSearchUrl, type RadiusKm, type VenueMatch } from "@/lib/places.ts";
 import { MY_LOCATION, type Place } from "./FilterPanel";
 
@@ -79,6 +80,7 @@ export function Paths({ dish, place, radius, group, onPickPlace, onSpin }: Props
 
   return (
     <section className="paths9 sect" id="paths" aria-labelledby="paths-title">
+      <Lines kind="plate" />
       <div className="paths9__card">
         <div className="paths9__how">
           <h2 id="paths-title" className="title9">სად შეჭამ?</h2>

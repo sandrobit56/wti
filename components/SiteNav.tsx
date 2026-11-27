@@ -39,7 +39,7 @@ const SECTIONS: SectionId[] = ["wheel", "paths", "game", "persona", "join"];
  * sections are rendered client-side after the header mounts, so an observer set up
  * on mount would find nothing.
  */
-function useActiveSection(): SectionId {
+export function useActiveSection(): SectionId {
   const [active, setActive] = useState<SectionId>("wheel");
   useEffect(() => {
     let raf = 0;

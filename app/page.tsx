@@ -14,6 +14,7 @@ import Link from "next/link";
 import { RandomizerClient } from "@/components/RandomizerClient";
 import { Intro } from "@/components/Intro";
 import { SiteHeader, SiteTabbar } from "@/components/SiteNav";
+import { ChapterRail } from "@/components/ChapterRail";
 
 // Runs before first paint: if the intro was already played this session, hide it
 // via <html data-intro="seen"> so returning visitors never see it flash.
@@ -25,6 +26,7 @@ export default function Home() {
       <script dangerouslySetInnerHTML={{ __html: INTRO_FLAG }} />
       <Intro />
       <SiteHeader />
+      <ChapterRail />
 
       <main>
         <RandomizerClient />

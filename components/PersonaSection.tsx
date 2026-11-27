@@ -15,12 +15,14 @@
  */
 import type { Persona } from "@/lib/personas.ts";
 import { TarotCard } from "./TarotCard";
+import { Lines } from "./Lines";
 
 type Props = { persona: Persona | null; onStart: () => void; onGallery: () => void };
 
 export function PersonaSection({ persona, onStart, onGallery }: Props) {
   return (
     <section className="persona9 sect" id="persona" aria-labelledby="persona-title">
+      <Lines kind="card" />
       <div className="persona9__card">
         <div className="persona9__text">
           <h2 id="persona-title" className="title9">{persona ? "შენ ხარ ეს" : "გაიგე შენი პერსონა"}</h2>

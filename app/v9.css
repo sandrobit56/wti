@@ -292,3 +292,88 @@
   .game9__rules b { font-size: 14px; white-space: nowrap; }
   .game9__rules li { grid-template-columns: 60px 1fr; }
 }
+
+/* ════ v9.2 (2026-11-27): Shopify-Editions-style rhythm — chapter rail, construction lines,
+   scroll reveals; sections differ by surface and composition, not by decoration ════ */
+
+/* surfaces: white dots (hero, persona) · white (place) · ink (game) · cream paper (critic) */
+.chapter.chapter--ink { background: var(--c-ink) !important; color: var(--c9-cream); }
+.chapter.chapter--paper { background: var(--c9-cream) !important; }
+.chapter--ink .title9 { color: var(--c9-cream); }
+.chapter--ink .lead9 { color: rgba(245, 242, 235, .72); }
+.chapter--ink .game9__stage { border-color: rgba(245, 242, 235, .12); box-shadow: 0 40px 80px -40px rgba(241, 67, 94, .45); }
+
+/* chapter rail (≥1280): numbers + names on the left edge, the line fills with the page scroll */
+.rail9 { display: none; }
+@media (min-width: 1280px) {
+  .rail9 { display: flex; gap: 14px; position: fixed; z-index: 55; left: 28px; top: 50%; translate: 0 -50%; mix-blend-mode: difference; color: #fff; }
+  .rail9 ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+  .rail9 a { display: flex; gap: 10px; align-items: baseline; color: inherit; text-decoration: none; font: 600 12px/1 var(--font); opacity: .45; transition: opacity .2s; }
+  .rail9 a span { font-weight: 800; font-variant-numeric: tabular-nums; }
+  .rail9 a:hover, .rail9 a.on { opacity: 1; }
+  .rail9 a.on { font-weight: 800; }
+  .rail9__track { position: relative; width: 1.5px; background: rgba(255, 255, 255, .25); }
+  .rail9__track i { position: absolute; inset: 0; background: #fff; transform-origin: top; scale: 1 0; }
+  @supports (animation-timeline: scroll()) {
+    .rail9__track i { animation: rail9-fill linear both; animation-timeline: scroll(root); }
+  }
+}
+@keyframes rail9-fill { to { scale: 1 1; } }
+
+/* construction lines: hairlines behind each section, drawn in as it enters */
+.sect { position: relative; }
+.lines9 { position: absolute; z-index: 0; inset: 0; width: 100%; height: min(100%, 900px); pointer-events: none; overflow: visible; }
+.lines9 path { fill: none; stroke: var(--c9-coral); stroke-width: 1; vector-effect: non-scaling-stroke; opacity: .35; stroke-dasharray: 1; stroke-dashoffset: 0; }
+.chapter--ink .lines9 path { stroke: var(--c9-cream); opacity: .18; }
+.paths9 > :not(.lines9), .game9 > :not(.lines9), .persona9 > :not(.lines9), .join9 > :not(.lines9) { position: relative; z-index: 1; }
+
+/* scroll reveals (scroll-driven CSS; browsers without it just show everything) */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .lines9 path { animation: draw9 linear both; animation-timeline: view(); animation-range: entry 10% cover 45%; }
+    .chapter .title9, .chapter .lead9, .chapter .kicker9 { animation: rise9 linear both; animation-timeline: view(); animation-range: entry 0% entry 70%; }
+    .chapter .dish9, .chapter .persona9__tarot, .chapter .game9__stage { animation: lift9 linear both; animation-timeline: view(); animation-range: entry 0% cover 35%; }
+    .rows9x li { animation: rise9 linear both; animation-timeline: view(); animation-range: entry 0% entry 90%; }
+    .persona9__tarot .tarot { animation: tilt9 linear both; animation-timeline: view(); animation-range: cover 0% cover 100%; }
+  }
+}
+@keyframes draw9 { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes rise9 { from { opacity: 0; translate: 0 40px; } to { opacity: 1; translate: 0 0; } }
+@keyframes lift9 { from { opacity: .2; scale: .92; translate: 0 60px; } to { opacity: 1; scale: 1; translate: 0 0; } }
+@keyframes tilt9 { from { rotate: -6deg; } to { rotate: 6deg; } }
+
+/* game hero: ჭამია */
+.game9__chick { display: block; }
+
+/* critic: editorial — sticky title column + drop-cap manifesto + ruled numbered rows */
+.join9 { padding: 180px 32px 200px; }
+.join9__inner { max-width: 1073px; margin: 0 auto; display: grid; grid-template-columns: 400px 1fr; gap: 80px; align-items: start; }
+.join9__side { position: sticky; top: 140px; display: flex; flex-direction: column; gap: 16px; }
+.join9__side .title9 { font-size: 64px; line-height: 1.25; }
+.kicker9 { margin: 0; font: 700 13px/1 var(--font); letter-spacing: .12em; text-transform: uppercase; color: var(--c-action); }
+.join9__body { display: flex; flex-direction: column; gap: 48px; align-items: flex-start; }
+.dropcap9 { margin: 0; font: 400 22px/1.55 var(--font); color: var(--c-ink); }
+.dropcap9::first-letter { float: left; margin: 6px 14px 0 0; font: 400 96px/0.8 var(--title9); color: var(--c9-coral); }
+.rows9x { list-style: none; margin: 0; padding: 0; width: 100%; counter-reset: none; }
+.rows9x li { display: grid; grid-template-columns: 64px 220px 1fr; gap: 16px; align-items: baseline; padding: 24px 0; border-top: 1.5px solid var(--c-ink); }
+.rows9x li:last-child { border-bottom: 1.5px solid var(--c-ink); }
+.rows9x span { font: 800 15px/1 var(--font); font-variant-numeric: tabular-nums; color: var(--c-action); }
+.rows9x b { font: 800 22px/1.2 var(--font); color: var(--c-ink); }
+.rows9x em { font: 400 16px/1.5 var(--font); font-style: normal; color: rgba(28, 26, 23, .75); }
+.join9 .join__form { max-width: 100%; }
+
+@media (max-width: 1023px) {
+  .join9__inner { grid-template-columns: 1fr; gap: 32px; }
+  .join9__side { position: static; }
+}
+@media (max-width: 760px) {
+  .join9 { padding: 96px 16px 120px; }
+  .join9__side .title9 { font-size: 40px; }
+  .dropcap9 { font-size: 18px; }
+  .dropcap9::first-letter { font-size: 72px; }
+  .rows9x li { grid-template-columns: 44px 1fr; row-gap: 4px; padding: 18px 0; }
+  .rows9x em { grid-column: 2; }
+  .lines9 { height: 520px; }
+}
+/* inside the game stage text is always ink (the ink chapter sets cream for its own copy) */
+.chapter--ink .game9__stage { color: var(--c-ink); }
