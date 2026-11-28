@@ -730,3 +730,44 @@
 /* the big blocks no longer fade in (a half-faded game stage looked broken after an anchor jump) — they only rise */
 @keyframes lift9 { from { scale: .96; translate: 0 40px; } to { scale: 1; translate: 0 0; } }
 .sect { scroll-margin-top: 0; }
+
+/* ════ v9.7 (2026-11-28): "სუფრა" — the group column left of the wheel ════ */
+.table9, .seat--paper, .seat__n { display: none !important; }
+.table9p { position: absolute; z-index: 5; left: max(24px, calc(50% - 640px)); top: 300px; width: 260px; padding: 18px; display: flex; flex-direction: column; gap: 12px;
+  background: rgba(255, 255, 255, .82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(28, 26, 23, .06); border-radius: 22px; box-shadow: 0 24px 50px -30px rgba(28, 26, 23, .45); text-align: left; }
+.table9p__head { display: flex; align-items: baseline; justify-content: space-between; }
+.table9p__head b { font: 400 26px/1 var(--title9); color: var(--c9-coral); letter-spacing: 1px; }
+.table9p__head span { font: 700 13px/1 var(--font); color: rgba(28, 26, 23, .55); }
+.table9p__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.table9p__row { position: relative; display: flex; align-items: center; gap: 10px; padding: 6px 8px 6px 6px; border-radius: 999px; background: #fff; border: 1.5px solid #ece7e1;
+  transition: border-color .12s, background-color .12s, scale .12s; }
+.table9p__row:focus-within { border-color: var(--c-ink); }
+.table9p__row.is-lit { border-color: var(--c9-coral); background: #fff1f3; scale: 1.03; }
+.table9p__row.is-payer { border-color: var(--c-action); background: var(--c-action); animation: pay9 .5s ease-out; }
+.table9p__row.is-payer .table9p__name { color: #fff; }
+@keyframes pay9 { 0% { scale: 1; } 40% { scale: 1.08; rotate: -2deg; } 70% { rotate: 1.5deg; } 100% { scale: 1.03; rotate: 0deg; } }
+.table9p__ava { flex: none; width: 34px !important; height: 34px !important; border-radius: 50%; object-fit: cover; background: #f4efe9; }
+.table9p__name { flex: 1; min-width: 0; border: 0; background: transparent; padding: 6px 2px; font: 700 15px/1.2 var(--font); color: var(--c-ink); outline: none; }
+.table9p__name::placeholder { color: rgba(28, 26, 23, .4); }
+.table9p__x { flex: none; width: 26px; height: 26px; border: 0; border-radius: 50%; background: #f4f1ed; color: var(--c-ink); cursor: pointer; font: 700 15px/1 var(--font); }
+.table9p__x:hover:not(:disabled) { background: var(--c-ink); color: var(--c-paper); }
+.table9p__pays { flex: none; padding: 5px 10px; border-radius: 999px; background: #fff; color: var(--c-action); font: 800 12px/1 var(--font); }
+.table9p__add { padding: 11px 14px; border: 1.5px dashed rgba(28, 26, 23, .3); border-radius: 999px; background: transparent; cursor: pointer; font: 700 14px/1 var(--font); color: var(--c-ink); transition: border-color .15s, background-color .15s; }
+.table9p__add:hover:not(:disabled) { border-color: var(--c-ink); background: #fff; }
+.table9p__hint { margin: 0; font: 400 13px/1.45 var(--font); color: rgba(28, 26, 23, .7); }
+.table9p__pay { padding: 12px 16px; border: 0; border-radius: 999px; background: var(--c-ink); color: var(--c-paper); cursor: pointer; font: 700 15px/1 var(--font); transition: background-color .15s; }
+.table9p__pay:hover:not(:disabled) { background: var(--c-action); }
+.table9p button:disabled { opacity: .5; cursor: default; }
+.table9p button:focus-visible, .table9p__name:focus-visible { outline: 2px solid var(--c-action); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .table9p__row { transition: none; } .table9p__row.is-payer { animation: none; } }
+/* narrow screens: the panel joins the flow under the chips */
+@media (max-width: 1099px) {
+  .table9p { position: static; order: 4; width: min(100%, 420px); margin: 24px auto 0; }
+}
+
+/* chips: one row, the icon chip never drops to a second line */
+@media (min-width: 761px) {
+  .hero__controls .tokens { flex-wrap: nowrap !important; max-width: none !important; }
+  .hero__controls.hero__controls { width: max-content !important; max-width: 100vw; }
+}

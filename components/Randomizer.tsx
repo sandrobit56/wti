@@ -21,7 +21,7 @@ import { DISHES, type Dish } from "@/lib/catalog.ts";
 import type { RadiusKm } from "@/lib/places.ts";
 import { PERSONAS } from "@/lib/personas.ts";
 import { applyQuiz, scoreQuiz } from "@/lib/quiz.ts";
-import { NO_PREFS, normalizeFilters, SpinError, displayName, explain, pickVariants, seeded, spin, targetRotation, type Filters, type Mood, type Prefs, type SpinContext, type Win, isAllowed } from "@/lib/spin.ts";
+import { NO_PREFS, normalizeFilters, SpinError, displayName, explain, pickVariants, seeded, spin, targetRotation, type Filters, type Mood, type Prefs, type SpinContext, type Win } from "@/lib/spin.ts";
 import { FilterPanel, MY_LOCATION, type Place } from "./FilterPanel";
 import { coarse } from "@/lib/security.ts";
 import { Paths } from "./Paths";
@@ -34,8 +34,9 @@ import { Sheet } from "./Sheet";
 import Image from "next/image";
 import { HeroTitle } from "./HeroTitle";
 import { JoinCritics } from "./JoinCritics";
-import { mapsSearchUrl } from "@/lib/places.ts";
-import { MAX_DINERS, fillSeats, seatAngles, seatsFor, sharedVenue, sliceAt, venueLabel } from "@/lib/seats.ts";
+import { TABLE_MAX, addGuest } from "@/lib/table.ts";
+import { TablePanel } from "./TablePanel";
+const TABLE_KEY = "wti.table.names";
 import { ResultModal } from "./ResultModal";
 import { Wheel } from "./Wheel";
 
@@ -106,7 +107,16 @@ export function Randomizer() {
   const [never, setNever] = useState<string[]>(init.never ?? []);
   const [history, setHistory] = useState<Win[]>(init.history ?? []);
   const [mood, setMood] = useState<Mood | null>(null);
-  const [diners, setDiners] = useState(1); // group mode: people around the table (1 = just you)
+  // group mode: the people at the table (left panel). 1 name = just you. Kept in this browser only.
+  const [names, setNamesState] = useState<string[]>(["შენ"]);
+  useEffect(() => {
+    try { const v = JSON.parse(localStorage.getItem(TABLE_KEY) ?? "null"); if (Array.isArray(v) && v.length && v.length <= TABLE_MAX && v.every((x) => typeof x === "string")) setNamesState(v); } catch { /* storage blocked */ }
+  }, []);
+  const setNames = (next: string[]) => {
+    setNamesState(next);
+    try { localStorage.setItem(TABLE_KEY, JSON.stringify(next)); } catch { /* storage blocked: names just aren't kept */ }
+  };
+  const diners = names.length;
   const excluded = useMemo(() => [...Object.keys(notToday), ...never], [notToday, never]);
   const doSpinRef = useRef<(random: boolean) => void>(() => {});
   const [locating, setLocating] = useState(false);
@@ -153,7 +163,11 @@ export function Randomizer() {
   function openDish(slug: string) {
     const d = DISHES.find((x) => x.slug === slug);
     if (!d) throw new Error(`openDish: unknown dish ${slug}`);
-    setSpun({ wheel: [d], winner: 0, landed: true, why: [], ctx: ctx(false) });
+    // keep a full wheel (a 1-slice wheel draws as a broken disc): the dish first, the preview after it
+    const rest = (preview.result?.wheel ?? DISHES).filter((x) => x.slug !== slug).slice(0, 7);
+    const w = [d, ...rest];
+    setSpun({ wheel: w, winner: 0, landed: true, why: [], ctx: ctx(false) });
+    setRotation((cur) => targetRotation(cur, 0, w.length, 1, 1));
     setModalOpen(true);
   }
 
@@ -174,25 +188,8 @@ export function Randomizer() {
     if (spun && !spun.landed) return;
     try {
       const c = { ...ctx(random), excluded: [...excluded, ...extraExcluded] };
-      let r = spin(DISHES, c, Math.random);
-      if (diners > 1) {
-        // Group: everyone should eat at ONE place. Your random dish (diner 0) decides the venue
-        // type — sushi → a sushi bar, khinkali → a Georgian place — so the type still varies;
-        // diners whose slice doesn't fit get an allowed dish of that type instead.
-        const seats = seatsFor(r.winnerIndex, r.wheel.length, Math.min(diners, r.wheel.length));
-        const mineDish = r.wheel[seats[0]];
-        const cat = [...mineDish.venue.cats].sort((x, y) =>
-          seats.filter((i) => r.wheel[i].venue.cats.includes(y)).length - seats.filter((i) => r.wheel[i].venue.cats.includes(x)).length)[0];
-        const pool = DISHES.filter((d) => isAllowed(d, c));
-        if (cat) r = { ...r, wheel: fillSeats(r.wheel, seats, cat, pool, Math.random) };
-        // too few dishes of that type (e.g. donuts)? fall back to the type the seated dishes share most
-        const left = sharedVenue(seats.map((i) => r.wheel[i]));
-        if (left.covered < seats.length) {
-          const cats = [...new Set(seats.flatMap((i) => r.wheel[i].venue.cats))];
-          const roomiest = cats.sort((x, y) => pool.filter((d) => d.venue.cats.includes(y)).length - pool.filter((d) => d.venue.cats.includes(x)).length)[0];
-          if (roomiest) r = { ...r, wheel: fillSeats(r.wheel, seats, roomiest, pool, Math.random) };
-        }
-      }
+      const r = spin(DISHES, c, Math.random);
+      // group mode: ONE spin, ONE dish for the whole table (they eat together)
       const dishWon = r.wheel[r.winnerIndex];
       const near = current && "counts" in current ? current.counts[dishWon.slug] : undefined;
       const why = [...explain(dishWon, c, persona?.name ?? null), ...(near ? [`${near} ადგილი ${radius} კმ-ში`] : [])].slice(0, 3);
@@ -200,8 +197,7 @@ export function Randomizer() {
       setSheetOpen(false);
       // the plate turns `aim` to the top; "your" dish is the one in front of diner 0
       const aim = r.winnerIndex;
-      const mine = diners > 1 ? seatsFor(aim, r.wheel.length, Math.min(diners, r.wheel.length))[0] : aim;
-      setSpun({ wheel: r.wheel, winner: mine, landed: false, why: mine === aim ? why : [], ctx: c });
+      setSpun({ wheel: r.wheel, winner: aim, landed: false, why, ctx: c });
       setSpinMs(how.ms);
       setRotation((cur) => targetRotation(cur + how.offset, aim, r.wheel.length, how.turns, how.dir));
     } catch (e) {
@@ -214,8 +210,7 @@ export function Randomizer() {
     if (!spun || spun.landed) return; // the fallback timer and transitionend may both call this
     setSpun((s) => (s ? { ...s, landed: true } : s));
     if (spun) setHistory((h) => [...h, { slug: spun.wheel[spun.winner].slug, at: Date.now() }].slice(-HISTORY_MAX));
-    if (diners === 1) window.setTimeout(() => setModalOpen(true), 350); // let the eye see the pointer settle first
-    // group mode: no popup — each diner's dish appears at their seat; tap a seat to open it
+    window.setTimeout(() => setModalOpen(true), 350); // let the eye see the pointer settle first
   }
 
   function pickPlace() {
@@ -294,10 +289,7 @@ export function Randomizer() {
     return name === d.name ? d : { ...d, name, search: name }; // search Google/Maps/Wolt for the version, too
   });
   const winner = spun?.landed ? spun.winner : null;
-  // Group mode: never more seats than slices, so nobody shares a slice by accident.
-  const seated = Math.min(diners, Math.max(1, wheel.length));
-  const seatSlices = spun?.landed && seated > 1 ? seatAngles(seated).map((deg) => sliceAt(rotation, deg, wheel.length)) : null;
-  const together = seatSlices ? sharedVenue(seatSlices.map((i) => wheel[i])) : null;
+
   const dish = spun?.landed ? wheel[spun.winner] : null;
   const spinning = Boolean(spun && !spun.landed);
   const matching = preview.result?.matching ?? preview.error ?? 0;
@@ -318,15 +310,7 @@ export function Randomizer() {
     />
   );
 
-  /** A diner's seat (on the rim or in the list) opens the dish in front of them. */
-  function openSeat(d: number) {
-    if (!seatSlices) return;
-    const i = seatSlices[d];
-    setSpun((s) => (s ? { ...s, winner: i, why: d === 0 ? s.why : [] } : s));
-    setModalOpen(true);
-  }
-
-  const addDiner = () => { setDiners((n) => Math.min(MAX_DINERS, n + 1)); setSpun((s) => (s?.landed ? null : s)); };
+  const addDiner = () => { if (names.length < TABLE_MAX) setNames(addGuest(names)); };
 
   return (
     <>
@@ -341,41 +325,14 @@ export function Randomizer() {
               ? <Wheel
                   dishes={wheel} rotation={rotation} spinning={spinning} spinMs={spinMs} winnerIndex={winner} landedOnce={Boolean(spun?.landed)}
                   onSpin={(o) => doSpin(false, [], { ...DEFAULT_SPIN, offset: o })} onFling={onFling} onLanded={onLanded}
-                  diners={seated} seatDishes={seatSlices ? seatSlices.map((i) => wheel[i].name) : null}
-                  onSeat={openSeat}
-                  onAddDiner={addDiner}
-                  onRemoveDiner={(d) => { void d; setDiners((n) => Math.max(1, n - 1)); setSpun((s) => (s?.landed ? null : s)); }}
+                  diners={1} seatDishes={null} onSeat={() => {}} onAddDiner={addDiner} onRemoveDiner={() => {}}
                 />
               : <div className="wheel wheel--empty"><p>ფილტრებს მხოლოდ {matching} კერძი ერგება.<br />შეარბილე ბიუჯეტი, დიეტა ან გაზარდე რადიუსი.</p></div>}
             {/* Figma: "+ 1/5" sits at the wheel's lower right */}
-            <button type="button" className="add-guest" onClick={addDiner} disabled={seated >= MAX_DINERS} aria-label={`დაამატე სტუმარი (${seated} / ${MAX_DINERS})`}>+ <span>{seated}/{MAX_DINERS}</span></button>
+            <button type="button" className="add-guest" onClick={addDiner} disabled={diners >= TABLE_MAX} aria-label={`დაამატე სტუმარი (${diners} / ${TABLE_MAX})`}>+ <span>{diners}/{TABLE_MAX}</span></button>
           </div>
-          {/* group mode: everyone at the table in one tidy row — who, what they got, remove */}
-          {seated > 1 && (
-            <div className="table9">
-              <ul className="table9__seats">
-                {Array.from({ length: seated }, (_, i) => (
-                  <li key={i} className="table9__seat">
-                    <button className="table9__who" onClick={() => openSeat(i)} disabled={!seatSlices}
-                      aria-label={`${i === 0 ? "შენ" : `სტუმარი ${i + 1}`}${seatSlices ? `: ${wheel[seatSlices[i]].name}` : ""}`}>
-                      <span className="table9__n">{i + 1}</span>
-                      <Image src={`/illustrations/people/diner-${i + 1}.webp`} alt="" width={64} height={64} />
-                      <span className="table9__txt"><small>{i === 0 ? "შენ" : `სტუმარი ${i + 1}`}</small><b>{seatSlices ? wheel[seatSlices[i]].name : "…"}</b></span>
-                    </button>
-                    {i > 0 && !spinning && (
-                      <button className="table9__x" onClick={() => { setDiners((n) => Math.max(1, n - 1)); setSpun((s) => (s?.landed ? null : s)); }} aria-label={`მოაშორე სტუმარი ${i + 1}`}>×</button>
-                    )}
-                  </li>
-                ))}
-              </ul>
-              {together && seatSlices && (
-                <p className="table9__note" role="status">
-                  {together.covered === seatSlices.length ? "ყველა ერთად" : `${together.covered} / ${seatSlices.length} ერთად`} — <strong>{venueLabel(together.cat)}</strong>
-                  {together.cat && <a href={mapsSearchUrl(together.cat.replace(/_/g, " ") + " restaurant", place?.label ?? null)} target="_blank" rel="noopener noreferrer">იპოვე რუკაზე ↗</a>}
-                </p>
-              )}
-            </div>
-          )}
+          {/* group mode lives in its own column left of the wheel */}
+          <TablePanel names={names} onChange={setNames} disabled={spinning} />
           <div className="hero__controls">
             <FilterTokens filters={filters} place={place?.label ?? null} radius={radius} onOpen={() => setSheetOpen(true)} />
             <p className="hero__status" aria-live="polite">{status}</p>
@@ -440,11 +397,7 @@ export function Randomizer() {
       <div ref={pathsRef} className="paths-anchor">
         <Paths
           dish={dish} place={place} radius={radius} onPickPlace={pickPlace}
-          group={together && seatSlices ? {
-            dishes: seatSlices.map((i) => wheel[i].name),
-            summary: `${together.covered === seatSlices.length ? "ყველა ერთად" : `${together.covered} / ${seatSlices.length} ერთად`} — ${venueLabel(together.cat)}`,
-            searchTerm: together.cat ? `${together.cat.replace(/_/g, " ")} restaurant` : null,
-          } : null}
+          group={diners > 1 && dish ? { dishes: names, summary: `${diners} ადამიანი, ერთი სუფრა — ${dish.name}`, searchTerm: null } : null}
           onSpin={() => heroRef.current?.scrollIntoView({ behavior: "smooth" })}
         />
       </div>
