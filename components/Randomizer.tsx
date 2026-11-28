@@ -436,7 +436,7 @@ export function Randomizer() {
 
       {quizOpen && <Quiz onClose={() => setQuizOpen(false)} onApply={applyPersona} onDish={(slug) => { setQuizOpen(false); openDish(slug); }} />}
 
-      <div className="chapter chapter--cream chapter--plain">
+      <div className="chapter chapter--cream chapter--plain chapter--blush9">
       <div ref={pathsRef} className="paths-anchor">
         <Paths
           dish={dish} place={place} radius={radius} onPickPlace={pickPlace}

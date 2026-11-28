@@ -4,7 +4,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-27
- * Version:     v2.1 — stickers instead of 01/02/03, no kicker; v2.0 — editorial: kicker + title stay on the left (sticky), drop-cap manifesto and
+ * Version:     v2.2 — Figma 211:8: the question is the headline (BPG, coral), serif line, one CTA;
+ *              steps on the right; discobolus with sushi; v2.1 — stickers instead of 01/02/03, no kicker; v2.0 — editorial: kicker + title stay on the left (sticky), drop-cap manifesto and
  *              ruled numbered rows on the right, on cream paper; chapter label + how-it-works steps; one-strip title; v1.4 — word-mosaic pomegranate (collage) replaces the flat badge; v1.3 — flat critic badge (logo style, arc lettering) instead of the 3D kit; was v1.1 — "კრიტიკოსი" (not "მსაჯი"), no 3D jury figures, one button style
  * Description: The closing section's one action: "გახდი კრიტიკოსი" (become a critic).
  *              A 3D "critic's kit" (notebook, magnifier, medal, khinkali — reusable later for the
@@ -16,6 +17,7 @@
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { checkSignup, DISTRICTS, LIMITS } from "@/lib/critics.ts";
+import Image from "next/image";
 import { Lines } from "./Lines";
 import { Sticker9 } from "./Stickers9";
 
@@ -43,25 +45,22 @@ export function JoinCritics() {
   return (
     <section className="join9 sect" id="join" aria-labelledby="join-title">
       <Lines kind="page" />
+      <Image className="join9__disco" src="/collage/discobolus-sushi.webp" alt="" aria-hidden="true" width={459} height={671} sizes="184px" />
       <div className="join9__inner">
         {/* editorial layout: the title + action stay put on the left while the manifesto reads on the right */}
         <div className="join9__side">
-          <h2 id="join-title" className="title9">გახდი კრიტიკოსი</h2>
+          <h2 id="join-title" className="join9__q">ჭამ, აკვირდები, გული გწყდება ცუდ ხინკალზე<em>?</em></h2>
+          <p className="join9__body-text">ვეძებთ ადამიანებს, ვინც რესტორნებს ჩვეულებრივ სტუმრად შეამოწმებს და გულწრფელად დაწერს.</p>
+          {status.kind === "closed" && (
+            <button className="btn9 join9__cta" onClick={() => setStatus({ kind: "open", error: null, field: null })}>გახდი კრიტიკოსი</button>
+          )}
         </div>
         <div className="join9__body">
-          <p className="dropcap9">
-            ჭამ, აკვირდები, გული გწყდება ცუდ ხინკალზე? ვეძებთ ადამიანებს, ვინც რესტორნებს ჩვეულებრივ
-            სტუმრად შეამოწმებს და გულწრფელად დაწერს — რეკლამის, ფასდაკლების და მეგობრული „კარგია“-ს გარეშე.
-          </p>
           <ol className="rows9x">
             <li><Sticker9 kind="join" /><b>შემოგვიერთდი</b><em>ორი წუთი: სახელი, ელფოსტა და რა გიყვარს.</em></li>
             <li><Sticker9 kind="taste" /><b>გასინჯე</b><em>მიდი როგორც ჩვეულებრივი სტუმარი: ჭამე, დააკვირდი.</em></li>
             <li><Sticker9 kind="write" /><b>დაწერე პირდაპირ</b><em>რა იყო კარგი, რა — არა. შენი სიტყვა ბორბალსაც ასწავლის.</em></li>
           </ol>
-
-        {status.kind === "closed" && (
-          <button className="btn9" onClick={() => setStatus({ kind: "open", error: null, field: null })}>მინდა შეფასება</button>
-        )}
 
         {(status.kind === "open" || status.kind === "sending") && (
           <form className="join__form" onSubmit={submit} noValidate>

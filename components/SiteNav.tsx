@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-27
- * Version:     v2.0 — Figma 191:615: one centred floating pill (logo + 4 links); blog and
+ * Version:     v2.1 — Figma 211:8: tab attached to the top edge, coral active pill, 3 links;
+ *              v2.0 — Figma 191:615: one centred floating pill (logo + 4 links); blog and
  *              profile placeholders removed from the header (the tab bar keeps profile).
  *              v1.4 — polished logo (bolder arc lettering, brand colours);
  *              v1.3 — header tone follows the section under it (data-on), "join" in scroll-spy;
@@ -23,12 +24,11 @@ import Image from "next/image";
 import { useEffect, useState, type ReactNode } from "react";
 
 type SectionId = "wheel" | "paths" | "game" | "persona" | "join";
-/** Figma 191:615 header: logo + these four, in one floating pill. */
+/** Figma 211:8 header: logo + these three, in a tab hanging from the top edge. */
 const NAV: { id: SectionId; label: string }[] = [
   { id: "wheel", label: "ბორბალი" },
   { id: "game", label: "თამაში" },
   { id: "persona", label: "ტესტი" },
-  { id: "join", label: "გახდი კრიტიკოსი" },
 ];
 
 /** Page order — the last section whose top passed the line wins. */

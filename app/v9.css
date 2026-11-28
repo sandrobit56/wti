@@ -514,3 +514,179 @@
 .modal .segmented::before, .modal .segmented::after { display: none !important; }
 .modal .segmented button:disabled { opacity: .4 !important; }
 .modal .segmented button.on:disabled { background: #e9e4de !important; color: var(--c-ink) !important; }
+
+/* ════ v9.5 (2026-11-28): Sandro's final desktop frame 211:8, 1:1 ════════════════════════════ */
+
+/* header: a tab hanging from the top edge — coral active pill, coral links */
+.header9 { top: 0 !important; }
+.header9__pill { position: relative; width: 575px; height: 63px !important; padding: 14px 32px !important; gap: 0 !important; justify-content: center;
+  border: 0 !important; border-radius: 0 0 53px 53px !important; background: rgba(255, 251, 252, .66) !important; }
+.header9__logo { position: absolute; left: 36px; top: 10px; width: 40px !important; height: 40px !important; }
+.header9__logo img { width: 40px !important; height: 40px !important; }
+.header9__nav a { color: var(--c9-coral) !important; }
+.header9__nav a:hover { background: rgba(241, 67, 94, .1) !important; }
+.header9__nav a.on { background: var(--c9-coral) !important; color: var(--c-paper) !important; }
+
+/* hero: pink light-ray bloom (Figma "Light rays" over a radial gradient, baked — the live effect needs HTML-in-Canvas) */
+.hero.hero, .no-webgpu .hero.hero { background: #f0e8ec url("/fig/hero-rays.webp") center top / 1440px 1103px no-repeat !important; }
+.hero__inner.hero__inner { height: 1103px; padding-top: 131px !important; }
+.title9--hero { font-size: 78px; background: linear-gradient(180deg, #d92f4c 0%, #ff5774 57.2%, #f1435e 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero9__head { min-height: 94px; position: static; }
+.hero9__winner { position: absolute; z-index: 5; left: 50%; translate: -50% 0; top: 948px; white-space: nowrap; }
+.hero9__stage.hero__stage { width: 640px !important; margin-top: 12px !important; }
+.hero9__stage .wheel { aspect-ratio: 1 !important; filter: none !important; }
+/* wheel: caustic plate, pointer 56×38, hub 110 */
+.wheel__caustic { position: absolute; z-index: 0; left: 8.1%; top: 8.1%; width: 83.8%; aspect-ratio: 1; border-radius: 50%; overflow: hidden; background: var(--c9-wine); pointer-events: none; }
+.wheel__caustic .fx { position: absolute; inset: 0; }
+.wheel__caustic .fx__canvas { width: 100% !important; height: 100% !important; display: block; }
+.hero9__stage .wheel__svg { position: relative; z-index: 1; }
+.hero9__stage .wheel__plate { fill: transparent; }
+.wheel--skeleton .wheel__plate, .wheel__plate:only-child { fill: var(--c9-wine); }
+.hero9__stage .wheel--paper::before { z-index: 3; top: 7.97% !important; width: 56px !important; height: 38px !important; background: var(--c9-coral) !important; }
+.hero9__stage .wheel__hub { z-index: 4; width: 17.19% !important; top: 50% !important; font: 900 16px/1 var(--font) !important; font-stretch: 62.5% !important; color: #fcf3f4 !important; }
+/* "+ 1/5": top-right of the wheel (Figma x1067 y323) */
+.hero9__stage .add-guest { left: calc(100% + 27px) !important; top: 86px !important; bottom: auto !important; right: auto !important; background: #4a010e !important; color: #f5f2eb !important; padding: 11px 16px !important; }
+.hero9__stage .add-guest span { font-size: 16px; }
+/* chips sit right under the wheel, 16px, the last one is an icon */
+.hero__controls.hero__controls { margin-top: -31px !important; gap: 10px !important; }
+.token.token { font-size: 16px !important; font-weight: 600 !important; min-height: 49px !important; padding: 12px 22px !important; }
+.token--more.token--more { min-width: 72px; justify-content: center; }
+.token--more svg { display: block !important; width: 25px; height: 25px; }
+.hero9__hermes { left: calc(50% + 315px) !important; right: auto !important; top: 538px !important; bottom: auto !important; width: 375px !important; height: 545px !important; }
+.hero9__clouds { left: calc(50% - 844px) !important; top: 762px !important; bottom: auto !important; width: 1688px !important; height: 491px !important; }
+
+/* section 2: blush page, pill rows, coral switch, round dish on a plate */
+.chapter.chapter--blush9 { background: #fcf3f4 !important; }
+.paths9 .title9 { font-size: 70px; }
+.paths9 .lines9 { top: 246px; height: 600px; }
+.seg9 button.on { background: var(--c9-coral) !important; color: var(--c-paper) !important; }
+.row9 { border-radius: 67px !important; padding: 0 16px !important; height: 47px; align-items: center; font-weight: 700 !important; }
+.dish9 { position: absolute; left: 550.5px !important; top: 63.5px !important; width: 493px !important; height: 501px; background: none !important; border-radius: 0 !important; overflow: visible !important; }
+.dish9__rim { position: absolute; inset: 0; width: 100% !important; height: 100% !important; object-fit: contain; filter: drop-shadow(0 18px 30px rgba(28, 26, 23, .12)); }
+.dish9__food { position: absolute; left: 64px; top: 60px; width: 363px; height: 363px; border-radius: 50%; overflow: hidden; background: #efe7e0; }
+.dish9__food .dish9__photo { width: 100% !important; height: 100% !important; object-fit: cover; border-radius: 0 !important; }
+.dish9--empty .dish9__food { background: repeating-linear-gradient(135deg, #f6f1ec 0 14px, #efe7e0 14px 28px) !important; }
+.dish9__pill { position: absolute; left: 50%; translate: -50% 0; top: 299px; width: 203px; height: 69px; padding-bottom: 6px; display: grid; place-items: center; border-radius: 159px; background: var(--c-action); }
+.dish9__pill h3 { margin: 0; font: 800 24px/1 var(--font); font-stretch: 75%; color: var(--c-paper); }
+.dish9__bar { display: none !important; }
+.paths9 { position: relative; }
+.paths9__courier { position: absolute; z-index: 1; left: 48px; top: 742px; width: 183px !important; height: auto !important; pointer-events: none; }
+
+/* game: ink → wine radial, mirrored slice lines at the bottom, Icarus with lavash wings */
+.chapter.chapter--ink { background: radial-gradient(ellipse 66% 85% at 50% 50%, #1c1a17 0%, #331e1f 50%, #4a2326 100%) !important; }
+.game9 { min-height: 1120px; padding-top: 140px !important; padding-bottom: 0 !important; }
+.game9 .lines9 { height: 553px; }
+.game9 .lines9--mirror { top: auto; bottom: 0; height: 364px; scale: 1 -1; }
+.game9__stage { height: 607px !important; margin-top: 38px !important; box-shadow: 0 29px 198.6px -35px rgba(241, 67, 94, .29) !important; }
+.game9__supra { position: absolute; left: -1px; top: 258px; width: 1040px !important; }
+.game9__scene { inset: 0 !important; }
+.game9__card { top: 59px !important; translate: -50% 0 !important; width: 440px !important; height: 426px; gap: 32px !important; padding: 24px !important; background: #fffafc !important; justify-content: flex-start; }
+.game9__chick { width: 120px; height: 112px; }
+.game9__rule { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 10px 12px; }
+.game9__rule p { margin: 0; font: 600 18px/1.5 var(--font); color: var(--c-ink); text-align: center; }
+.game9__pills { display: flex; gap: 8px; width: 258px; }
+.game9__pill { flex: 1; height: 36px; display: grid; place-items: center; border-radius: 70px; background: #fff; border: 1px solid #e4e4e4; font: 400 15px/1 var(--font); color: var(--c-action); }
+.game9__pill--combo { background: var(--c9-coral); border-color: var(--c9-coral); color: #fff; font-weight: 800; }
+.game9__card .btn9 { width: 320px !important; }
+.game9__best { display: none; }
+.game9__rules { display: none !important; }
+.game9__icarus { position: absolute; z-index: 3; left: calc(50% + 402px); top: 853px; width: 344px !important; height: auto !important; pointer-events: none; }
+
+/* persona: rotated card lines, coral title, two buttons, card tilted +3°, clouds bottom-left */
+.persona9 { padding: 242px 0 0 !important; min-height: 900px; display: block !important; position: relative; overflow: hidden; }
+.persona9 .lines9--card { left: 50%; top: -29px; width: 3268px; height: 1362px; translate: -50% 0; rotate: -2.42deg; }
+.persona9__card { width: 1126px !important; margin: 0 auto; align-items: flex-start !important; }
+.persona9__text { width: 557px !important; gap: 28px !important; }
+.persona9 .title9 { color: var(--c9-coral); line-height: 1.23; }
+.persona9 .lead9 { width: 299px; margin-left: 10px !important; }
+.persona9__btns { display: flex; gap: 22px; margin: 14px 0 0 10px; }
+.persona9__btns .btn9 { width: 224px !important; }
+.btn9--light { background: #fff !important; color: var(--c-ink) !important; filter: drop-shadow(0 3px 0 #bebebe) !important; }
+.btn9--light:hover { background: var(--c9-cream) !important; }
+.persona9__tarot { width: 300px !important; margin: 22px 8px 0 0; rotate: 3deg !important; }
+.persona9__tarot:hover { rotate: 0deg !important; }
+.persona9__clouds { position: absolute; z-index: 0; left: calc(50% - 1063px); top: 745px; width: 969px; height: 228px; pointer-events: none; }
+.persona9__clouds img { width: 100%; height: 100%; object-fit: contain; }
+.persona9 .link9 { display: none; }
+
+/* critic: the question is the headline, steps on the right */
+.chapter.chapter--paper { background: radial-gradient(ellipse 75% 95% at 50% 50%, #f5f2eb 0%, #f9ebea 60%, #ffe3e8 100%) !important; }
+.join9 { min-height: 771px; padding: 103px 0 80px !important; position: relative; overflow: hidden; }
+.join9 .lines9--page { height: 771px; left: 10px; }
+.join9__inner { max-width: 1110px !important; margin: 0 auto 0 126px !important; grid-template-columns: 460px 592px !important; gap: 58px !important; }
+@media (min-width: 1441px) { .join9__inner { margin: 0 auto !important; } }
+.join9__side { position: static !important; padding-top: 36px; gap: 0 !important; }
+.join9__q { margin: 0; width: 460px; font: 400 47px/1.29 var(--title9); color: var(--c9-coral); letter-spacing: 0; }
+.join9__q em { font-style: normal; color: var(--c-action); }
+.join9__body-text { margin: 20px 0 0 4px; width: 456px; font: 400 16px/1.383 var(--serif); letter-spacing: 1px; color: var(--c-ink); }
+.join9__cta { width: 224px !important; margin: 38px 0 0 2px; }
+.join9__body { gap: 24px !important; }
+.rows9x li { grid-template-columns: 70px 220px 1fr !important; height: 112px; padding: 24px 0 !important; border: 0 !important; }
+.rows9x li:last-child { border: 0 !important; }
+.rows9x .sticker9 { width: 70px; height: 70px; }
+.join9__disco { position: absolute; z-index: 1; left: calc(50% + 409px); top: 450px; width: 184px !important; height: auto !important; pointer-events: none; }
+.dropcap9 { display: none; }
+
+/* phones & tablets: keep the same pieces, stacked */
+@media (max-width: 1199px) {
+  .hero9__hermes { left: auto !important; right: -40px !important; width: 260px !important; height: 378px !important; top: 640px !important; }
+  .persona9__card { width: auto !important; padding: 0 24px; }
+  .join9__inner { grid-template-columns: 1fr !important; margin: 0 auto !important; padding: 0 24px; max-width: 640px !important; }
+  .join9__q, .join9__body-text { width: auto; }
+  .join9__disco, .game9__icarus { display: none; }
+  .dish9 { position: relative !important; left: auto !important; top: auto !important; margin: 0 auto; }
+}
+@media (max-width: 760px) {
+  .header9__pill { width: auto; min-width: 120px; padding: 0 !important; height: 52px !important; }
+  .header9__logo { position: static; }
+  .hero__inner.hero__inner { height: auto; padding: 84px 16px 300px !important; }
+  .title9--hero { font-size: 42px; }
+  .hero9__stage.hero__stage { width: min(94vw, 420px) !important; margin-top: 16px !important; }
+  .hero9__stage .add-guest { left: auto !important; right: 0 !important; top: -4px !important; }
+  .hero__controls.hero__controls { margin-top: 12px !important; }
+  .token.token { font-size: 14px !important; min-height: 42px !important; padding: 10px 16px !important; }
+  .token--more.token--more { min-width: 56px; }
+  .hero9__winner { top: auto; bottom: 230px; }
+  .hero9__clouds { left: calc(50% - 450px) !important; width: 900px !important; height: 262px !important; top: auto !important; bottom: -20px !important; }
+  .hero9__hermes { width: 150px !important; height: 218px !important; top: auto !important; bottom: 60px !important; right: -24px !important; }
+  .paths9 .title9 { font-size: 40px; }
+  .dish9 { width: min(92vw, 420px) !important; height: auto; aspect-ratio: 493 / 501; }
+  .dish9__food { left: 13%; top: 12%; width: 73.6%; height: auto; aspect-ratio: 1; }
+  .dish9__pill { top: auto; bottom: -14px; width: 56%; height: 56px; }
+  .dish9__pill h3 { font-size: 20px; }
+  .paths9__courier { left: 4px; top: auto; bottom: 8px; width: 110px !important; }
+  .game9 { min-height: 0; padding: 88px 16px 96px !important; }
+  .game9__stage { height: 560px !important; }
+  .game9__card { width: calc(100% - 24px) !important; height: auto; gap: 18px !important; top: 16px !important; }
+  .game9__rule p { font-size: 15px; }
+  .persona9 { padding: 88px 0 140px !important; }
+  .persona9__text { width: 100% !important; }
+  .persona9 .lead9 { width: auto; margin-left: 0 !important; }
+  .persona9__btns { flex-direction: column; width: 100%; margin-left: 0; gap: 12px; }
+  .persona9__btns .btn9 { width: 100% !important; }
+  .persona9__tarot { width: 240px !important; margin: 0; }
+  .persona9__clouds { left: -280px; top: auto; bottom: -40px; width: 700px; height: 165px; }
+  .join9 { padding: 88px 0 96px !important; }
+  .join9__q { font-size: 32px; }
+  .join9__body-text { margin-left: 0; font-size: 15px; }
+  .join9__cta { width: 100% !important; }
+  .rows9x li { grid-template-columns: 56px 1fr !important; height: auto; padding: 14px 0 !important; }
+  .rows9x .sticker9 { width: 52px; height: 52px; }
+}
+/* chapters are just surfaces now: the sections inside carry the Figma heights */
+.chapter.chapter.chapter--plain { padding: 0 !important; min-height: 0 !important; gap: 0 !important; }
+.chapter--plain > .sect { margin: 0 !important; }
+@media (min-width: 1200px) {
+  .paths9 { box-sizing: border-box; height: 956px; min-height: 0 !important; padding-bottom: 0 !important; }
+  .game9 { box-sizing: border-box; height: 1120px; min-height: 0 !important; }
+  .persona9 { box-sizing: border-box; height: 900px; }
+  .join9 { box-sizing: border-box; height: 771px; min-height: 0 !important; padding-bottom: 0 !important; }
+}
+/* decorations are out of flow (the generic ".x > :not(.lines9) { position: relative }" rule must not catch them) */
+.paths9 > .paths9__courier, .game9 > .game9__icarus, .game9 > .lines9--mirror, .persona9 > .persona9__clouds, .join9 > .join9__disco { position: absolute !important; }
+.persona9__art { display: block; width: 300px !important; height: 400px !important; object-fit: cover; border-radius: 4px; box-shadow: 0 16px 26px -10px rgba(28, 26, 23, .35); }
+.chapter.chapter--dots:has(> .persona9) { background: linear-gradient(100deg, #fde6ea 0%, #fff6f2 42%, #fffaf3 100%) !important; }
+@media (max-width: 1199px) {
+  .join9 > .join9__disco, .game9 > .game9__icarus { display: none !important; }
+  .dish9, .dish9.dish9--empty { height: auto !important; aspect-ratio: 493 / 501 !important; flex: none; }
+}

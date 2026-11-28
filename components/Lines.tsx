@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-27
- * Version:     v1.0
+ * Version:     v1.1 — critic grid follows Figma 211:8 (1440×771)
  * Description: Thin construction lines behind a section title — the "Da Vinci lines" idea
  *              from Shopify Editions, told with our own geometry: the plate (circles), the
  *              slices (radii), the table (horizontals). Each section gets its own figure, so
@@ -20,13 +20,13 @@ const FIG: Record<Kind, string[]> = {
   // persona: a card's proportions (3:4) and its diagonals
   card: ["M570 60H870V460H570Z", "M570 60L870 460", "M870 60L570 460", "M0 260H1440", "M720 0V600"],
   // critic: a page — margins, baseline grid, one circle for the drop cap
-  page: ["M180 0V600", "M1260 0V600", "M0 140H1440", "M0 460H1440", "M330 300a90 90 0 1 0 -180 0a90 90 0 1 0 180 0"],
+  page: ["M104 0V771", "M1270 0V771", "M0 110H1440", "M0 605H1440", "M1394 584a111 111 0 1 0 -222 0a111 111 0 1 0 222 0"],
   table: ["M0 420H1440", "M120 420L720 120L1320 420"],
 };
 
 export function Lines({ kind, className = "" }: { kind: Kind; className?: string }) {
   return (
-    <svg className={`lines9 ${className}`} viewBox="0 0 1440 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <svg className={`lines9 lines9--${kind} ${className}`} viewBox={kind === "page" ? "0 0 1440 771" : "0 0 1440 600"} preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       {FIG[kind].map((d, i) => <path key={i} d={d} pathLength={1} style={{ ["--i" as string]: i }} />)}
     </svg>
   );

@@ -3,7 +3,7 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-27
- * Version:     v10.4 — group mode: seats are numbered busts on the rim only; their names, dishes
+ * Version:     v10.5 — Figma 211:8: caustic-shader plate, bigger pointer; v10.4 — group mode: seats are numbered busts on the rim only; their names, dishes
  *              and remove buttons moved to one list under the wheel (was: pills and × all around);
  *              v10.3 — Figma 191:615: dark wine plate (colour in CSS), cream band, coral hub;
  *              v10.2 — labels in Mkhedruli as in Figma v8;
@@ -27,6 +27,7 @@
  */
 "use client";
 
+import { FigmaFill } from "./FigmaShaders";
 import Image from "next/image";
 import { useEffect, useId, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import type { Dish } from "@/lib/catalog.ts";
@@ -166,6 +167,8 @@ export function Wheel({ dishes, rotation, spinning, spinMs, winnerIndex, landedO
 
   return (
     <div className={dragging ? "wheel wheel--paper wheel--dragging" : "wheel wheel--paper"} style={BOX}>
+      {/* Figma 211:14: the plate is a "Water caustic" shader (wine); the SVG plate on top is transparent */}
+      <div className="wheel__caustic" aria-hidden="true"><FigmaFill name="plateCaustic" className="fx--plate" /></div>
       <svg ref={svgRef} className="wheel__svg" viewBox={`${-HALF} ${-HALF} ${HALF * 2} ${HALF * 2}`} role="img"
         aria-label={`ბორბალი: ${dishes.map((d) => d.name).join(", ")}. გადაატარე თითი ან დააჭირე ღილაკს.`}
         onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up}>

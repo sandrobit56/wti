@@ -44,7 +44,12 @@ const PERSONA_PAPER: Shader = {
   params: { layerScale: 100, layerFlow: 100, cycles: 20, layerGain: 100, layerBlend: 0, transform: { x: 50, y: 50, radius: 100, angle: -9.733396530151367 }, sharpness: 91, tileSizeX: 0, turbulence: 200, tileSizeY: 100, layers: 1, noiseType: 1, saturation: 0, phase: 100 },
 };
 
-const SHADERS = { heroClouds: HERO_CLOUDS, section2Water: SECTION2_WATER, personaPaper: PERSONA_PAPER } as const;
+/** Figma 211:14 — the wheel plate: wine water with a dark-red caustic (static, playhead 100). */
+const PLATE_CAUSTIC: Shader = {
+  setup: water.setup, render: water.render, manifest: water.manifest,
+  params: { center: { x: 50, y: 50 }, scale: 4.799999713897705, playhead: 100, highlightColor: { r: 0.658823549747467, g: 0.14509804546833038, b: 0.23137255012989044, a: 1 }, waterColor: { r: 0.23137255012989044, g: 0.05098039284348488, b: 0.0941176488995552, a: 1 }, intensity: 0.3700000047683716 },
+};
+const SHADERS = { heroClouds: HERO_CLOUDS, section2Water: SECTION2_WATER, personaPaper: PERSONA_PAPER, plateCaustic: PLATE_CAUSTIC } as const;
 
 const noop = () => () => {};
 /** false on the server and in browsers without WebGPU */

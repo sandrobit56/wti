@@ -3,7 +3,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-27
- * Version:     v6.0 — Figma 191:615: title + switch + venue rows + one button on the left,
+ * Version:     v6.1 — Figma 211:8: round dish on a plate photo, coral name pill, courier statue;
+ *              v6.0 — Figma 191:615: title + switch + venue rows + one button on the left,
  *              the dish photo with a coral name bar on the right; no labels, strips or tiles.
  *              v5.2 chapter label, lead line, three ways; v5.1 one-strip title; v5.0 — one result card: dish photo + name on the left, way / main action /
  *              places on the right; clear empty state. (v4 stacked 9 centred blocks.)
@@ -117,17 +118,16 @@ export function Paths({ dish, place, radius, group, onPickPlace, onSpin }: Props
           )}
         </div>
 
+        {/* Figma 211:100: the dish served on a ceramic plate; its name in a coral pill at the rim */}
         <figure className={dish ? "dish9" : "dish9 dish9--empty"}>
-          {dish ? (
-            <>
-              <Image key={dish.slug} className="dish9__photo" src={typePhoto(dish.slug)?.src ?? stickerSrc(dish.slug)} alt={dish.name} width={1054} height={672} sizes="(max-width: 760px) 92vw, 527px" />
-              <figcaption className="dish9__bar"><h3>{dish.name}</h3><p>{dish.priceGel[0]}–{dish.priceGel[1]} ₾ &nbsp; {dish.cuisine}</p></figcaption>
-            </>
-          ) : (
-            <figcaption className="dish9__bar"><h3>შენი კერძი</h3><p>აქ გამოჩნდება</p></figcaption>
-          )}
+          <Image className="dish9__rim" src="/fig/plate-rim.webp" alt="" aria-hidden="true" width={1233} height={1252} sizes="(max-width: 760px) 92vw, 493px" />
+          <div className="dish9__food">
+            {dish && <Image key={dish.slug} className="dish9__photo" src={typePhoto(dish.slug)?.src ?? stickerSrc(dish.slug)} alt={dish.name} width={726} height={726} sizes="(max-width: 760px) 70vw, 363px" />}
+            <figcaption className="dish9__pill"><h3>{dish ? dish.name : "შენი კერძი"}</h3></figcaption>
+          </div>
         </figure>
       </div>
+      <Image className="paths9__courier" src="/collage/courier-scooter.webp" alt="" aria-hidden="true" width={458} height={456} sizes="183px" />
     </section>
   );
 }

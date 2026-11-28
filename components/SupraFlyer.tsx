@@ -4,7 +4,8 @@
  * Application: რა ვჭამოთ? (WTI)
  * Author:      Sandro Germanishvili
  * Date:        2026-11-27
- * Version:     v9.2 — the hero is ჭამია, the logo chick (chomps, flaps, gulps), not Hermes;
+ * Version:     v9.3 — Figma 211:8: card = one sentence + ♥♥♥ / ×5 pills; Icarus with lavash wings;
+ *              v9.2 — the hero is ჭამია, the logo chick (chomps, flaps, gulps), not Hermes;
  *              v9 — one style with the page (white paper, BPG title, light sky stage); HUD in
  *              three fixed places (course progress bar · score + combo · lives); score, ×5 combo and
  *              a best score in this browser; clean start/over cards; no stepper, no toast art.
@@ -205,6 +206,8 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
   return (
     <section className="game9 sect" id="game" aria-labelledby="game-title">
       <Lines kind="slices" />
+      <Lines kind="slices" className="lines9--mirror" />
+      <Image className="game9__icarus" src="/collage/icarus-lavash.webp" alt="" aria-hidden="true" width={861} height={651} sizes="344px" />
       <div className="game9__inner">
         <h2 id="game-title" className="title9 title9--center">სუფრის მფრინავი</h2>
         <p className="lead9">ჭამიას შია. გაატარე სუფრაზე, შეჭამე ოთხივე რიგი და აარიდე წიწაკას.</p>
@@ -237,11 +240,13 @@ export function SupraFlyer({ onDish }: { onDish: (slug: string) => void }) {
           {screen === "idle" && (
             <div className="card9 game9__card">
               <ChickMark className="game9__chick" size={104} />
-              <ul className="game9__rules">
-                <li><b>4 რიგი</b><span>სალათები → ცხელი → მწვადი → ტკბილეული</span></li>
-                <li><b>×5</b><span>კერძები ზედიზედ = მეტი ქულა</span></li>
-                <li><b>♥♥♥</b><span>წიწაკა სიცოცხლეს და კომბოს გართმევს</span></li>
-              </ul>
+              <div className="game9__rule">
+                <p>ჭამიას შია. გაატარე სუფრაზე, შეჭამე ოთხივე რიგი და აარიდე წიწაკას.</p>
+                <div className="game9__pills">
+                  <span className="game9__pill" aria-label="3 სიცოცხლე — წიწაკა ერთს გართმევს">♥♥♥</span>
+                  <span className="game9__pill game9__pill--combo" aria-label="ზედიზედ შეჭმული კერძები ქულას ხუთამდე ამრავლებს">×5</span>
+                </div>
+              </div>
               {storedBest > 0 && <p className="game9__best">შენი რეკორდი: <b>{storedBest}</b></p>}
               <button className="btn9" onClick={start}>აფრენა</button>
             </div>

@@ -44,8 +44,8 @@ export function FilterTokens({ filters: f, place, radius, onOpen }: Props) {
         </button>
       ))}
       <button type="button" className={more ? "token token--more on" : "token token--more"} style={{ ["--i" as string]: 4 }} onClick={onOpen} aria-label={`ყველა ფილტრი${more ? `, ${more} არჩეული` : ""}`}>
-        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" /><circle cx="16" cy="7" r="2.4" fill="none" stroke="currentColor" strokeWidth="2.4" /><circle cx="10" cy="17" r="2.4" fill="none" stroke="currentColor" strokeWidth="2.4" /></svg>
-        {more ? `+${more}` : "მეტი"}
+        <svg width="25" height="25" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" /><circle cx="16" cy="7" r="2.4" fill="none" stroke="currentColor" strokeWidth="2.4" /><circle cx="10" cy="17" r="2.4" fill="none" stroke="currentColor" strokeWidth="2.4" /></svg>
+        {more ? `+${more}` : null}
       </button>
     </div>
   );
