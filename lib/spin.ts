@@ -73,9 +73,22 @@ export type SpinContext = {
   prefs: Prefs;
   mood: Mood | null;
   history: Win[];              // past winners, oldest first
+  group?: number;              // people at the table; 2+ → only dishes for sharing (see SHAREABLE)
 };
 
 export type Rng = () => number; // [0, 1)
+
+/**
+ * Dishes a table orders "for the middle" and shares — what a group of 2–5 can eat together.
+ * Personal portions (shawarma, burger, ramen, poke …) stay off a group wheel.
+ */
+export const SHAREABLE: ReadonlySet<string> = new Set([
+  "khinkali", "mtsvadi", "kupati", "shkmeruli", "ojakhuri", "ostri", "korean-chicken", "steak",
+  "khachapuri", "lobiani", "kubdari", "mchadi", "lahmacun",
+  "chakapuli", "chakhokhbili", "chashushuli", "lobio", "elarji", "tolma", "satsivi", "dumplings-asian", "chinese", "pelmeni",
+  "pkhali", "badrijani", "georgian-salad", "hummus", "falafel",
+  "georgian-breakfast", "brunch", "pizza", "fried-chicken", "tacos", "sushi", "seafood", "georgian-sweets", "cake",
+]);
 
 export const WHEEL_SIZE = 8;
 export const MIN_WHEEL = 3;
@@ -242,7 +255,10 @@ export function countMatching(dishes: Dish[], ctx: SpinContext): number {
  * user to loosen filters instead of spinning a 1-slice wheel.
  */
 export function spin(dishes: Dish[], ctx: SpinContext, rng: Rng): SpinResult {
-  const pool = dishes.filter((d) => isAllowed(d, ctx));
+  const allowed = dishes.filter((d) => isAllowed(d, ctx));
+  // a group eats from the middle; if the filters leave too few sharing dishes, any allowed dish will do
+  const shared = (ctx.group ?? 1) > 1 ? allowed.filter((d) => SHAREABLE.has(d.slug)) : allowed;
+  const pool = shared.length >= MIN_WHEEL ? shared : allowed;
   const matching = pool.length;
   if (pool.length < MIN_WHEEL) {
     throw new SpinError(`only ${pool.length} dishes match the filters`, pool.length);

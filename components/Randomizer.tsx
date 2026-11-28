@@ -113,6 +113,8 @@ export function Randomizer() {
     try { const v = JSON.parse(localStorage.getItem(TABLE_KEY) ?? "null"); if (Array.isArray(v) && v.length && v.length <= TABLE_MAX && v.every((x) => typeof x === "string")) setNamesState(v); } catch { /* storage blocked */ }
   }, []);
   const setNames = (next: string[]) => {
+    // going solo ↔ group changes which dishes may land, so an old result no longer fits
+    if ((next.length > 1) !== (names.length > 1)) setSpun((x) => (x?.landed ? null : x));
     setNamesState(next);
     try { localStorage.setItem(TABLE_KEY, JSON.stringify(next)); } catch { /* storage blocked: names just aren't kept */ }
   };
@@ -146,17 +148,17 @@ export function Randomizer() {
   const loadingCounts = Boolean(key) && !current;
   const available = useMemo(() => (current && "counts" in current ? new Set(Object.keys(current.counts)) : null), [current]);
 
-  const ctx = (random: boolean): SpinContext => ({ filters, now: new Date(), excluded, random, available, prefs, mood, history });
+  const ctx = (random: boolean): SpinContext => ({ filters, now: new Date(), excluded, random, available, prefs, mood, history, group: diners });
 
   // Live preview: recomputed on every filter / place / radius change.
   const preview = useMemo(() => {
     try {
-      return { result: spin(DISHES, { filters, now: init.now, excluded, random: false, available, prefs, mood, history }, seeded(seed)), error: null };
+      return { result: spin(DISHES, { filters, now: init.now, excluded, random: false, available, prefs, mood, history, group: diners }, seeded(seed)), error: null };
     } catch (e) {
       if (!(e instanceof SpinError)) throw e;
       return { result: null, error: e.matching };
     }
-  }, [filters, excluded, available, seed, init.now, prefs, mood, history]);
+  }, [filters, excluded, available, seed, init.now, prefs, mood, history, diners]);
 
   // Any input change drops the last result and reshuffles the preview.
   /** The ribbon game hands over the last dish the mascot ate — open it like a wheel result. */

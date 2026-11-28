@@ -326,3 +326,24 @@ test("normalizeFilters fills groups missing from older saved filters", () => {
   assert.deepEqual([f.cuisines, f.categories, f.meals], [[], [], []]);
   assert.equal(f.priceMax, 2);
 });
+
+// v6: a table of 2+ people spins only dishes you put in the middle and share
+test("group spin keeps to shareable dishes; solo spin doesn't", async () => {
+  const { SHAREABLE } = await import("./spin.ts");
+  const base: SpinContext = { filters: DEFAULT_FILTERS, now: new Date("2026-11-28T19:00:00"), excluded: [], random: false, available: null, prefs: NO_PREFS, mood: null, history: [] };
+  for (let s = 0; s < 40; s++) {
+    const r = spin(DISHES, { ...base, group: 4 }, seeded(s));
+    assert.ok(r.wheel.every((d) => SHAREABLE.has(d.slug)), `seed ${s}: ${r.wheel.map((d) => d.slug).join(",")}`);
+  }
+  assert.ok(!SHAREABLE.has("shawarma") && SHAREABLE.has("khinkali") && SHAREABLE.has("pizza"));
+  const solo = new Set<string>();
+  for (let s = 0; s < 40; s++) spin(DISHES, base, seeded(s)).wheel.forEach((d) => solo.add(d.slug));
+  assert.ok([...solo].some((x) => !SHAREABLE.has(x)), "solo wheels still include personal dishes");
+});
+
+test("group spin falls back to all allowed dishes when too few shareable ones fit", async () => {
+  const { SHAREABLE } = await import("./spin.ts");
+  const excluded = DISHES.filter((d) => SHAREABLE.has(d.slug)).map((d) => d.slug).slice(2); // leave 2 shareable
+  const r = spin(DISHES, { filters: DEFAULT_FILTERS, now: new Date(), excluded, random: false, available: null, prefs: NO_PREFS, mood: null, history: [], group: 3 }, seeded(1));
+  assert.ok(r.wheel.length >= 3);
+});
