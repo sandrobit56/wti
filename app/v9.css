@@ -690,3 +690,43 @@
   .join9 > .join9__disco, .game9 > .game9__icarus { display: none !important; }
   .dish9, .dish9.dish9--empty { height: auto !important; aspect-ratio: 493 / 501 !important; flex: none; }
 }
+
+/* ════ v9.6 (2026-11-28): fixes from Sandro's 1190px screenshots ════ */
+/* anchors land below the header tab */
+.sect, #wheel { scroll-margin-top: 72px; }
+/* hero grows with its content (group mode adds a row); decorations hang from the bottom instead of a fixed top */
+.hero__inner.hero__inner { height: auto !important; min-height: 1103px; padding-top: 150px !important; padding-bottom: 210px !important; }
+.hero9__clouds { top: auto !important; bottom: -150px !important; }
+.hero9__hermes { top: auto !important; bottom: 20px !important; z-index: 1 !important; }
+.hero9__stage { z-index: 3; }
+/* chips: one row on desktop, never wrapping the icon chip to a second line */
+@media (min-width: 761px) {
+  .hero__controls .tokens { max-width: none !important; flex-wrap: nowrap !important; }
+  .hero__controls.hero__controls { width: auto !important; }
+}
+/* group mode: the seat list goes under the chips with real space, not under them */
+.hero9__stage + .table9 { margin-top: 20px; }
+.hero9__stage + .table9 + .hero__controls { margin-top: 24px !important; }
+.table9 { position: relative; z-index: 4; }
+.table9__seats { max-width: 980px; }
+/* persona clouds: drift over the next section's edge instead of being cut by a hard line */
+.chapter:has(> .persona9) { position: relative; z-index: 3; overflow: visible !important; overflow-x: clip !important; }
+.persona9 { overflow: visible !important; }
+.chapter:has(> .join9) { position: relative; z-index: 1; }
+@media (max-width: 1279px) and (min-width: 761px) {
+  .hero9__hermes { right: -70px !important; left: auto !important; width: 280px !important; height: 407px !important; }
+}
+/* winner line flows after the chips (no more absolute overlap); in group mode the seat list already names every dish */
+.hero9__head { display: contents !important; }
+.hero__inner > * { order: 6; }
+.hero__inner .title9--hero { order: 1; }
+.hero__inner > .hero9__stage { order: 2; }
+.hero__inner > .hero__controls { order: 3; }
+.hero__inner > .table9 { order: 4; margin-top: 22px; }
+.hero9__winner { order: 5; position: static !important; translate: none !important; margin-top: 16px !important; }
+.hero__inner:has(> .table9) .hero9__winner { display: none !important; }
+.hero9__stage + .table9 + .hero__controls { margin-top: -31px !important; }
+@media (max-width: 760px) { .hero9__stage + .table9 + .hero__controls { margin-top: 12px !important; } }
+/* the big blocks no longer fade in (a half-faded game stage looked broken after an anchor jump) — they only rise */
+@keyframes lift9 { from { scale: .96; translate: 0 40px; } to { scale: 1; translate: 0 0; } }
+.sect { scroll-margin-top: 0; }
